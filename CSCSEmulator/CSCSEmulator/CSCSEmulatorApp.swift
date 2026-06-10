@@ -1,0 +1,17 @@
+//
+//  CSCSEmulatorApp.swift
+//  CSCSEmulator
+//
+//  Created by Tony Tallman on 6/10/26.
+//
+
+import SwiftUI
+
+@main
+struct CSCSEmulatorApp: App {
+    var body: some Scene {
+        WindowGroup {
+            ContentView()
+        }
+    }
+}
