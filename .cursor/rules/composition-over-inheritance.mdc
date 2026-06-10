@@ -1,0 +1,40 @@
+---
+description: Prefer composition over inheritance for CSCS BLE Emulator
+globs: **/*.swift
+alwaysApply: false
+---
+
+# Composition Over Inheritance
+
+Build behavior by composing small, focused types rather than growing class hierarchies.
+
+## Rules
+
+- Prefer protocols and protocol extensions for shared behavior instead of base classes.
+- Compose capabilities from small types with constructor-injected collaborators; see [dependency-injection.mdc](.cursor/rules/dependency-injection.mdc).
+- Favor value types (`struct`, `enum`) unless reference semantics are required.
+- Use class inheritance only for framework superclass requirements (for example, `NSObject`). Delegate protocols are fine; keep behavior composed behind them.
+- Avoid deep inheritance chains; if a subclass overrides more than a few methods, refactor toward composition.
+
+## Examples
+
+```swift
+// ❌ BAD — behavior locked in a base class hierarchy
+class BaseMeasurementEncoder {
+    func encode() -> Data { fatalError("override") }
+}
+final class CSCSMeasurementEncoder: BaseMeasurementEncoder {
+    override func encode() -> Data { /* ... */ }
+}
+
+// ✅ GOOD — protocol + composed collaborator
+protocol MeasurementEncoding {
+    func encode() -> Data
+}
+struct CSCSMeasurementEncoder: MeasurementEncoding {
+    private let wheelRevolutionSource: WheelRevolutionSource
+    func encode() -> Data { /* use wheelRevolutionSource */ }
+}
+```
+
+Wire composed types at the composition root.
