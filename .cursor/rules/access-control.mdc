@@ -1,0 +1,67 @@
+---
+description: Swift access control — most restrictive visibility; prefer package over @testable import
+globs: **/*.swift
+alwaysApply: false
+---
+
+# Access Control
+
+Use the most restrictive visibility that still satisfies the call site. Do not leave members at `internal` (the default) when a narrower level works.
+
+## Visibility Order (most to least restrictive)
+
+`private` → `fileprivate` → `package` → `internal` → `public` → `open`
+
+## Rules
+
+- **`private`**: default for members used only inside the enclosing type.
+- **`fileprivate`**: sharing within a single source file (e.g. co-located test helpers, file-scoped collaborators).
+- **`package`**: API shared with other targets in the same Swift package (including unit tests). Prefer this over `internal` + `@testable import`.
+- **`internal`**: cross-file use within the app module when tests do not need access.
+- **`public` / `open`**: only for library or framework API consumed outside the package.
+
+When adding or changing a type, method, or property, start at `private` and widen only when required.
+
+## Testing
+
+- Mark types and members that tests need as `package`, then use a normal `import CSCSEmulator` in test files.
+- Reserve `@testable import` for legacy code or cases where `package` is not viable; do not use it to avoid choosing an explicit access level.
+- Prefer testing through `package` public surface or injected protocols rather than widening `internal` state.
+
+## Examples
+
+```swift
+// ❌ BAD — internal detail exposed to all module code and tests via @testable
+struct CoastingModel {
+    func decayedSpeed(from speed: Speed) -> Speed { ... }
+}
+
+// test file
+@testable import CSCSEmulator
+
+// ✅ GOOD — explicit test-facing visibility without @testable
+package struct CoastingModel {
+    package init(decayFactor: Double = 0.98, zeroEpsilon: Double = 0.01) { ... }
+
+    package func decayedSpeed(from speed: Speed) -> Speed { ... }
+}
+
+// test file
+import CSCSEmulator
+```
+
+```swift
+// ❌ BAD — public when only AppContainer needs it
+public final class SimulationEngine { ... }
+
+// ✅ GOOD — package for app + tests; private for tick implementation
+package final class SimulationEngine {
+    package init(...) { ... }
+
+    package func start() { ... }
+
+    private func tick() { ... }
+}
+```
+
+See [unit-testing.mdc](.cursor/rules/unit-testing.mdc) for test structure; see [dependency-injection.mdc](.cursor/rules/dependency-injection.mdc) for testability via protocols.

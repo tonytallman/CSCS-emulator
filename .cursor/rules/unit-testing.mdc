@@ -15,7 +15,7 @@ All unit tests use Swift Testing and mirror the relative folder structure of the
 
 ```swift
 import Testing
-@testable import CSCSEmulator
+import CSCSEmulator
 
 @Suite struct TypeUnderTestTests {
     @Test func describesExpectedBehavior() {
@@ -24,6 +24,8 @@ import Testing
     }
 }
 ```
+
+Use `@testable import CSCSEmulator` only when a type under test cannot be marked `package`; see [access-control.mdc](.cursor/rules/access-control.mdc).
 
 ## Mirrored Folder Structure
 

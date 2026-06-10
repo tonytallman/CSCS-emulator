@@ -1,0 +1,60 @@
+---
+description: Require trailing commas in multiline comma-separated constructs
+alwaysApply: true
+---
+
+# Trailing Commas
+
+Always include a trailing comma in multiline comma-separated constructs wherever the language allows it. Single-line constructs do not need trailing commas.
+
+## Apply To
+
+- Function, initializer, method, closure, and generic parameter lists
+- Argument lists and call sites
+- Array and dictionary literals
+- Enum cases with associated values
+- Tuple literals and tuple types
+- Multiline declarations or builder-style DSL blocks when comma syntax is used
+
+## Examples
+
+```swift
+// ❌ BAD — multiline without trailing comma
+func configure(
+    name: String,
+    mode: OperatingMode
+) { }
+
+let values = [
+    1,
+    2,
+    3
+]
+
+let settings: [String: Int] = [
+    "a": 1,
+    "b": 2
+]
+
+// ✅ GOOD — trailing comma on every multiline element
+func configure(
+    name: String,
+    mode: OperatingMode,
+) { }
+
+let values = [
+    1,
+    2,
+    3,
+]
+
+let settings: [String: Int] = [
+    "a": 1,
+    "b": 2,
+]
+
+// ✅ GOOD — single-line, no trailing comma required
+let compact = [1, 2, 3]
+```
+
+When editing existing multiline lists, add trailing commas as part of the change rather than leaving mixed formatting.
