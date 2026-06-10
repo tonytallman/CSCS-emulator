@@ -34,4 +34,18 @@ enum SimulatorRanges {
     static let speedMax = Speed.milesPerHour(50)
     static let cadenceMin = Cadence.rpm(0)
     static let cadenceMax = Cadence.rpm(200)
+
+    static func clampedSpeed(_ speed: Speed) -> Speed {
+        let mph = speed.converted(to: .milesPerHour).value
+        let minMPH = speedMin.converted(to: .milesPerHour).value
+        let maxMPH = speedMax.converted(to: .milesPerHour).value
+        return .milesPerHour(min(max(mph, minMPH), maxMPH))
+    }
+
+    static func clampedCadence(_ cadence: Cadence) -> Cadence {
+        let rpm = cadence.converted(to: .revolutionsPerMinute).value
+        let minRPM = cadenceMin.converted(to: .revolutionsPerMinute).value
+        let maxRPM = cadenceMax.converted(to: .revolutionsPerMinute).value
+        return .rpm(min(max(rpm, minRPM), maxRPM))
+    }
 }

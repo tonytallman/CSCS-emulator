@@ -118,6 +118,9 @@ CSCSEmulator/
 │   └── RunningViewModel.swift
 ├── Simulation/
 │   ├── SimulationEngine.swift
+│   ├── PedalingState.swift
+│   ├── CoastingState.swift
+│   ├── RandomState.swift
 │   ├── RandomCadenceGenerator.swift
 │   └── CoastingModel.swift
 ├── BLE/

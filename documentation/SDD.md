@@ -213,6 +213,9 @@ The view models act as the boundary between UI and application logic.
 
 ```text
 SimulationEngine
+PedalingState
+CoastingState
+RandomState
 RandomCadenceGenerator
 CoastingModel
 ```
@@ -274,23 +277,42 @@ enum OperatingMode {
 
 ---
 
-## SimulatorState
+## SimulatorVitals
+
+Shared measurement and capability data carried by every operating-mode state:
 
 ```swift
-struct SimulatorState {
-    var mode: OperatingMode
-
+struct SimulatorVitals {
     var speed: Speed
     var cadence: Cadence
-
     var supportsSpeed: Bool
     var supportsCadence: Bool
-
-    var isRunning: Bool
 }
 ```
 
-The Simulation Engine owns this state.
+## SimulatorState
+
+Mode-specific behavior is encapsulated behind a protocol. Each concrete state type owns a `SimulatorVitals` value and implements tick and input rules for its operating mode:
+
+```swift
+protocol SimulatorState {
+    var mode: OperatingMode { get }
+    var vitals: SimulatorVitals { get }
+    func tick() -> any SimulatorState
+    func setSpeed(_ speed: Speed) -> any SimulatorState
+    func setCadence(_ cadence: Cadence) -> any SimulatorState
+}
+```
+
+Concrete implementations:
+
+```text
+PedalingState   — user-controlled speed/cadence; tick is a no-op
+CoastingState   — zero cadence on entry; decays speed each tick
+RandomState     — random-walk cadence with derived speed; input ignored
+```
+
+The Simulation Engine owns the active `any SimulatorState` and the running lifecycle (`isRunning`).
 
 ---
 
@@ -298,10 +320,10 @@ The Simulation Engine owns this state.
 
 ## Responsibilities
 
-* Maintain current state
-* Execute simulation updates
+* Maintain the active operating-mode state
+* Execute simulation updates by delegating to the current `SimulatorState`
 * Publish state changes
-* Apply operating mode rules
+* Construct mode-specific states on mode transitions
 
 ## Update Frequency
 
@@ -465,7 +487,7 @@ The implementation shall follow the Bluetooth SIG CSCS specification.
 
 ## Measurement Characteristic
 
-Measurement packets shall be generated from the current SimulatorState.
+Measurement packets shall be generated from the current simulator vitals (speed, cadence, and capability flags) exposed by the active `SimulatorState`.
 
 The packet encoder shall be isolated from BLE transport logic.
 
@@ -541,7 +563,7 @@ The encoder converts `Speed` and `Cadence` measurements to the raw integer wheel
 ### Inputs
 
 ```swift
-SimulatorState
+any SimulatorState
 ```
 
 ### Outputs
@@ -602,6 +624,9 @@ CSCSEmulator/
 │
 ├── Simulation/
 │   ├── SimulationEngine.swift
+│   ├── PedalingState.swift
+│   ├── CoastingState.swift
+│   ├── RandomState.swift
 │   ├── RandomCadenceGenerator.swift
 │   └── CoastingModel.swift
 │
