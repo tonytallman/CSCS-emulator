@@ -1,0 +1,50 @@
+---
+description: Unit testing conventions - Swift Testing, mirrored folders, tests with functional changes
+alwaysApply: true
+---
+
+# Unit Testing
+
+All unit tests use Swift Testing and mirror the relative folder structure of the code under test.
+
+## Swift Testing
+
+- Use [Swift Testing](https://developer.apple.com/documentation/testing) (`import Testing`), not XCTest.
+- Use `@Test`, `#expect`, and `@Suite` where appropriate.
+- Name test types `{TypeUnderTest}Tests` (e.g. `CoastingModelTests`).
+
+```swift
+import Testing
+@testable import CSCSEmulator
+
+@Suite struct TypeUnderTestTests {
+    @Test func describesExpectedBehavior() {
+        let result = TypeUnderTest().performAction()
+        #expect(result == .expectedValue)
+    }
+}
+```
+
+## Mirrored Folder Structure
+
+- Test target root: `CSCSEmulatorTests/`
+- Preserve the subdirectory path under `CSCSEmulator/` (drop only the `CSCSEmulator/` prefix).
+- Prefer one mirrored test file per primary source type; append `Tests` to the filename.
+- When adding, moving, or renaming source files, apply the same change to the mirrored test path.
+
+Examples:
+
+- `CSCSEmulator/Simulation/CoastingModel.swift` -> `CSCSEmulatorTests/Simulation/CoastingModelTests.swift`
+- `CSCSEmulator/BLE/CSCSMeasurementEncoder.swift` -> `CSCSEmulatorTests/BLE/CSCSMeasurementEncoderTests.swift`
+- `CSCSEmulator/ViewModels/RunningViewModel.swift` -> `CSCSEmulatorTests/ViewModels/RunningViewModelTests.swift`
+
+`App/` and pure SwiftUI `Views/` may have little unit-test coverage; mirror structure when tests are added (e.g. ViewModel tests under `ViewModels/`, not `Views/`).
+
+## Tests With Functional Changes
+
+- Any change that adds, removes, or changes behavior must include corresponding unit test additions, removals, or updates in the mirrored test file.
+- Exemptions: documentation-only, assets, or project config with no behavior change; pure refactors that do not alter observable behavior (existing tests must still pass).
+- If a functional change does not update tests, the final summary must explicitly state why tests were not applicable.
+- Treat missing or outdated tests as incomplete work.
+
+See [`.cursor/rules/dependency-injection.mdc`](.cursor/rules/dependency-injection.mdc) for testability conventions (protocols, constructor injection).

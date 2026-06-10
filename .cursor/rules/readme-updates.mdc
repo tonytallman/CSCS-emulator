@@ -1,0 +1,29 @@
+---
+description: Keep README.md in sync with code changes when user-facing or project docs are affected
+alwaysApply: true
+---
+
+# README Updates
+
+Every code change should be evaluated for whether [README.md](README.md) needs updating. When the change affects something README currently documents (or should document), update README in the same change.
+
+## Update README When a Change
+
+- Adds, removes, or changes a user-facing feature, screen, control, or behavior
+- Changes supported platforms, BLE behavior, operating modes, or architecture components listed in README
+- Adds, removes, or renames modules/files under the documented project structure
+- Changes the technology stack, dependencies, or how to build/run the app (once those sections exist)
+
+## Skip README Updates When a Change
+
+- Is internal-only (refactors, test-only, DI wiring) with no effect on features, structure, or usage described in README
+- Fixes a bug that restores already-documented intended behavior
+- Touches files or concerns README does not cover and does not need to cover yet
+
+## Guidelines
+
+- Match README's existing sections and tone (overview tables, architecture table, project structure tree).
+- Update only the sections affected; avoid unrelated rewrites.
+- Do not document features in README until they are ready for users.
+- Detailed design belongs in [documentation/SDD.md](documentation/SDD.md); README stays concise and user/developer oriented.
+- If README does not need an update for a functional change, the final summary must explicitly state that README was considered and why it was not changed.
