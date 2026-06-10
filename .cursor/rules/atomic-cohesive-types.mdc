@@ -1,0 +1,55 @@
+---
+description: Encourage atomic cohesive Swift types
+globs: **/*.swift
+alwaysApply: false
+---
+
+# Atomic Cohesive Types
+
+When a type accumulates multiple responsibilities, modes, policies, algorithms, or state transitions, extract those concerns into small, named collaborators.
+
+## Rules
+
+- Prefer atomic types with one clear responsibility and one reason to change.
+- Extract distinct behavior modes into cohesive collaborators when branching by state or mode becomes central to the type.
+- Treat State, Strategy, Policy, Command, value objects, and small domain services as valid decomposition tools.
+- Extract only when there is a concrete threshold: recurring branching on mode/state, or a responsibility that is independently testable. Do not force patterns onto trivial code.
+- Keep extracted types cohesive, not just collections of thin helper methods. For wiring, see [composition-over-inheritance.mdc](.cursor/rules/composition-over-inheritance.mdc).
+
+## Example
+
+State Pattern is one valid decomposition when modes have distinct rules—not mandatory for every simulator-like type.
+
+```swift
+// ❌ BAD — one type owns every behavior mode
+final class Simulator {
+    func tick() {
+        switch mode {
+        case .pedaling: ...
+        case .coasting: ...
+        case .random: ...
+        }
+    }
+}
+
+// ✅ GOOD — explicit behavior objects when modes have distinct rules
+final class Simulator {
+    private var state: SimulatorState
+
+    func tick() {
+        state = state.tick()
+    }
+}
+
+protocol SimulatorState {
+    func tick() -> SimulatorState
+}
+
+extension Simulator {
+    struct PedalingState: SimulatorState { ... }
+    struct CoastingState: SimulatorState { ... }
+    struct RandomState: SimulatorState { ... }
+}
+```
+
+Use the smallest decomposition that makes the domain clearer.
