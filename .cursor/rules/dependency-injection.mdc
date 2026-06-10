@@ -1,0 +1,46 @@
+---
+description: Dependency injection and composition-root conventions for CSCS BLE Emulator
+globs: **/*.swift
+alwaysApply: false
+---
+
+# Dependency Injection
+
+Construct and wire dependencies only at the composition root (`AppContainer`, instantiated once in `CSCSEmulatorApp`).
+
+## Rules
+
+- Use initializer (constructor) injection for all collaborators.
+- Depend on protocol abstractions, not concrete types, where testability matters.
+- No singletons, global shared state, or service locators outside `AppContainer`.
+- Views receive fully built view models from the container; they do not construct dependencies.
+- `AppContainer` uses factory methods (e.g. `makeConfigurationViewModel()`) with explicit construction code, not a string-key or dictionary registry.
+
+## Examples
+
+```swift
+// ❌ BAD — resolving inside a view model
+final class RunningViewModel {
+    private let engine = SimulationEngine.shared
+}
+
+// ❌ BAD — constructing BLE manager inline in a view
+struct RunningView: View {
+    @StateObject private var viewModel = RunningViewModel(
+        engine: SimulationEngine(),
+        peripheralManager: CSCPeripheralManager()
+    )
+}
+
+// ✅ GOOD — container owns lifetimes and wiring
+final class AppContainer {
+    private let simulationEngine = SimulationEngine()
+    private lazy var peripheralManager = CSCPeripheralManager(engine: simulationEngine)
+
+    func makeRunningViewModel() -> RunningViewModel {
+        RunningViewModel(engine: simulationEngine, peripheralManager: peripheralManager)
+    }
+}
+```
+
+See [documentation/SDD.md](documentation/SDD.md) section 3.1 for the full design.

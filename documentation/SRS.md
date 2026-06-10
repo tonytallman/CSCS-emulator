@@ -1,8 +1,8 @@
-# CSCS Emulator Requirements
+# CSCS BLE Emulator Requirements
 
 ## 1. Overview
 
-The CSCS Emulator is a cross-platform application that advertises and publishes simulated Bluetooth Low Energy (BLE) Cycling Speed and Cadence Service (CSCS) data.
+The CSCS BLE Emulator is a cross-platform application that advertises and publishes simulated Bluetooth Low Energy (BLE) Cycling Speed and Cadence Service (CSCS) data.
 
 The primary purpose of the application is to allow developers, testers, and users to simulate a cycling speed and cadence sensor without requiring dedicated hardware.
 
@@ -41,7 +41,7 @@ Advertising and transmitting CSCS measurement data via BLE.
 ### 3.1 Configuration Screen
 
 Before the emulator starts, the user shall be able to configure which metrics are supported by the simulated device.
-See ./designs/configuration.png.
+See ./designs/configuration.png (visual reference only; screen mockups currently cover iPhone layout).
 
 #### Controls
 
@@ -66,7 +66,7 @@ See ./designs/configuration.png.
 ### 3.2 Running Screen
 
 After the emulator starts, the application shall transition to a running state.
-See ./designs/running.png.
+See ./designs/running.png (visual reference only; screen mockups currently cover iPhone layout).
 
 #### Controls
 
@@ -86,6 +86,15 @@ The Speed Slider shall be visible only when Speed support was enabled during con
 ##### Cadence Slider
 
 The Cadence Slider shall be visible only when Cadence support was enabled during configuration.
+
+#### Slider Ranges
+
+| Slider  | Range (MPH or RPM) |
+| ------- | ------------------ |
+| Speed   | 0–50 MPH           |
+| Cadence | 0–200 RPM          |
+
+These ranges shall accommodate Random-mode derived speed (200 RPM corresponds to approximately 44 MPH).
 
 ---
 
@@ -121,7 +130,7 @@ The emulator shall support at most one connected BLE central device at a time.
 
 - If no central is connected, connection requests shall be accepted.
 - If a central is already connected, additional connection requests shall be rejected.
-- The user interface shall display connection status.
+- Connection status display is a future enhancement; see section 8.
 - The identity of the connected central is not required to be displayed.
 
 ---

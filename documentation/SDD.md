@@ -1,8 +1,8 @@
-# CSCS Emulator Software Design Document
+# CSCS BLE Emulator Software Design Document
 
 ## 1. Purpose
 
-This document describes the software architecture and implementation approach for the CSCS Emulator application.
+This document describes the software architecture and implementation approach for the CSCS BLE Emulator application.
 
 The application simulates a Bluetooth Low Energy (BLE) Cycling Speed and Cadence Service (CSCS) peripheral and allows users to control the transmitted data through a graphical user interface.
 
@@ -83,6 +83,46 @@ View models communicate with the simulation engine.
 
 The BLE subsystem observes simulator state and publishes measurement updates.
 
+`CSCSEmulatorApp` is the composition root. It instantiates `AppContainer` once and uses it to construct view models and long-lived collaborators. See section 3.1.
+
+---
+
+## 3.1 Dependency Injection
+
+Dependencies are constructed and wired at a single composition root using a code-based container, not a string-key or dictionary registry.
+
+### AppContainer
+
+`AppContainer` holds factory methods that construct fully wired objects:
+
+```swift
+final class AppContainer {
+    private let simulationEngine: SimulationEngine
+    private let peripheralManager: CSCPeripheralManager
+
+    init() { /* construct shared collaborators */ }
+
+    func makeConfigurationViewModel() -> ConfigurationViewModel { ... }
+    func makeRunningViewModel() -> RunningViewModel { ... }
+}
+```
+
+Rationale:
+
+* Compile-time safety without a DI framework
+* Explicit construction order and object lifetimes
+* Factory methods are more flexible than a simple dependency dictionary
+
+### Lifetimes
+
+Long-lived collaborators (`SimulationEngine`, `CSCPeripheralManager`) are stored properties on `AppContainer` so they can be shared (for example, the simulation engine is shared by the running view model and the BLE peripheral manager).
+
+### Injection Rules
+
+* Components depend on protocol abstractions and receive collaborators via initializers.
+* Views receive fully constructed view models from the container.
+* No singletons, global shared state, or service locators outside `AppContainer`.
+
 ---
 
 # 4. Technology Stack
@@ -104,6 +144,10 @@ The BLE subsystem observes simulator state and publishes measurement updates.
 * Swift Concurrency
 * MainActor for UI updates
 
+## Units
+
+* Foundation `Measurement` for unit-safe speed and cadence quantities
+
 ## Platforms
 
 * iOS
@@ -120,9 +164,10 @@ The BLE subsystem observes simulator state and publishes measurement updates.
 
 * Display configuration controls
 * Display simulator controls
-* Display connection status
 * Display current speed and cadence
 * Display error messages
+
+Screen mockups in `./designs/` are visual references only (currently iPhone layout). iPadOS and macOS layouts are required but not yet mocked.
 
 ### Components
 
@@ -176,6 +221,34 @@ CoastingModel
 
 # 6. Simulator State Model
 
+## Units
+
+Speed and cadence are represented using Foundation `Measurement` rather than raw `Double` values.
+
+Type aliases (defined in `Models/Units.swift`):
+
+```swift
+typealias Speed = Measurement<UnitSpeed>
+typealias Cadence = Measurement<UnitFrequency>
+```
+
+Custom RPM unit on `UnitFrequency` (RPM = 1/60 Hz):
+
+```swift
+extension UnitFrequency {
+    static let revolutionsPerMinute = UnitFrequency(
+        symbol: "rpm",
+        converter: UnitConverterLinear(coefficient: 1.0 / 60.0)
+    )
+}
+```
+
+`UnitSpeed.milesPerHour` is used for speed; no custom speed unit is required.
+
+Display formatting uses `MeasurementFormatter` (or `.formatted()`) in views and view models.
+
+---
+
 ## SimulatorConfiguration
 
 ```swift
@@ -207,8 +280,8 @@ enum OperatingMode {
 struct SimulatorState {
     var mode: OperatingMode
 
-    var speedMPH: Double
-    var cadenceRPM: Double
+    var speed: Speed
+    var cadence: Cadence
 
     var supportsSpeed: Bool
     var supportsCadence: Bool
@@ -263,7 +336,7 @@ No automatic updates occur.
 Immediately upon entering coasting mode:
 
 ```text
-cadenceRPM = 0
+cadence = 0 rpm
 ```
 
 The current speed value is retained.
@@ -273,7 +346,7 @@ The current speed value is retained.
 Each simulation tick:
 
 ```text
-speedRPM = decay(speedRPM)
+speed = decay(speed)
 ```
 
 until speed reaches zero.
@@ -283,7 +356,7 @@ until speed reaches zero.
 The initial implementation may use:
 
 ```text
-speed = speed * 0.98
+speed = Speed(value: speed.converted(to: .milesPerHour).value * 0.98, unit: .milesPerHour)
 ```
 
 per simulation tick.
@@ -337,20 +410,21 @@ cadence =
 Where:
 
 ```text
-randomDelta ∈ [-2,+2]
-biasToward90 = (90 - cadence) * 0.02
+randomDelta ∈ [-2,+2] rpm
+biasToward90 = (90 - cadenceInRPM) * 0.02
 ```
 
-The exact constants may be tuned.
+The exact constants may be tuned. Cadence values are stored as `Cadence` measurements using `.revolutionsPerMinute`.
 
 ---
 
 ## Speed Generation
 
-Speed is derived from cadence.
+Speed is derived from cadence:
 
 ```text
-speedMPH = cadenceRPM * 20.0 / 90.0
+speedMPH = cadenceInRPM * 20.0 / 90.0
+speed = Speed(value: speedMPH, unit: .milesPerHour)
 ```
 
 ---
@@ -452,14 +526,7 @@ reject additional connection
 
 ## UI Display
 
-The running screen shall display:
-
-```text
-Not Connected
-Connected
-```
-
-No additional central details are required.
+Connection status display is a future enhancement. The running screen is not required to show connection state in the initial release.
 
 ---
 
@@ -468,6 +535,8 @@ No additional central details are required.
 ## Responsibilities
 
 Convert simulator state into valid CSCS measurement packets.
+
+The encoder converts `Speed` and `Cadence` measurements to the raw integer wheel and crank units required by the CSCS packet format. This conversion happens at the encoder boundary; the encoder remains free of CoreBluetooth dependencies.
 
 ### Inputs
 
@@ -513,9 +582,11 @@ Errors should be user-visible and logged.
 CSCSEmulator/
 
 ├── App/
-│   └── CSCSEmulatorApp.swift
+│   ├── CSCSEmulatorApp.swift
+│   └── AppContainer.swift
 │
 ├── Models/
+│   ├── Units.swift
 │   ├── SimulatorConfiguration.swift
 │   ├── SimulatorState.swift
 │   ├── OperatingMode.swift
