@@ -5,7 +5,7 @@ alwaysApply: true
 
 # Trailing Commas
 
-Always include a trailing comma in multiline comma-separated constructs wherever the language allows it. Single-line constructs do not need trailing commas.
+Always include a trailing comma in multiline comma-separated constructs. Single-line constructs do not need trailing commas.
 
 ## Apply To
 

@@ -27,6 +27,18 @@ final class AppContainer {
         peripheralManager = CSCPeripheralManager { engine.state.vitals }
     }
 
-    // Phase 5+: makeConfigurationViewModel() -> ConfigurationViewModel
-    // Phase 5+: makeRunningViewModel() -> RunningViewModel
+    func makeConfigurationViewModel() -> ConfigurationViewModel {
+        ConfigurationViewModel(
+            simulation: simulationEngine,
+            broadcaster: peripheralManager,
+        )
+    }
+
+    func makeRunningViewModel() -> RunningViewModel {
+        RunningViewModel(
+            simulation: simulationEngine,
+            broadcaster: peripheralManager,
+            observableEngine: simulationEngine,
+        )
+    }
 }

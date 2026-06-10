@@ -13,7 +13,10 @@ struct CSCSEmulatorApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            RootView(
+                configurationViewModel: container.makeConfigurationViewModel(),
+                runningViewModel: container.makeRunningViewModel()
+            )
         }
     }
 }

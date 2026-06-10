@@ -82,10 +82,10 @@ The app follows MVVM with a clear separation of concerns:
 
 | Layer | Components |
 | --- | --- |
-| UI | `ConfigurationView`, `RunningView` |
+| UI | `RootView`, `ConfigurationView`, `RunningView` |
 | View Models | `ConfigurationViewModel`, `RunningViewModel` |
 | Simulation | `SimulationEngine`, `RandomCadenceGenerator`, `CoastingModel` |
-| BLE | `CSCPeripheralManager`, `CSCSMeasurementEncoder`, `BLEConnectionManager` |
+| BLE | `CSCPeripheralManager`, `CSCSMeasurementEncoder`, `CentralSubscriptionTracker` |
 
 Dependencies are wired at a single composition root (`AppContainer`) using constructor injection — no singletons or service locators.
 
@@ -111,6 +111,7 @@ CSCSEmulator/
 │   ├── OperatingMode.swift
 │   └── AppError.swift
 ├── Views/
+│   ├── RootView.swift
 │   ├── ConfigurationView.swift
 │   └── RunningView.swift
 ├── ViewModels/
@@ -126,7 +127,7 @@ CSCSEmulator/
 ├── BLE/
 │   ├── CSCPeripheralManager.swift
 │   ├── CSCSMeasurementEncoder.swift
-│   └── BLEConnectionManager.swift
+│   └── CentralSubscriptionTracker.swift
 └── Resources/
 ```
 
