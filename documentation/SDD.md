@@ -121,7 +121,7 @@ Long-lived collaborators (`SimulationEngine`, `CSCPeripheralManager`) are stored
 
 * Components depend on protocol abstractions and receive collaborators via initializers.
 * Views receive fully constructed view models from the container.
-* No singletons, global shared state, or service locators outside `AppContainer`.
+* No direct singleton access (e.g. `Type.shared`), global shared state, or service locators outside `AppContainer` and bootstrap code.
 
 ---
 

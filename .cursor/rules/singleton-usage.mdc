@@ -1,0 +1,35 @@
+---
+description: Singleton usage confined to composition root; inject abstractions elsewhere
+globs: **/*.swift
+alwaysApply: false
+---
+
+# Singleton Usage
+
+Singletons may be used when they represent a naturally shared application-wide resource and provide a meaningful simplification of system design.
+
+Knowledge of a singleton's existence must be confined to the dependency container (composition root) and closely related bootstrap code. A type may expose a `static let shared`, but only `AppContainer` and bootstrap code may reference it.
+
+Application code must not directly access singleton instances (for example, `Logger.shared` or `BluetoothManager.shared`). Instead, dependencies should be expressed as protocols or other abstractions and injected through constructors.
+
+Dependent types should remain unaware of whether the provided implementation is a singleton, a newly created instance, or a test double.
+
+Prefer:
+
+```swift
+let sensorService = SensorService(
+    logger: appContainer.sensorLogger
+)
+```
+
+Over:
+
+```swift
+let sensorService = SensorService(
+    logger: Logger.shared
+)
+```
+
+A singleton is an implementation detail of dependency assembly, not a dependency management mechanism.
+
+See [.cursor/rules/dependency-injection.mdc](.cursor/rules/dependency-injection.mdc) for composition-root wiring.

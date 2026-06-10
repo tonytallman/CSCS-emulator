@@ -12,7 +12,8 @@ Construct and wire dependencies only at the composition root (`AppContainer`, in
 
 - Use initializer (constructor) injection for all collaborators.
 - Depend on protocol abstractions, not concrete types, where testability matters.
-- No singletons, global shared state, or service locators outside `AppContainer`.
+- No direct singleton access (e.g. `Type.shared`) outside `AppContainer` and bootstrap code; see [singleton-usage.mdc](.cursor/rules/singleton-usage.mdc).
+- No global shared state or service locators outside `AppContainer`.
 - Views receive fully built view models from the container; they do not construct dependencies.
 - `AppContainer` uses factory methods (e.g. `makeConfigurationViewModel()`) with explicit construction code, not a string-key or dictionary registry.
 
