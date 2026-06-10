@@ -8,19 +8,25 @@
 @MainActor
 final class AppContainer {
     let simulationEngine: SimulationEngine<SystemRandomNumberGenerator>
+    let peripheralManager: CSCPeripheralManager
 
-    init(simulationEngine: SimulationEngine<SystemRandomNumberGenerator>) {
+    init(
+        simulationEngine: SimulationEngine<SystemRandomNumberGenerator>,
+        peripheralManager: CSCPeripheralManager,
+    ) {
         self.simulationEngine = simulationEngine
+        self.peripheralManager = peripheralManager
     }
 
     init() {
-        simulationEngine = SimulationEngine(
+        let engine = SimulationEngine(
             coastingModel: CoastingModel(),
             randomCadenceGenerator: RandomCadenceGenerator(rng: SystemRandomNumberGenerator()),
         )
+        simulationEngine = engine
+        peripheralManager = CSCPeripheralManager { engine.state.vitals }
     }
 
-    // Phase 4+: CSCPeripheralManager (shared)
     // Phase 5+: makeConfigurationViewModel() -> ConfigurationViewModel
     // Phase 5+: makeRunningViewModel() -> RunningViewModel
 }
