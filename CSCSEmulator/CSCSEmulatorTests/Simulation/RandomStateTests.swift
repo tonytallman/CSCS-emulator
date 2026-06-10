@@ -24,10 +24,28 @@ import Testing
         #expect(state.cadence.converted(to: .revolutionsPerMinute).value == 0)
     }
 
-    @Test func tickAdvancesCadenceAndDerivedSpeed() {
+    @Test func tickDoesNotChangeCadenceBeforeOneSecond() {
         let initial = makeState(seed: 123)
         let initialCadence = initial.cadence.converted(to: .revolutionsPerMinute).value
-        let updated = initial.tick() as! RandomState<SplitMix64>
+        let initialSpeed = initial.speed.converted(to: .milesPerHour).value
+
+        var state: any SimulatorState = initial
+        for _ in 0..<9 {
+            state = state.tick()
+            #expect(state.cadence.converted(to: .revolutionsPerMinute).value == initialCadence)
+            #expect(state.speed.converted(to: .milesPerHour).value == initialSpeed)
+        }
+    }
+
+    @Test func tickAdvancesCadenceAndDerivedSpeedOncePerSecond() {
+        let initial = makeState(seed: 123)
+        let initialCadence = initial.cadence.converted(to: .revolutionsPerMinute).value
+
+        var state: any SimulatorState = initial
+        for _ in 0..<10 {
+            state = state.tick()
+        }
+        let updated = state as! RandomState<SplitMix64>
 
         let cadenceRPM = updated.cadence.converted(to: .revolutionsPerMinute).value
         let speedMPH = updated.speed.converted(to: .milesPerHour).value
@@ -44,8 +62,9 @@ import Testing
             internalCadence: .rpm(90),
         )
 
-        state = state.tick()
-        state = state.tick()
+        for _ in 0..<10 {
+            state = state.tick()
+        }
 
         #expect(state.speed.converted(to: .milesPerHour).value > 0)
     }

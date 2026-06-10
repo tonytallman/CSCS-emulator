@@ -18,5 +18,6 @@ struct CSCSEmulatorApp: App {
                 runningViewModel: container.makeRunningViewModel()
             )
         }
+        .defaultSize(width: 480, height: 760)
     }
 }

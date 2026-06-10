@@ -57,7 +57,7 @@ Rider has stopped pedaling. All sliders are disabled. Cadence immediately drops 
 
 ### Random
 
-Simulates a rider pedaling with naturally varying cadence. All sliders are disabled. Cadence follows a bounded random-walk model with a weak tendency toward 90 RPM. Speed is derived from cadence using:
+Simulates a rider pedaling with naturally varying cadence. All sliders are disabled. Cadence follows a bounded random-walk model with a weak tendency toward 90 RPM, updating once per second. Speed is derived from cadence using:
 
 ```
 speed (MPH) = cadence (RPM) × 20 / 90

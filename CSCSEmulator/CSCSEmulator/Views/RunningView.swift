@@ -19,6 +19,8 @@ struct RunningView: View {
                 infoCallout
                 stopButton
             }
+            .frame(maxWidth: 480)
+            .frame(maxWidth: .infinity)
             .padding()
         }
         .navigationTitle("CSCS BLE Emulator")

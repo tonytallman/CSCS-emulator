@@ -17,6 +17,8 @@ struct ConfigurationView: View {
                 infoCallout
                 startButton
             }
+            .frame(maxWidth: 480)
+            .frame(maxWidth: .infinity)
             .padding()
         }
         .navigationTitle("CSCS BLE Emulator")
@@ -97,6 +99,7 @@ struct ConfigurationView: View {
             Spacer()
             Toggle(title, isOn: isOn)
                 .labelsHidden()
+                .toggleStyle(.switch)
         }
         .padding()
     }
