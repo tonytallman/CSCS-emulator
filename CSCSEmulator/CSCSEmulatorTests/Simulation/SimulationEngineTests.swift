@@ -9,7 +9,10 @@ import Testing
 
 @Suite @MainActor struct SimulationEngineTests {
     private func makeEngine() -> SimulationEngine<SplitMix64> {
-        SimulationEngine(randomCadenceGenerator: RandomCadenceGenerator(rng: SplitMix64(seed: 1)))
+        SimulationEngine(
+            coastingModel: CoastingModel(),
+            randomCadenceGenerator: RandomCadenceGenerator(rng: SplitMix64(seed: 1))
+        )
     }
 
     @Test func startSetsRunningAndResetsState() {
@@ -109,6 +112,7 @@ import Testing
 
     @Test func randomModeAdvancesCadenceAndDerivedSpeed() {
         let engine = SimulationEngine(
+            coastingModel: CoastingModel(),
             randomCadenceGenerator: RandomCadenceGenerator(rng: SplitMix64(seed: 123))
         )
         engine.start(configuration: SimulatorConfiguration(supportsSpeed: true, supportsCadence: true))
@@ -129,6 +133,7 @@ import Testing
 
     @Test func randomModeAdvancesInternalCadenceWhenCadenceUnsupported() {
         let engine = SimulationEngine(
+            coastingModel: CoastingModel(),
             randomCadenceGenerator: RandomCadenceGenerator(rng: SplitMix64(seed: 456))
         )
         engine.start(configuration: SimulatorConfiguration(supportsSpeed: true, supportsCadence: false))
