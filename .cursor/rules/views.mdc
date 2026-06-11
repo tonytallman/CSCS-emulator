@@ -1,0 +1,61 @@
+---
+description: Conventions for SwiftUI View types in CSCS BLE Emulator
+globs: **/*.swift
+alwaysApply: false
+---
+
+# Views
+
+SwiftUI `View` types are responsible for layout and presentation only. They contain no business logic, no state mutations, and no direct access to services or engines.
+
+## Rules
+
+- A `View` has exactly one primary dependency, which is either:
+  - A **view model** (for screens and significant composed UI), or
+  - A **model value** (for simple, reusable control views that display or bind a single value).
+- Logic that determines what to show, what action to take, or how to transform data belongs in a view model, not in the view.
+- Views do not construct their own dependencies. All dependencies are passed in from outside (see [dependency-injection.mdc](.cursor/rules/dependency-injection.mdc)).
+- Multi-parameter view initialisers are a signal that logic or wiring is leaking into the view layer.
+
+## Examples
+
+```swift
+// ❌ BAD — view takes multiple top-level dependencies (wiring belongs in view model)
+struct RunningView: View {
+    var viewModel: RunningViewModel
+    var peripheralManager: CSCPeripheralManager
+    var simulationEngine: SimulationEngine<SystemRandomNumberGenerator>
+}
+
+// ❌ BAD — business logic inside the view body
+struct RunningView: View {
+    var viewModel: RunningViewModel
+
+    var body: some View {
+        // deciding what to show based on raw engine state — belongs in view model
+        if viewModel.engine.state.vitals.speed.value > 0 {
+            SpeedView()
+        }
+    }
+}
+
+// ✅ GOOD — screen view with a single view model dependency
+struct RunningView: View {
+    @Bindable var viewModel: RunningViewModel
+
+    var body: some View {
+        if viewModel.supportsSpeed {
+            SpeedView()
+        }
+    }
+}
+
+// ✅ GOOD — reusable control view with a plain model value
+struct MetricCardView: View {
+    var metric: Metric
+
+    var body: some View {
+        Text(metric.formatted)
+    }
+}
+```
