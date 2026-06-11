@@ -4,19 +4,10 @@
 //
 
 /// Composition root: constructs and wires application dependencies.
-/// Factory methods for view models and long-lived collaborators arrive in later phases.
 @MainActor
 final class AppContainer {
-    let simulationEngine: SimulationEngine<SystemRandomNumberGenerator>
-    let peripheralManager: CSCPeripheralManager
-
-    init(
-        simulationEngine: SimulationEngine<SystemRandomNumberGenerator>,
-        peripheralManager: CSCPeripheralManager,
-    ) {
-        self.simulationEngine = simulationEngine
-        self.peripheralManager = peripheralManager
-    }
+    private let simulationEngine: SimulationEngine<SystemRandomNumberGenerator>
+    private let peripheralManager: CSCPeripheralManager
 
     init() {
         let engine = SimulationEngine(
@@ -27,18 +18,26 @@ final class AppContainer {
         peripheralManager = CSCPeripheralManager { engine.state.vitals }
     }
 
-    func makeConfigurationViewModel() -> ConfigurationViewModel {
+    private func makeConfigurationViewModel() -> ConfigurationViewModel {
         ConfigurationViewModel(
             simulation: simulationEngine,
             broadcaster: peripheralManager,
         )
     }
 
-    func makeRunningViewModel() -> RunningViewModel {
+    private func makeRunningViewModel() -> RunningViewModel {
         RunningViewModel(
             simulation: simulationEngine,
             broadcaster: peripheralManager,
-            observableEngine: simulationEngine,
+            simulationEngine: simulationEngine,
+        )
+    }
+
+    func makeRootViewModel() -> RootViewModel {
+        RootViewModel(
+            configurationViewModel: makeConfigurationViewModel(),
+            runningViewModel: makeRunningViewModel(),
+            simulationEngine: simulationEngine,
         )
     }
 }

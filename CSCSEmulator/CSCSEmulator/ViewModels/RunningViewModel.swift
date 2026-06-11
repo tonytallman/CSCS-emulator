@@ -11,9 +11,7 @@ import Observation
 final class RunningViewModel {
     private let simulation: SimulationControlling
     private let broadcaster: MeasurementBroadcasting
-
-    /// When set, SwiftUI can observe live simulation updates through this engine.
-    let observableEngine: (any SimulationControlling & AnyObject)?
+    let simulationEngine: SimulationEngine<SystemRandomNumberGenerator>?
 
     private static let speedFormatter: MeasurementFormatter = {
         let formatter = MeasurementFormatter()
@@ -33,11 +31,11 @@ final class RunningViewModel {
     init(
         simulation: SimulationControlling,
         broadcaster: MeasurementBroadcasting,
-        observableEngine: (any SimulationControlling & AnyObject)? = nil
+        simulationEngine: SimulationEngine<SystemRandomNumberGenerator>? = nil,
     ) {
         self.simulation = simulation
         self.broadcaster = broadcaster
-        self.observableEngine = observableEngine
+        self.simulationEngine = simulationEngine
     }
 
     var isRunning: Bool {

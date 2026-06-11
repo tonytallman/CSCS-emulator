@@ -7,7 +7,6 @@ import SwiftUI
 
 struct RunningView: View {
     @Bindable var viewModel: RunningViewModel
-    var engine: SimulationEngine<SystemRandomNumberGenerator>?
     @State private var showError = false
 
     var body: some View {
@@ -25,7 +24,7 @@ struct RunningView: View {
         }
         .navigationTitle("CSCS BLE Emulator")
         .background {
-            if let engine {
+            if let engine = viewModel.simulationEngine {
                 SimulationObservation(engine: engine)
             }
         }

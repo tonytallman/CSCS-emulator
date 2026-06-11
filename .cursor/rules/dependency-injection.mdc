@@ -16,6 +16,7 @@ Construct and wire dependencies only at the composition root (`AppContainer`, in
 - No global shared state or service locators outside `AppContainer`.
 - Views receive fully built view models from the container; they do not construct dependencies.
 - `AppContainer` uses factory methods (e.g. `makeConfigurationViewModel()`) with explicit construction code, not a string-key or dictionary registry.
+- All stored properties and intermediate factory methods on `AppContainer` must be `private`. Only `init()` and the single root-object factory (typically `makeRootViewModel()`) are internal or wider.
 
 ## Examples
 
@@ -33,13 +34,19 @@ struct RunningView: View {
     )
 }
 
-// ✅ GOOD — container owns lifetimes and wiring
+// ✅ GOOD — container owns lifetimes and wiring; only init and root factory are non-private
 final class AppContainer {
     private let simulationEngine = SimulationEngine()
     private lazy var peripheralManager = CSCPeripheralManager(engine: simulationEngine)
 
-    func makeRunningViewModel() -> RunningViewModel {
+    // private — intermediate factory consumed only by makeRootViewModel
+    private func makeRunningViewModel() -> RunningViewModel {
         RunningViewModel(engine: simulationEngine, peripheralManager: peripheralManager)
+    }
+
+    // internal — the single entry point exposed to the app entry point
+    func makeRootViewModel() -> RootViewModel {
+        RootViewModel(runningViewModel: makeRunningViewModel())
     }
 }
 ```

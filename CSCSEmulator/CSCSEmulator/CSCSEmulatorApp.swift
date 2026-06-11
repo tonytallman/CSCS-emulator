@@ -13,10 +13,7 @@ struct CSCSEmulatorApp: App {
 
     var body: some Scene {
         WindowGroup {
-            RootView(
-                configurationViewModel: container.makeConfigurationViewModel(),
-                runningViewModel: container.makeRunningViewModel()
-            )
+            RootView(viewModel: container.makeRootViewModel())
         }
         .defaultSize(width: 480, height: 760)
     }

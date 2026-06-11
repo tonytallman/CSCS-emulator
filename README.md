@@ -83,7 +83,7 @@ The app follows MVVM with a clear separation of concerns:
 | Layer | Components |
 | --- | --- |
 | UI | `RootView`, `ConfigurationView`, `RunningView` |
-| View Models | `ConfigurationViewModel`, `RunningViewModel` |
+| View Models | `RootViewModel`, `ConfigurationViewModel`, `RunningViewModel` |
 | Simulation | `SimulationEngine`, `RandomCadenceGenerator`, `CoastingModel` |
 | BLE | `CSCPeripheralManager`, `CSCSMeasurementEncoder`, `CentralSubscriptionTracker` |
 
@@ -115,6 +115,7 @@ CSCSEmulator/
 │   ├── ConfigurationView.swift
 │   └── RunningView.swift
 ├── ViewModels/
+│   ├── RootViewModel.swift
 │   ├── ConfigurationViewModel.swift
 │   └── RunningViewModel.swift
 ├── Simulation/
