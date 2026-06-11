@@ -33,6 +33,13 @@ import Testing
         #expect(abs(kmh - 32.18688) < 0.001)
     }
 
+    @Test func stoppedSpeedAndCadenceAreZero() {
+        #expect(Speed.stopped.converted(to: .milesPerHour).value == 0)
+        #expect(Cadence.stopped.converted(to: .revolutionsPerMinute).value == 0)
+        #expect(Speed.stopped == .milesPerHour(0))
+        #expect(Cadence.stopped == .rpm(0))
+    }
+
     @Test func simulatorRangeConstantsMatchSRS() {
         #expect(SimulatorRanges.speedMin.converted(to: .milesPerHour).value == 0)
         #expect(SimulatorRanges.speedMax.converted(to: .milesPerHour).value == 50)

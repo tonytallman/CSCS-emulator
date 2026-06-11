@@ -64,9 +64,7 @@ final class SimulationControllingSpy: SimulationControlling {
         case .pedaling:
             internalState = PedalingState(vitals: vitals)
         case .coasting:
-            var updated = vitals
-            updated.cadence = .rpm(0)
-            internalState = CoastingState(vitals: updated, coastingModel: CoastingModel())
+            internalState = CoastingState(vitals: vitals, coastingModel: CoastingModel())
         case .random:
             internalState = StubSimulatorState(mode: .random, vitals: vitals)
         }

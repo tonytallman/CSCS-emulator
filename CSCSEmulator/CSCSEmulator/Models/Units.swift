@@ -20,11 +20,19 @@ extension Speed {
     static func milesPerHour(_ value: Double) -> Speed {
         Speed(value: value, unit: .milesPerHour)
     }
+    
+    static var stopped: Speed {
+        .milesPerHour(0)
+    }
 }
 
 extension Cadence {
     static func rpm(_ value: Double) -> Cadence {
         Cadence(value: value, unit: .revolutionsPerMinute)
+    }
+    
+    static var stopped: Cadence {
+        .rpm(0)
     }
 }
 

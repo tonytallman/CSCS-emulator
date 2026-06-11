@@ -12,8 +12,8 @@ struct SimulatorVitals: Equatable, Sendable {
 
     static func initial(supportsSpeed: Bool, supportsCadence: Bool) -> SimulatorVitals {
         SimulatorVitals(
-            speed: .milesPerHour(0),
-            cadence: .rpm(0),
+            speed: .stopped,
+            cadence: .stopped,
             supportsSpeed: supportsSpeed,
             supportsCadence: supportsCadence,
         )

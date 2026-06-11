@@ -81,7 +81,6 @@ final class SimulationEngine<RNG: RandomNumberGenerator> {
             return PedalingState(vitals: vitals)
         case .coasting:
             var coastingVitals = vitals
-            coastingVitals.cadence = .rpm(0)
             return CoastingState(vitals: coastingVitals, coastingModel: coastingModel)
         case .random:
             return RandomState(

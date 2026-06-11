@@ -11,7 +11,9 @@ struct CoastingState: SimulatorState {
     var mode: OperatingMode { .coasting }
 
     init(vitals: SimulatorVitals, coastingModel: CoastingModel) {
-        self.vitals = vitals
+        var updated = vitals
+        updated.cadence = .stopped
+        self.vitals = updated
         self.coastingModel = coastingModel
     }
 

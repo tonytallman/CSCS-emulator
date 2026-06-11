@@ -18,12 +18,12 @@ struct CoastingModel: Sendable {
     func decayedSpeed(from speed: Speed) -> Speed {
         let mph = speed.converted(to: .milesPerHour).value
         guard mph > zeroEpsilon else {
-            return .milesPerHour(0)
+            return .stopped
         }
 
         let decayedMPH = mph * decayFactor
         guard decayedMPH > zeroEpsilon else {
-            return .milesPerHour(0)
+            return .stopped
         }
 
         return .milesPerHour(decayedMPH)

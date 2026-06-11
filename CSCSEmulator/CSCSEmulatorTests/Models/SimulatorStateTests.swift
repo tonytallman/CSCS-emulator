@@ -11,8 +11,8 @@ import Testing
     @Test func initialVitalsDefaults() {
         let vitals = SimulatorVitals.initial(supportsSpeed: true, supportsCadence: true)
 
-        #expect(vitals.speed.converted(to: .milesPerHour).value == 0)
-        #expect(vitals.cadence.converted(to: .revolutionsPerMinute).value == 0)
+        #expect(vitals.speed == .stopped)
+        #expect(vitals.cadence == .stopped)
         #expect(vitals.supportsSpeed)
         #expect(vitals.supportsCadence)
     }
@@ -29,8 +29,8 @@ import Testing
         let state: any SimulatorState = PedalingState(vitals: vitals)
 
         #expect(state.mode == .pedaling)
-        #expect(state.speed.converted(to: .milesPerHour).value == 0)
-        #expect(state.cadence.converted(to: .revolutionsPerMinute).value == 0)
+        #expect(state.speed == .stopped)
+        #expect(state.cadence == .stopped)
         #expect(state.supportsSpeed)
         #expect(state.supportsCadence)
     }

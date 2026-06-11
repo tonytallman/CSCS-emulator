@@ -27,11 +27,11 @@ import Testing
         for _ in 0..<500 {
             speed = model.decayedSpeed(from: speed)
         }
-        #expect(speed.converted(to: .milesPerHour).value == 0)
+        #expect(speed == .stopped)
     }
 
     @Test func zeroSpeedStaysZero() {
         let zero = Speed.milesPerHour(0)
-        #expect(model.decayedSpeed(from: zero).converted(to: .milesPerHour).value == 0)
+        #expect(model.decayedSpeed(from: zero) == .stopped)
     }
 }

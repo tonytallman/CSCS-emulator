@@ -23,8 +23,8 @@ import Testing
         #expect(engine.state.supportsSpeed)
         #expect(engine.state.supportsCadence)
         #expect(engine.state.mode == .pedaling)
-        #expect(engine.state.speed.converted(to: .milesPerHour).value == 0)
-        #expect(engine.state.cadence.converted(to: .revolutionsPerMinute).value == 0)
+        #expect(engine.state.speed == .stopped)
+        #expect(engine.state.cadence == .stopped)
 
         engine.stop()
     }
@@ -72,8 +72,8 @@ import Testing
         engine.setSpeed(.milesPerHour(30))
         engine.setCadence(.rpm(100))
 
-        #expect(engine.state.speed.converted(to: .milesPerHour).value == 0)
-        #expect(engine.state.cadence.converted(to: .revolutionsPerMinute).value == 0)
+        #expect(engine.state.speed == .stopped)
+        #expect(engine.state.cadence == .stopped)
 
         engine.stop()
     }
@@ -82,10 +82,11 @@ import Testing
         let engine = makeEngine()
         engine.start(configuration: SimulatorConfiguration(supportsSpeed: true, supportsCadence: true))
         engine.setSpeed(.milesPerHour(28))
+        engine.setCadence(.rpm(85))
 
         engine.setMode(.coasting)
 
-        #expect(engine.state.cadence.converted(to: .revolutionsPerMinute).value == 0)
+        #expect(engine.state.cadence == .stopped)
         #expect(engine.state.speed.converted(to: .milesPerHour).value == 28)
 
         engine.stop()
@@ -105,7 +106,7 @@ import Testing
             previousMPH = mph
         }
 
-        #expect(engine.state.speed.converted(to: .milesPerHour).value == 0)
+        #expect(engine.state.speed == .stopped)
 
         engine.stop()
     }

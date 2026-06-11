@@ -20,8 +20,8 @@ import Testing
         let afterSpeed = makeState().setSpeed(.milesPerHour(30)) as! RandomState<SplitMix64>
         let state = afterSpeed.setCadence(.rpm(100)) as! RandomState<SplitMix64>
 
-        #expect(state.speed.converted(to: .milesPerHour).value == 0)
-        #expect(state.cadence.converted(to: .revolutionsPerMinute).value == 0)
+        #expect(state.speed == .stopped)
+        #expect(state.cadence == .stopped)
     }
 
     @Test func tickDoesNotChangeCadenceBeforeOneSecond() {

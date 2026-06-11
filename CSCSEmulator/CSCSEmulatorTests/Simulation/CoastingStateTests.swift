@@ -14,12 +14,21 @@ import Testing
         return CoastingState(vitals: vitals, coastingModel: CoastingModel())
     }
 
+    @Test func entryZerosCadenceFromNonZeroVitals() {
+        var vitals = SimulatorVitals.initial(supportsSpeed: true, supportsCadence: true)
+        vitals.cadence = .rpm(85)
+
+        let state = CoastingState(vitals: vitals, coastingModel: CoastingModel())
+
+        #expect(state.cadence == .stopped)
+    }
+
     @Test func ignoresSliderInput() {
         let afterSpeed = makeState().setSpeed(.milesPerHour(30)) as! CoastingState
         let state = afterSpeed.setCadence(.rpm(100)) as! CoastingState
 
         #expect(state.speed.converted(to: .milesPerHour).value == 20)
-        #expect(state.cadence.converted(to: .revolutionsPerMinute).value == 0)
+        #expect(state.cadence == .stopped)
     }
 
     @Test func tickDecaysSpeedToZero() {
@@ -33,6 +42,6 @@ import Testing
             previousMPH = mph
         }
 
-        #expect(state.speed.converted(to: .milesPerHour).value == 0)
+        #expect(state.speed == .stopped)
     }
 }

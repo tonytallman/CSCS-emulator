@@ -33,6 +33,6 @@ import Testing
         let updated = afterSpeed.tick() as! PedalingState
 
         #expect(updated.speed.converted(to: .milesPerHour).value == 20)
-        #expect(updated.cadence.converted(to: .revolutionsPerMinute).value == 0)
+        #expect(updated.cadence == .stopped)
     }
 }
