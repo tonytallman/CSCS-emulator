@@ -7,8 +7,8 @@
 struct SimulatorVitals: Equatable, Sendable {
     var speed: Speed
     var cadence: Cadence
-    var supportsSpeed: Bool
-    var supportsCadence: Bool
+    let supportsSpeed: Bool
+    let supportsCadence: Bool
 
     static func initial(supportsSpeed: Bool, supportsCadence: Bool) -> SimulatorVitals {
         SimulatorVitals(
