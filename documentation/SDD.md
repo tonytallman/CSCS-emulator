@@ -97,6 +97,7 @@ Dependencies are constructed and wired at a single composition root using a code
 
 ```swift
 final class AppContainer {
+    private let appStateStore: AppStateStore
     private let simulationEngine: SimulationEngine
     private let peripheralManager: CSCPeripheralManager
 
@@ -104,6 +105,7 @@ final class AppContainer {
 
     func makeConfigurationViewModel() -> ConfigurationViewModel { ... }
     func makeRunningViewModel() -> RunningViewModel { ... }
+    func makeRootViewModel() -> RootViewModel { ... }
 }
 ```
 
@@ -115,7 +117,7 @@ Rationale:
 
 ### Lifetimes
 
-Long-lived collaborators (`SimulationEngine`, `CSCPeripheralManager`) are stored properties on `AppContainer` so they can be shared (for example, the simulation engine is shared by the running view model and the BLE peripheral manager).
+Long-lived collaborators (`AppStateStore`, `SimulationEngine`, `CSCPeripheralManager`) are stored properties on `AppContainer` so they can be shared (for example, `AppStateStore` is shared by all view models for navigation state, and the simulation engine is shared by the running view model and the BLE peripheral manager).
 
 ### Injection Rules
 
@@ -192,11 +194,31 @@ The views should contain minimal business logic.
 ### Components
 
 ```text
+RootViewModel
 ConfigurationViewModel
 RunningViewModel
+AppStateStore
 ```
 
 The view models act as the boundary between UI and application logic.
+
+### App Navigation State
+
+Screen navigation (configuration vs running) is explicit via `AppState`:
+
+```swift
+enum AppState {
+    case configuring
+    case running
+}
+```
+
+`AppStateStore` is an `@Observable` shared object created once in `AppContainer` and injected into `RootViewModel`, `ConfigurationViewModel`, and `RunningViewModel`. Child view models mutate it on successful start/stop; `RootViewModel` exposes `appState` for `RootView` to switch screens. This replaces inferring navigation from `SimulationEngine.isRunning` at the view-model layer.
+
+* `ConfigurationViewModel.startEmulator()` calls `appStateStore.enterRunning()` after simulation and broadcaster start successfully.
+* `RunningViewModel.stopEmulator()` calls `appStateStore.enterConfiguring()` after stopping the broadcaster and simulation (including the fatal BLE error auto-stop path).
+
+`SimulationEngine.isRunning` remains the engine's internal tick-loop lifecycle flag and is not used for root navigation.
 
 ---
 
@@ -612,15 +634,19 @@ CSCSEmulator/
 │   ├── SimulatorConfiguration.swift
 │   ├── SimulatorState.swift
 │   ├── OperatingMode.swift
+│   ├── AppState.swift
 │   └── AppError.swift
 │
 ├── Views/
+│   ├── RootView.swift
 │   ├── ConfigurationView.swift
 │   └── RunningView.swift
 │
 ├── ViewModels/
+│   ├── RootViewModel.swift
 │   ├── ConfigurationViewModel.swift
-│   └── RunningViewModel.swift
+│   ├── RunningViewModel.swift
+│   └── AppStateStore.swift
 │
 ├── Simulation/
 │   ├── SimulationEngine.swift

@@ -24,9 +24,7 @@ struct RunningView: View {
         }
         .navigationTitle("CSCS BLE Emulator")
         .background {
-            if let engine = viewModel.simulationEngine {
-                SimulationObservation(engine: engine)
-            }
+            SimulationObservation(engine: viewModel.simulationEngine)
         }
         .onChange(of: viewModel.lastError) { _, error in
             viewModel.handleErrorChange()

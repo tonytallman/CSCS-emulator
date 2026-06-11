@@ -14,10 +14,16 @@ final class ConfigurationViewModel {
 
     private let simulation: SimulationControlling
     private let broadcaster: MeasurementBroadcasting
+    private let appStateStore: AppStateStore
 
-    init(simulation: SimulationControlling, broadcaster: MeasurementBroadcasting) {
+    init(
+        simulation: SimulationControlling,
+        broadcaster: MeasurementBroadcasting,
+        appStateStore: AppStateStore,
+    ) {
         self.simulation = simulation
         self.broadcaster = broadcaster
+        self.appStateStore = appStateStore
     }
 
     var canStart: Bool {
@@ -40,5 +46,6 @@ final class ConfigurationViewModel {
 
         simulation.start(configuration: configuration)
         broadcaster.start(configuration: configuration)
+        appStateStore.enterRunning()
     }
 }

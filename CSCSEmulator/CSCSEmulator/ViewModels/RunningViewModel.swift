@@ -11,7 +11,8 @@ import Observation
 final class RunningViewModel {
     private let simulation: SimulationControlling
     private let broadcaster: MeasurementBroadcasting
-    let simulationEngine: SimulationEngine<SystemRandomNumberGenerator>?
+    private let appStateStore: AppStateStore
+    let simulationEngine: SimulationEngine<SystemRandomNumberGenerator>
 
     private static let speedFormatter: MeasurementFormatter = {
         let formatter = MeasurementFormatter()
@@ -31,15 +32,13 @@ final class RunningViewModel {
     init(
         simulation: SimulationControlling,
         broadcaster: MeasurementBroadcasting,
-        simulationEngine: SimulationEngine<SystemRandomNumberGenerator>? = nil,
+        simulationEngine: SimulationEngine<SystemRandomNumberGenerator>,
+        appStateStore: AppStateStore,
     ) {
         self.simulation = simulation
         self.broadcaster = broadcaster
         self.simulationEngine = simulationEngine
-    }
-
-    var isRunning: Bool {
-        simulation.isRunning
+        self.appStateStore = appStateStore
     }
 
     var mode: OperatingMode {
@@ -111,6 +110,7 @@ final class RunningViewModel {
     func stopEmulator() {
         broadcaster.stop()
         simulation.stop()
+        appStateStore.enterConfiguring()
     }
 
     func handleErrorChange() {

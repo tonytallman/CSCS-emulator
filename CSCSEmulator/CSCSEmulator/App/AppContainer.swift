@@ -6,6 +6,7 @@
 /// Composition root: constructs and wires application dependencies.
 @MainActor
 final class AppContainer {
+    private let appStateStore = AppStateStore()
     private let simulationEngine: SimulationEngine<SystemRandomNumberGenerator>
     private let peripheralManager: CSCPeripheralManager
 
@@ -22,6 +23,7 @@ final class AppContainer {
         ConfigurationViewModel(
             simulation: simulationEngine,
             broadcaster: peripheralManager,
+            appStateStore: appStateStore,
         )
     }
 
@@ -30,6 +32,7 @@ final class AppContainer {
             simulation: simulationEngine,
             broadcaster: peripheralManager,
             simulationEngine: simulationEngine,
+            appStateStore: appStateStore,
         )
     }
 
@@ -37,7 +40,7 @@ final class AppContainer {
         RootViewModel(
             configurationViewModel: makeConfigurationViewModel(),
             runningViewModel: makeRunningViewModel(),
-            simulationEngine: simulationEngine,
+            appStateStore: appStateStore,
         )
     }
 }

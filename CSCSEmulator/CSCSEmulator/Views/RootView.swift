@@ -10,9 +10,10 @@ struct RootView: View {
 
     var body: some View {
         NavigationStack {
-            if viewModel.isRunning {
+            switch viewModel.appState {
+            case .running:
                 RunningView(viewModel: viewModel.runningViewModel)
-            } else {
+            case .configuring:
                 ConfigurationView(viewModel: viewModel.configurationViewModel)
             }
         }

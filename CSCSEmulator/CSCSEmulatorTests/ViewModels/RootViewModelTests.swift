@@ -13,6 +13,7 @@ import Testing
         SimulationEngine<SystemRandomNumberGenerator>,
         MeasurementBroadcastingSpy,
     ) {
+        let appStateStore = AppStateStore()
         let engine = SimulationEngine(
             coastingModel: CoastingModel(),
             randomCadenceGenerator: RandomCadenceGenerator(rng: SystemRandomNumberGenerator()),
@@ -21,37 +22,39 @@ import Testing
         let configurationViewModel = ConfigurationViewModel(
             simulation: engine,
             broadcaster: broadcaster,
+            appStateStore: appStateStore,
         )
         let runningViewModel = RunningViewModel(
             simulation: engine,
             broadcaster: broadcaster,
             simulationEngine: engine,
+            appStateStore: appStateStore,
         )
         let rootViewModel = RootViewModel(
             configurationViewModel: configurationViewModel,
             runningViewModel: runningViewModel,
-            simulationEngine: engine,
+            appStateStore: appStateStore,
         )
         return (rootViewModel, engine, broadcaster)
     }
 
-    @Test func isRunningIsFalseInitially() {
+    @Test func appStateIsConfiguringInitially() {
         let (viewModel, _, _) = makeViewModel()
 
-        #expect(!viewModel.isRunning)
+        #expect(viewModel.appState == .configuring)
     }
 
-    @Test func isRunningBecomesTrueAfterStartEmulator() {
+    @Test func appStateBecomesRunningAfterStartEmulator() {
         let (viewModel, _, _) = makeViewModel()
         viewModel.configurationViewModel.supportsSpeed = true
         viewModel.configurationViewModel.supportsCadence = true
 
         viewModel.configurationViewModel.startEmulator()
 
-        #expect(viewModel.isRunning)
+        #expect(viewModel.appState == .running)
     }
 
-    @Test func isRunningBecomesFalseAfterStopEmulator() {
+    @Test func appStateBecomesConfiguringAfterStopEmulator() {
         let (viewModel, _, _) = makeViewModel()
         viewModel.configurationViewModel.supportsSpeed = true
         viewModel.configurationViewModel.supportsCadence = true
@@ -59,6 +62,6 @@ import Testing
 
         viewModel.runningViewModel.stopEmulator()
 
-        #expect(!viewModel.isRunning)
+        #expect(viewModel.appState == .configuring)
     }
 }

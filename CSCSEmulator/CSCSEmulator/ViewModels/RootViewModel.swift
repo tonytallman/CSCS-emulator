@@ -11,19 +11,19 @@ import Observation
 final class RootViewModel {
     let configurationViewModel: ConfigurationViewModel
     let runningViewModel: RunningViewModel
-    let simulationEngine: SimulationEngine<SystemRandomNumberGenerator>
+    private let appStateStore: AppStateStore
 
     init(
         configurationViewModel: ConfigurationViewModel,
         runningViewModel: RunningViewModel,
-        simulationEngine: SimulationEngine<SystemRandomNumberGenerator>,
+        appStateStore: AppStateStore,
     ) {
         self.configurationViewModel = configurationViewModel
         self.runningViewModel = runningViewModel
-        self.simulationEngine = simulationEngine
+        self.appStateStore = appStateStore
     }
 
-    var isRunning: Bool {
-        simulationEngine.isRunning
+    var appState: AppState {
+        appStateStore.state
     }
 }

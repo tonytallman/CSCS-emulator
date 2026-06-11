@@ -109,12 +109,23 @@ final class MeasurementBroadcastingSpy: MeasurementBroadcasting {
 @Suite @MainActor struct ConfigurationViewModelTests {
     private func makeViewModel(
         simulation: SimulationControllingSpy? = nil,
-        broadcaster: MeasurementBroadcastingSpy? = nil
-    ) -> (ConfigurationViewModel, SimulationControllingSpy, MeasurementBroadcastingSpy) {
+        broadcaster: MeasurementBroadcastingSpy? = nil,
+        appStateStore: AppStateStore? = nil,
+    ) -> (
+        ConfigurationViewModel,
+        SimulationControllingSpy,
+        MeasurementBroadcastingSpy,
+        AppStateStore,
+    ) {
         let simulation = simulation ?? SimulationControllingSpy()
         let broadcaster = broadcaster ?? MeasurementBroadcastingSpy()
-        let viewModel = ConfigurationViewModel(simulation: simulation, broadcaster: broadcaster)
-        return (viewModel, simulation, broadcaster)
+        let appStateStore = appStateStore ?? AppStateStore()
+        let viewModel = ConfigurationViewModel(
+            simulation: simulation,
+            broadcaster: broadcaster,
+            appStateStore: appStateStore,
+        )
+        return (viewModel, simulation, broadcaster, appStateStore)
     }
 
     @Test(arguments: [
@@ -123,7 +134,7 @@ final class MeasurementBroadcastingSpy: MeasurementBroadcasting {
         (false, true),
     ])
     func canStartIsTrueForValidMetricCombinations(supportsSpeed: Bool, supportsCadence: Bool) {
-        let (viewModel, _, _) = makeViewModel()
+        let (viewModel, _, _, _) = makeViewModel()
         viewModel.supportsSpeed = supportsSpeed
         viewModel.supportsCadence = supportsCadence
 
@@ -131,7 +142,7 @@ final class MeasurementBroadcastingSpy: MeasurementBroadcasting {
     }
 
     @Test func canStartIsFalseWhenBothMetricsDisabled() {
-        let (viewModel, _, _) = makeViewModel()
+        let (viewModel, _, _, _) = makeViewModel()
         viewModel.supportsSpeed = false
         viewModel.supportsCadence = false
 
@@ -144,7 +155,12 @@ final class MeasurementBroadcastingSpy: MeasurementBroadcasting {
         simulation.onStart = { startOrder.append("simulation") }
         let broadcaster = MeasurementBroadcastingSpy()
         broadcaster.onStart = { startOrder.append("broadcaster") }
-        let viewModel = ConfigurationViewModel(simulation: simulation, broadcaster: broadcaster)
+        let appStateStore = AppStateStore()
+        let viewModel = ConfigurationViewModel(
+            simulation: simulation,
+            broadcaster: broadcaster,
+            appStateStore: appStateStore,
+        )
         viewModel.supportsSpeed = true
         viewModel.supportsCadence = false
 
@@ -154,12 +170,18 @@ final class MeasurementBroadcastingSpy: MeasurementBroadcasting {
         #expect(simulation.startCalls == [expected])
         #expect(broadcaster.startCalls == [expected])
         #expect(startOrder == ["simulation", "broadcaster"])
+        #expect(appStateStore.state == .running)
     }
 
     @Test func startEmulatorDoesNothingWhenCannotStart() {
         let simulation = SimulationControllingSpy()
         let broadcaster = MeasurementBroadcastingSpy()
-        let viewModel = ConfigurationViewModel(simulation: simulation, broadcaster: broadcaster)
+        let appStateStore = AppStateStore()
+        let viewModel = ConfigurationViewModel(
+            simulation: simulation,
+            broadcaster: broadcaster,
+            appStateStore: appStateStore,
+        )
         viewModel.supportsSpeed = false
         viewModel.supportsCadence = false
 
@@ -167,5 +189,6 @@ final class MeasurementBroadcastingSpy: MeasurementBroadcasting {
 
         #expect(simulation.startCalls.isEmpty)
         #expect(broadcaster.startCalls.isEmpty)
+        #expect(appStateStore.state == .configuring)
     }
 }
