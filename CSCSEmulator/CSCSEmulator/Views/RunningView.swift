@@ -3,10 +3,32 @@
 //  CSCSEmulator
 //
 
+import Observation
 import SwiftUI
 
-struct RunningView: View {
-    @Bindable var viewModel: RunningViewModel
+@MainActor
+protocol RunningViewModel: AnyObject, Observable {
+    var mode: OperatingMode { get }
+    var supportsSpeed: Bool { get }
+    var supportsCadence: Bool { get }
+    var isConnected: Bool { get }
+    var lastError: AppError? { get }
+    var slidersEnabled: Bool { get }
+    var formattedSpeed: String { get }
+    var formattedCadence: String { get }
+    var speedRangeMPH: ClosedRange<Double> { get }
+    var cadenceRangeRPM: ClosedRange<Double> { get }
+    var speedMPH: Double { get set }
+    var cadenceRPM: Double { get set }
+    var simulationEngine: SimulationEngine<SystemRandomNumberGenerator>? { get }
+
+    func setMode(_ mode: OperatingMode)
+    func stopEmulator()
+    func handleErrorChange()
+}
+
+struct RunningView<ViewModel: RunningViewModel>: View {
+    @Bindable var viewModel: ViewModel
     @State private var showError = false
 
     var body: some View {
@@ -24,7 +46,9 @@ struct RunningView: View {
         }
         .navigationTitle("CSCS BLE Emulator")
         .background {
-            SimulationObservation(engine: viewModel.simulationEngine)
+            if let simulationEngine = viewModel.simulationEngine {
+                SimulationObservation(engine: simulationEngine)
+            }
         }
         .onChange(of: viewModel.lastError) { _, error in
             viewModel.handleErrorChange()
@@ -221,3 +245,11 @@ private struct SimulationObservation: View {
             .onChange(of: engine.state.vitals) { _, _ in }
     }
 }
+
+#if DEBUG
+#Preview {
+    NavigationStack {
+        RunningView(viewModel: PreviewRunningViewModel())
+    }
+}
+#endif

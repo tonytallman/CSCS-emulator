@@ -8,7 +8,7 @@ import Observation
 
 @Observable
 @MainActor
-final class ConfigurationViewModel {
+final class AppConfigurationViewModel: ConfigurationViewModel {
     var supportsSpeed = true
     var supportsCadence = true
 

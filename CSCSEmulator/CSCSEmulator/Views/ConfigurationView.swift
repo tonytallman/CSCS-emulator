@@ -3,10 +3,21 @@
 //  CSCSEmulator
 //
 
+import Observation
 import SwiftUI
 
-struct ConfigurationView: View {
-    @Bindable var viewModel: ConfigurationViewModel
+@MainActor
+protocol ConfigurationViewModel: AnyObject, Observable {
+    var supportsSpeed: Bool { get set }
+    var supportsCadence: Bool { get set }
+    var canStart: Bool { get }
+    var lastError: AppError? { get }
+
+    func startEmulator()
+}
+
+struct ConfigurationView<ViewModel: ConfigurationViewModel>: View {
+    @Bindable var viewModel: ViewModel
     @State private var showError = false
 
     var body: some View {
@@ -138,3 +149,11 @@ struct ConfigurationView: View {
         #endif
     }
 }
+
+#if DEBUG
+#Preview {
+    NavigationStack {
+        ConfigurationView(viewModel: PreviewConfigurationViewModel())
+    }
+}
+#endif

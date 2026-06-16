@@ -9,7 +9,7 @@ import Testing
 
 @Suite @MainActor struct RootViewModelTests {
     private func makeViewModel() -> (
-        RootViewModel,
+        AppRootViewModel,
         SimulationEngine<SystemRandomNumberGenerator>,
         MeasurementBroadcastingSpy,
     ) {
@@ -19,18 +19,18 @@ import Testing
             randomCadenceGenerator: RandomCadenceGenerator(rng: SystemRandomNumberGenerator()),
         )
         let broadcaster = MeasurementBroadcastingSpy()
-        let configurationViewModel = ConfigurationViewModel(
+        let configurationViewModel = AppConfigurationViewModel(
             simulation: engine,
             broadcaster: broadcaster,
             appStateStore: appStateStore,
         )
-        let runningViewModel = RunningViewModel(
+        let runningViewModel = AppRunningViewModel(
             simulation: engine,
             broadcaster: broadcaster,
             simulationEngine: engine,
             appStateStore: appStateStore,
         )
-        let rootViewModel = RootViewModel(
+        let rootViewModel = AppRootViewModel(
             configurationViewModel: configurationViewModel,
             runningViewModel: runningViewModel,
             appStateStore: appStateStore,

@@ -22,7 +22,7 @@ import Testing
         broadcaster: MeasurementBroadcastingSpy? = nil,
         appStateStore: AppStateStore? = nil,
     ) -> (
-        RunningViewModel,
+        AppRunningViewModel,
         SimulationEngine<SystemRandomNumberGenerator>,
         MeasurementBroadcastingSpy,
         AppStateStore,
@@ -30,7 +30,7 @@ import Testing
         let engine = engine ?? makeEngine()
         let broadcaster = broadcaster ?? MeasurementBroadcastingSpy()
         let appStateStore = appStateStore ?? AppStateStore()
-        let viewModel = RunningViewModel(
+        let viewModel = AppRunningViewModel(
             simulation: engine,
             broadcaster: broadcaster,
             simulationEngine: engine,
@@ -101,7 +101,7 @@ import Testing
         broadcaster.start(configuration: SimulatorConfiguration(supportsSpeed: true, supportsCadence: true))
         let appStateStore = AppStateStore()
         appStateStore.enterRunning()
-        let viewModel = RunningViewModel(
+        let viewModel = AppRunningViewModel(
             simulation: engine,
             broadcaster: broadcaster,
             simulationEngine: engine,
@@ -121,7 +121,7 @@ import Testing
         let broadcaster = MeasurementBroadcastingSpy()
         let appStateStore = AppStateStore()
         appStateStore.enterRunning()
-        let viewModel = RunningViewModel(
+        let viewModel = AppRunningViewModel(
             simulation: engine,
             broadcaster: broadcaster,
             simulationEngine: engine,

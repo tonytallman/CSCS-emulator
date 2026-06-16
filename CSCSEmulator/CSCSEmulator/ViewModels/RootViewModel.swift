@@ -8,19 +8,27 @@ import Observation
 
 @Observable
 @MainActor
-final class RootViewModel {
-    let configurationViewModel: ConfigurationViewModel
-    let runningViewModel: RunningViewModel
+final class AppRootViewModel: RootViewModel {
+    private let appConfigurationViewModel: AppConfigurationViewModel
+    private let appRunningViewModel: AppRunningViewModel
     private let appStateStore: AppStateStore
 
     init(
-        configurationViewModel: ConfigurationViewModel,
-        runningViewModel: RunningViewModel,
+        configurationViewModel: AppConfigurationViewModel,
+        runningViewModel: AppRunningViewModel,
         appStateStore: AppStateStore,
     ) {
-        self.configurationViewModel = configurationViewModel
-        self.runningViewModel = runningViewModel
+        self.appConfigurationViewModel = configurationViewModel
+        self.appRunningViewModel = runningViewModel
         self.appStateStore = appStateStore
+    }
+
+    var configurationViewModel: some ConfigurationViewModel {
+        appConfigurationViewModel
+    }
+
+    var runningViewModel: some RunningViewModel {
+        appRunningViewModel
     }
 
     var appState: AppState {

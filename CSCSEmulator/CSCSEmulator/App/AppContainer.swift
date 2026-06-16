@@ -19,16 +19,16 @@ final class AppContainer {
         peripheralManager = CSCPeripheralManager { engine.state.vitals }
     }
 
-    private func makeConfigurationViewModel() -> ConfigurationViewModel {
-        ConfigurationViewModel(
+    private func makeConfigurationViewModel() -> AppConfigurationViewModel {
+        AppConfigurationViewModel(
             simulation: simulationEngine,
             broadcaster: peripheralManager,
             appStateStore: appStateStore,
         )
     }
 
-    private func makeRunningViewModel() -> RunningViewModel {
-        RunningViewModel(
+    private func makeRunningViewModel() -> AppRunningViewModel {
+        AppRunningViewModel(
             simulation: simulationEngine,
             broadcaster: peripheralManager,
             simulationEngine: simulationEngine,
@@ -36,8 +36,8 @@ final class AppContainer {
         )
     }
 
-    func makeRootViewModel() -> RootViewModel {
-        RootViewModel(
+    func makeRootViewModel() -> AppRootViewModel {
+        AppRootViewModel(
             configurationViewModel: makeConfigurationViewModel(),
             runningViewModel: makeRunningViewModel(),
             appStateStore: appStateStore,

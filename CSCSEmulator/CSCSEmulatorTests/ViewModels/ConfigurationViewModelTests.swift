@@ -110,7 +110,7 @@ final class MeasurementBroadcastingSpy: MeasurementBroadcasting {
         broadcaster: MeasurementBroadcastingSpy? = nil,
         appStateStore: AppStateStore? = nil,
     ) -> (
-        ConfigurationViewModel,
+        AppConfigurationViewModel,
         SimulationControllingSpy,
         MeasurementBroadcastingSpy,
         AppStateStore,
@@ -118,7 +118,7 @@ final class MeasurementBroadcastingSpy: MeasurementBroadcasting {
         let simulation = simulation ?? SimulationControllingSpy()
         let broadcaster = broadcaster ?? MeasurementBroadcastingSpy()
         let appStateStore = appStateStore ?? AppStateStore()
-        let viewModel = ConfigurationViewModel(
+        let viewModel = AppConfigurationViewModel(
             simulation: simulation,
             broadcaster: broadcaster,
             appStateStore: appStateStore,
@@ -154,7 +154,7 @@ final class MeasurementBroadcastingSpy: MeasurementBroadcasting {
         let broadcaster = MeasurementBroadcastingSpy()
         broadcaster.onStart = { startOrder.append("broadcaster") }
         let appStateStore = AppStateStore()
-        let viewModel = ConfigurationViewModel(
+        let viewModel = AppConfigurationViewModel(
             simulation: simulation,
             broadcaster: broadcaster,
             appStateStore: appStateStore,
@@ -175,7 +175,7 @@ final class MeasurementBroadcastingSpy: MeasurementBroadcasting {
         let simulation = SimulationControllingSpy()
         let broadcaster = MeasurementBroadcastingSpy()
         let appStateStore = AppStateStore()
-        let viewModel = ConfigurationViewModel(
+        let viewModel = AppConfigurationViewModel(
             simulation: simulation,
             broadcaster: broadcaster,
             appStateStore: appStateStore,

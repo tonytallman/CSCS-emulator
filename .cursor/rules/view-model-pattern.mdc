@@ -1,0 +1,138 @@
+---
+description: View model protocol pattern for SwiftUI screens - same-file protocols, generic views, Runtime/Preview implementations
+globs: "**/*View.swift,**/*ViewModel.swift,**/*ViewModels.swift"
+alwaysApply: false
+---
+
+# View Model Pattern
+
+Screen-level `View` types that use a view model define the view model's shape with a top-level protocol in the same Swift file as the view. The protocol sits outside the view declaration, and the view is generic over that protocol. A `Runtime`-prefixed class is the runtime implementation; a `Preview`-prefixed class is used only in previews.
+
+## Rules
+
+- Define `@MainActor protocol FooViewModel: AnyObject, Observable` in `Views/FooView.swift`, outside and immediately before `FooView`.
+- Declare the view as `struct FooView<ViewModel: FooViewModel>: View`.
+- The runtime implementation is `@Observable @MainActor final class RuntimeFooViewModel: FooViewModel` in `ViewModels/FooViewModel.swift`.
+- The preview implementation is `@Observable @MainActor final class PreviewFooViewModel: FooViewModel`.
+- The preview class and all `#Preview` blocks are wrapped in `#if DEBUG`.
+- Preview view models live together in `ViewModels/PreviewViewModels.swift`.
+- When a view model publishes a child view model, the parent protocol declares an `associatedtype` constrained to the child view-model protocol. The implementation returns `some ChildViewModelProtocol` from a private backing property.
+- Views receive view models from outside and do not construct runtime dependencies.
+- Files that declare view-model protocols import `Observation` alongside `SwiftUI`.
+
+## Example
+
+```swift
+// Views/ConfigurationView.swift
+import Observation
+import SwiftUI
+
+@MainActor
+protocol ConfigurationViewModel: AnyObject, Observable {
+    var supportsSpeed: Bool { get set }
+    var supportsCadence: Bool { get set }
+    var canStart: Bool { get }
+    var lastError: AppError? { get }
+
+    func startEmulator()
+}
+
+struct ConfigurationView<ViewModel: ConfigurationViewModel>: View {
+    @Bindable var viewModel: ViewModel
+
+    var body: some View { ... }
+}
+
+#if DEBUG
+#Preview {
+    ConfigurationView(viewModel: PreviewConfigurationViewModel())
+}
+#endif
+
+// ViewModels/ConfigurationViewModel.swift
+@Observable
+@MainActor
+final class RuntimeConfigurationViewModel: ConfigurationViewModel {
+    var supportsSpeed = true
+    var supportsCadence = true
+    var canStart: Bool { ... }
+    var lastError: AppError? { ... }
+    func startEmulator() { ... }
+}
+
+// ViewModels/PreviewViewModels.swift
+#if DEBUG
+@Observable
+@MainActor
+final class PreviewConfigurationViewModel: ConfigurationViewModel {
+    var supportsSpeed = true
+    var supportsCadence = true
+    var canStart: Bool { true }
+    var lastError: AppError?
+    func startEmulator() {}
+}
+#endif
+```
+
+For a view that hosts child views, declare child view model types with an `associatedtype` and return opaque `some`:
+
+```swift
+// Views/RootView.swift
+import Observation
+import SwiftUI
+
+@MainActor
+protocol RootViewModel: AnyObject, Observable {
+    associatedtype Configuration: ConfigurationViewModel
+    associatedtype Running: RunningViewModel
+
+    var configurationViewModel: Configuration { get }
+    var runningViewModel: Running { get }
+    var appState: AppState { get }
+}
+
+struct RootView<ViewModel: RootViewModel>: View {
+    let viewModel: ViewModel
+
+    var body: some View { ... }
+}
+
+// ViewModels/RootViewModel.swift
+@Observable
+@MainActor
+final class RuntimeRootViewModel: RootViewModel {
+    private let runtimeConfigurationViewModel: RuntimeConfigurationViewModel
+    private let runtimeRunningViewModel: RuntimeRunningViewModel
+
+    var configurationViewModel: some ConfigurationViewModel {
+        runtimeConfigurationViewModel
+    }
+
+    var runningViewModel: some RunningViewModel {
+        runtimeRunningViewModel
+    }
+
+    var appState: AppState { ... }
+}
+```
+
+## Counter-examples
+
+```swift
+// BAD - view tied to a concrete runtime implementation
+struct ConfigurationView: View {
+    @Bindable var viewModel: RuntimeConfigurationViewModel
+}
+
+// BAD - runtime implementation exposed through a parent protocol
+protocol RootViewModel: AnyObject, Observable {
+    var configurationViewModel: RuntimeConfigurationViewModel { get }
+}
+
+// BAD - protocol separated from the view it shapes
+// ViewModels/ConfigurationViewModel.swift
+protocol ConfigurationViewModel: AnyObject, Observable { ... }
+
+// BAD - preview implementation compiled in non-DEBUG builds
+final class PreviewConfigurationViewModel: ConfigurationViewModel { ... }
+```

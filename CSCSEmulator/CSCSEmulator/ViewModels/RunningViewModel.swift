@@ -8,11 +8,11 @@ import Observation
 
 @Observable
 @MainActor
-final class RunningViewModel {
+final class AppRunningViewModel: RunningViewModel {
     private let simulation: SimulationControlling
     private let broadcaster: MeasurementBroadcasting
     private let appStateStore: AppStateStore
-    let simulationEngine: SimulationEngine<SystemRandomNumberGenerator>
+    let simulationEngine: SimulationEngine<SystemRandomNumberGenerator>?
 
     private static let speedFormatter: MeasurementFormatter = {
         let formatter = MeasurementFormatter()
@@ -122,5 +122,4 @@ final class RunningViewModel {
             break
         }
     }
-
 }
