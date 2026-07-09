@@ -18,6 +18,7 @@ CSCS Emulator simulates a Bluetooth Low Energy cycling speed and cadence sensor,
 - Three simulation modes: Pedaling, Coasting, and Random
 - Real-time speed (0–50 MPH) and cadence (0–200 RPM) control via sliders
 - Supports one connected BLE central at a time
+- On iPhone and iPad, continues BLE advertising while the app runs in the background
 - Graceful error handling for Bluetooth unavailability, permission denials, and advertising failures
 
 ## User Interface
@@ -75,6 +76,7 @@ speed (MPH) = cadence (RPM) × 20 / 90
 - **Service:** Cycling Speed and Cadence Service (Bluetooth SIG standard)
 - **Published data:** Only the metrics selected during configuration (speed only, cadence only, or both)
 - **Connections:** At most one BLE central at a time; additional connection requests are rejected
+- **Background (iOS / iPadOS):** Continues advertising while backgrounded; the local name may be omitted from advertisement packets per CoreBluetooth behavior
 
 ## Architecture
 
@@ -130,7 +132,12 @@ CSCSEmulator/
 │   ├── CSCSMeasurementEncoder.swift
 │   └── CentralSubscriptionTracker.swift
 └── Resources/
+    └── PrivacyInfo.xcprivacy
 ```
+
+## App Store Submission
+
+See [documentation/APP_STORE_SUBMISSION.md](documentation/APP_STORE_SUBMISSION.md) for metadata, privacy answers, and the manual submission checklist. Privacy policy: [documentation/PRIVACY_POLICY.md](documentation/PRIVACY_POLICY.md).
 
 ## Future Enhancements
 
@@ -143,5 +150,4 @@ CSCSEmulator/
 - Multiple virtual sensors
 - FTMS integration
 - ANT+ support
-- Background operation
 - BLE connection status display

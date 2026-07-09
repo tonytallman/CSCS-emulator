@@ -133,6 +133,14 @@ The emulator shall support at most one connected BLE central device at a time.
 - Connection status display is a future enhancement; see section 8.
 - The identity of the connected central is not required to be displayed.
 
+### 4.5 Background Operation (iOS / iPadOS)
+
+On iPhone and iPad, while the emulator is running, the application shall continue advertising the CSCS service and publishing measurements when moved to the background.
+
+When backgrounded on iOS, CoreBluetooth may omit the advertised local name and expose the service UUID in the overflow area instead. This is expected platform behavior and shall not prevent centrals from discovering and connecting to the emulator.
+
+macOS does not require a background mode entitlement for this behavior.
+
 ---
 
 ## 5. Operating Modes
@@ -299,5 +307,4 @@ Potential future features include:
 * Automatic interval generation
 * Multiple virtual sensors
 * FTMS integration
-* Background operation
 * BLE connection status display

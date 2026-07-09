@@ -8,6 +8,21 @@ import Observation
 
 private let simulationTickInterval: Duration = .milliseconds(100)
 
+/// Holds the simulation tick task so it can be cancelled from `deinit` without MainActor isolation.
+private final class TickTaskHolder: @unchecked Sendable {
+    private var task: Task<Void, Never>?
+
+    func setTask(_ task: Task<Void, Never>?) {
+        self.task?.cancel()
+        self.task = task
+    }
+
+    func cancel() {
+        task?.cancel()
+        task = nil
+    }
+}
+
 /// Owns simulator state and executes mode-specific updates at a fixed interval (SDD section 7).
 @Observable
 @MainActor
@@ -18,7 +33,7 @@ final class SimulationEngine<RNG: RandomNumberGenerator> {
 
     private let coastingModel: CoastingModel
     private var randomCadenceGenerator: RandomCadenceGenerator<RNG>
-    private var tickTask: Task<Void, Never>?
+    private let tickTaskHolder = TickTaskHolder()
 
     init(
         coastingModel: CoastingModel,
@@ -27,6 +42,11 @@ final class SimulationEngine<RNG: RandomNumberGenerator> {
         self.state = PedalingState(vitals: .initial(supportsSpeed: false, supportsCadence: false))
         self.coastingModel = coastingModel
         self.randomCadenceGenerator = randomCadenceGenerator
+    }
+
+    @inline(never)
+    deinit {
+        tickTaskHolder.cancel()
     }
 
     func start(configuration: SimulatorConfiguration) {
@@ -41,18 +61,17 @@ final class SimulationEngine<RNG: RandomNumberGenerator> {
         )
         isRunning = true
 
-        tickTask = Task { [weak self] in
+        tickTaskHolder.setTask(Task { [weak self] in
             while !Task.isCancelled {
                 try? await Task.sleep(for: simulationTickInterval)
                 guard !Task.isCancelled else { break }
                 self?.tick()
             }
-        }
+        })
     }
 
     func stop() {
-        tickTask?.cancel()
-        tickTask = nil
+        tickTaskHolder.cancel()
         isRunning = false
     }
 
