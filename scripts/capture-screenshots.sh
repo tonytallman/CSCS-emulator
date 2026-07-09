@@ -45,6 +45,13 @@ capture_ios() {
   sleep 3
   xcrun simctl io "$device_id" screenshot "$OUT/${prefix}-running.png"
   xcrun simctl terminate "$device_id" "$BUNDLE_ID" >/dev/null || true
+
+  # iPhone 16/17 Pro Max simulators capture at 1320×2868 (6.9" display). App Store
+  # Connect's 6.5" iPhone slot requires 1284×2778 or 1242×2688.
+  if [[ "$prefix" == iphone ]]; then
+    sips -z 2778 1284 "$OUT/${prefix}-configuration.png" --out "$OUT/${prefix}-configuration.png" >/dev/null
+    sips -z 2778 1284 "$OUT/${prefix}-running.png" --out "$OUT/${prefix}-running.png" >/dev/null
+  fi
 }
 
 capture_ios "iPhone 16 Pro Max" iphone

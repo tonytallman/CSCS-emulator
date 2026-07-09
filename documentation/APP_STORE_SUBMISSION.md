@@ -139,8 +139,8 @@ Screenshots are stored in `documentation/screenshots/`. Upload the appropriate s
 
 | File | Dimensions | Target requirement |
 | --- | --- | --- |
-| `iphone-configuration.png` | 1320 × 2868 | 1290 × 2796 (6.7" iPhone) |
-| `iphone-running.png` | 1320 × 2868 | 1290 × 2796 (6.7" iPhone) |
+| `iphone-configuration.png` | 1284 × 2778 | 1284 × 2778 (6.5" iPhone) |
+| `iphone-running.png` | 1284 × 2778 | 1284 × 2778 (6.5" iPhone) |
 | `ipad-configuration.png` | 2064 × 2752 | 2048 × 2732 (12.9" iPad) |
 | `ipad-running.png` | 2064 × 2752 | 2048 × 2732 (12.9" iPad) |
 | `mac-configuration.png` | 1280 × 2027 | 1280 × 800 minimum (Mac) |
@@ -166,9 +166,11 @@ for mode in configuration running; do
 done
 ```
 
-### iPhone (6.7" display — iPhone 15 Pro Max class)
+### iPhone (6.5" display — iPhone 14 Pro Max class)
 
-Required: **1290 × 2796 px** (portrait) or **2796 × 1290 px** (landscape)
+Required: **1284 × 2778 px** (portrait) or **2778 × 1284 px** (landscape). Also accepted: **1242 × 2688 px** / **2688 × 1242 px**.
+
+The capture script uses the iPhone 16 Pro Max simulator (1320 × 2868 raw) and resizes to 1284 × 2778 for App Store Connect.
 
 | File | Screen |
 | --- | --- |
