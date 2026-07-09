@@ -284,130 +284,64 @@ Optional second-device verification: any CSCS-compatible app on another phone, t
 
 ### Review Notes template (items 1–7)
 
-Paste into App Store Connect → **App Review Information** → **Notes**. Replace the device list placeholder with your actual test hardware.
+Paste into App Store Connect → **App Review Information** → **Notes**. Replace the device list placeholder with your actual test hardware. The Notes field has a **4000 character limit**; this template is kept under that limit.
 
 ```
-APP REVIEW INFORMATION — CSC Emulator v1.0
+CSC Emulator is a developer/testing utility that turns an iPhone, iPad, or Mac into
+a virtual Bluetooth Low Energy (BLE) Cycling Speed and Cadence (CSCS) sensor. No
+account, network access, or data collection is involved.
 
 1. SCREEN RECORDING
-A screen recording is attached to this submission (or was uploaded with this reply).
-It was captured on a physical device running the latest OS and begins at app launch.
+Attached, captured on a physical device on the latest OS, starting at app launch:
+launch app -> Bluetooth permission prompt (first launch) -> Configuration screen,
+enable Speed/Cadence -> "Start Emulator" -> Running screen, switch Pedaling/
+Coasting/Random modes, adjust sliders -> "Stop Emulator".
 
-The recording demonstrates the full core user flow:
-- Launch CSC Emulator
-- Bluetooth permission prompt (if shown on first launch)
-- Configuration screen: enable Speed and/or Cadence
-- Tap "Start Emulator" to begin BLE advertising
-- Running screen: switch between Pedaling, Coasting, and Random modes
-- Adjust speed/cadence sliders (Pedaling mode)
-- Tap "Stop Emulator" to return to configuration
+Not applicable (app has none of these): account registration/login/deletion, paid
+content/subscriptions, user-generated content, location/contacts/camera/ATT
+prompts. Bluetooth is the only sensitive permission used
+(NSBluetoothAlwaysUsageDescription: "Advertises a simulated cycling speed and
+cadence sensor.").
 
-Not applicable to this app (none of these features exist):
-- Account registration, login, or account deletion
-- Paid content, purchases, or subscriptions
-- User-generated content, reporting, or blocking
-- Location, contacts, camera, or App Tracking Transparency prompts
-
-The only sensitive capability requested is Bluetooth (NSBluetoothAlwaysUsageDescription:
-"Advertises a simulated cycling speed and cadence sensor.").
-
-Optional second-device verification: any CSCS-compatible app on another phone, tablet,
-or bike computer can scan for a peripheral named "CSCS emulator" and connect to
-receive simulated speed/cadence data. This is not required to verify the app itself
-functions correctly.
-
-
-2. DEVICES AND OPERATING SYSTEMS TESTED
-[PASTE YOUR TESTING NOTES HERE — e.g.:]
-
+2. DEVICES AND OS TESTED
+[PASTE YOUR TESTING NOTES HERE, e.g.:]
 - iPhone [model], iOS [version]
 - iPad [model], iPadOS [version]
 - Mac [model], macOS [version]
 
+3. PURPOSE AND AUDIENCE
+Developers, QA engineers, and cyclists testing CSCS-compatible apps or bike
+computers often lack a physical sensor. CSC Emulator provides a controllable,
+standards-compliant CSCS peripheral without hardware. Audience: iOS/macOS
+developers building cycling/fitness apps, QA teams verifying BLE integrations, and
+cyclists evaluating apps before buying a sensor. It simulates speed (0-50 mph) and
+cadence (0-200 rpm) via three modes (Pedaling, Coasting, Random) and advertises the
+standard Bluetooth SIG CSCS service. Free, no account required.
 
-3. APP PURPOSE AND TARGET AUDIENCE
+4. SETUP AND TESTING
+No credentials or sample files needed. On a physical iPhone/iPad (BLE peripheral
+mode is unavailable in Simulator): launch app, grant Bluetooth permission if
+prompted, enable Speed and/or Cadence, tap "Start Emulator", try each mode
+(Pedaling: adjust sliders; Coasting: cadence drops to 0 and speed decays; Random:
+cadence/speed vary automatically), then tap "Stop Emulator". Optional: connect from
+a second device running any CSCS-compatible app by scanning for "CSCS emulator".
+Same flow on Mac; enable Bluetooth in System Settings first.
 
-CSC Emulator is a developer and testing utility that turns an iPhone, iPad, or Mac
-into a virtual Bluetooth Low Energy (BLE) Cycling Speed and Cadence (CSCS) sensor.
-
-Problem it solves:
-Developers, QA engineers, and cyclists often need to test apps or bike computers that
-read CSCS sensor data, but physical sensors are not always available during
-development or review. CSC Emulator provides a controllable, standards-compliant
-CSCS peripheral without dedicated hardware.
-
-Target audience:
-- iOS/macOS developers building cycling or fitness apps with BLE CSCS support
-- QA teams verifying BLE sensor integrations
-- Cyclists evaluating CSCS-compatible apps before purchasing a physical sensor
-
-Value provided:
-- Simulates speed (0–50 mph) and cadence (0–200 rpm) in real time
-- Three modes: Pedaling (manual control), Coasting (speed decay), Random (natural
-  cadence variation)
-- Advertises the standard Bluetooth SIG Cycling Speed and Cadence Service
-- Free, no account required, no data collection
-
-
-4. SETUP AND TESTING INSTRUCTIONS
-
-No login credentials, sample files, or external setup are required.
-
-To test on a physical iPhone or iPad (Bluetooth is not available in Simulator):
-1. Launch CSC Emulator.
-2. If prompted, grant Bluetooth permission.
-3. On the configuration screen, enable Speed and/or Cadence (at least one required).
-4. Tap "Start Emulator."
-5. On the running screen:
-   - Use the mode picker: Pedaling, Coasting, or Random
-   - In Pedaling mode, adjust speed and cadence sliders
-   - In Coasting mode, observe cadence drop to 0 and speed decay
-   - In Random mode, observe automatically varying cadence and derived speed
-6. Tap "Stop Emulator" to end the session and return to configuration.
-
-To verify BLE output (optional, second device):
-- On another device running any CSCS-compatible central app, scan for a peripheral
-  named "CSCS emulator" and connect. Speed and/or cadence measurements will update
-  based on the selected mode and slider values.
-
-macOS testing:
-- Same steps as above. Bluetooth must be enabled in System Settings.
-
-
-5. EXTERNAL SERVICES, TOOLS, AND PLATFORMS
-
-None. CSC Emulator is fully self-contained and operates entirely on-device.
-
-- No network access, servers, or cloud services
-- No authentication providers
-- No payment processors or subscriptions
-- No analytics, crash reporting, or advertising SDKs
-- No AI services or third-party data providers
-
-Core functionality uses only Apple platform APIs:
-- CoreBluetooth (BLE peripheral advertising and GATT service)
-- SwiftUI (user interface)
-- Standard Bluetooth SIG Cycling Speed and Cadence Service (0x1816)
-
+5. EXTERNAL SERVICES
+None. Fully self-contained, on-device only: no network calls, servers,
+authentication, payments, analytics, crash reporting, ads, or AI services. Uses
+only Apple frameworks: CoreBluetooth (BLE peripheral/GATT) and SwiftUI, plus the
+standard Bluetooth SIG Cycling Speed and Cadence Service (0x1816).
 
 6. REGIONAL DIFFERENCES
+None. The app functions identically in all App Store territories with no
+region-specific features, content, or restrictions.
 
-The app functions identically in all App Store territories. There are no region-
-specific features, content, pricing tiers, or restrictions. All simulation modes
-and BLE behavior are the same worldwide.
-
-
-7. REGULATED INDUSTRY / PROTECTED THIRD-PARTY MATERIAL
-
-Not applicable. CSC Emulator:
-- Does not operate in a regulated industry (healthcare, finance, gambling, etc.)
-- Does not include copyrighted media, licensed content, or protected third-party
-  material
-- Implements the publicly documented Bluetooth SIG Cycling Speed and Cadence
-  Service specification for interoperability testing only
-- Does not provide medical, fitness coaching, or health advice
-
-No additional authorization documentation is required.
+7. REGULATED INDUSTRY / PROTECTED MATERIAL
+Not applicable. The app does not operate in a regulated industry and includes no
+copyrighted, licensed, or protected third-party material. It implements the
+publicly documented Bluetooth SIG CSCS specification for interoperability testing
+only. No additional authorization is required.
 ```
 
 ---
