@@ -252,33 +252,163 @@ Complete these steps in order:
 
 - [ ] In App Store Connect, select the uploaded build
 - [ ] Answer export compliance (exempt — see above)
-- [ ] Add **Review Notes** if helpful, for example:
-
-  > CSC Emulator advertises as a BLE Cycling Speed and Cadence (CSCS) peripheral for testing and development. To test: launch the app, enable speed and/or cadence, tap Start Emulator, and scan for "CSCS emulator" from any CSCS-compatible central app. Bluetooth permission is required. No account or network access is needed.
-
+- [ ] Record a **screen recording** on a physical device (see [App Review Information](#app-review-information) below)
+- [ ] Paste the full **Review Notes** template into App Store Connect → **App Review Information** → **Notes** (fill in device list and attach recording)
 - [ ] Submit for review
 
 ---
 
-## Review Notes Template
+## App Review Information
 
-```
-CSC Emulator is a developer/testing utility that simulates a Bluetooth Low Energy
-Cycling Speed and Cadence (CSCS) sensor.
+Apple may reject new submissions under **Guideline 2.1 — Information Needed** if the **Notes** field in App Store Connect does not include enough detail for reviewers to understand and test the app. Include all seven items below in every submission.
 
-How to test:
-1. Launch the app on a physical iPhone or iPad (Bluetooth is not available in Simulator).
-2. Enable Speed and/or Cadence on the configuration screen.
-3. Tap "Start Emulator".
-4. From a second device running any CSCS-compatible app, scan for a peripheral named
-   "CSCS emulator" and connect.
-5. Adjust speed/cadence sliders or switch modes (Pedaling, Coasting, Random).
+### Screen recording (item 1)
 
-The app collects no data and requires no account. Bluetooth permission is the only
-permission requested.
-```
+Capture on a **physical device** running the **latest OS**. Begin at app launch and show the typical user flow:
+
+1. Launch CSC Emulator
+2. Bluetooth permission prompt (if shown on first launch)
+3. Configuration screen: enable Speed and/or Cadence
+4. Tap **Start Emulator**
+5. Running screen: switch between Pedaling, Coasting, and Random modes
+6. Adjust speed/cadence sliders (Pedaling mode)
+7. Tap **Stop Emulator**
+
+**Not applicable to this app** (none of these features exist): account registration/login/deletion, paid content or subscriptions, user-generated content, location/contacts/camera/App Tracking Transparency prompts.
+
+The only sensitive capability requested is Bluetooth (`NSBluetoothAlwaysUsageDescription`: "Advertises a simulated cycling speed and cadence sensor.").
+
+Optional second-device verification: any CSCS-compatible app on another phone, tablet, or bike computer can scan for a peripheral named **CSCS emulator** and connect. This is not required to verify the app itself functions correctly.
 
 **Important:** App Review testing of BLE requires a **physical device**. The Simulator cannot advertise as a BLE peripheral.
+
+### Review Notes template (items 1–7)
+
+Paste into App Store Connect → **App Review Information** → **Notes**. Replace the device list placeholder with your actual test hardware.
+
+```
+APP REVIEW INFORMATION — CSC Emulator v1.0
+
+1. SCREEN RECORDING
+A screen recording is attached to this submission (or was uploaded with this reply).
+It was captured on a physical device running the latest OS and begins at app launch.
+
+The recording demonstrates the full core user flow:
+- Launch CSC Emulator
+- Bluetooth permission prompt (if shown on first launch)
+- Configuration screen: enable Speed and/or Cadence
+- Tap "Start Emulator" to begin BLE advertising
+- Running screen: switch between Pedaling, Coasting, and Random modes
+- Adjust speed/cadence sliders (Pedaling mode)
+- Tap "Stop Emulator" to return to configuration
+
+Not applicable to this app (none of these features exist):
+- Account registration, login, or account deletion
+- Paid content, purchases, or subscriptions
+- User-generated content, reporting, or blocking
+- Location, contacts, camera, or App Tracking Transparency prompts
+
+The only sensitive capability requested is Bluetooth (NSBluetoothAlwaysUsageDescription:
+"Advertises a simulated cycling speed and cadence sensor.").
+
+Optional second-device verification: any CSCS-compatible app on another phone, tablet,
+or bike computer can scan for a peripheral named "CSCS emulator" and connect to
+receive simulated speed/cadence data. This is not required to verify the app itself
+functions correctly.
+
+
+2. DEVICES AND OPERATING SYSTEMS TESTED
+[PASTE YOUR TESTING NOTES HERE — e.g.:]
+
+- iPhone [model], iOS [version]
+- iPad [model], iPadOS [version]
+- Mac [model], macOS [version]
+
+
+3. APP PURPOSE AND TARGET AUDIENCE
+
+CSC Emulator is a developer and testing utility that turns an iPhone, iPad, or Mac
+into a virtual Bluetooth Low Energy (BLE) Cycling Speed and Cadence (CSCS) sensor.
+
+Problem it solves:
+Developers, QA engineers, and cyclists often need to test apps or bike computers that
+read CSCS sensor data, but physical sensors are not always available during
+development or review. CSC Emulator provides a controllable, standards-compliant
+CSCS peripheral without dedicated hardware.
+
+Target audience:
+- iOS/macOS developers building cycling or fitness apps with BLE CSCS support
+- QA teams verifying BLE sensor integrations
+- Cyclists evaluating CSCS-compatible apps before purchasing a physical sensor
+
+Value provided:
+- Simulates speed (0–50 mph) and cadence (0–200 rpm) in real time
+- Three modes: Pedaling (manual control), Coasting (speed decay), Random (natural
+  cadence variation)
+- Advertises the standard Bluetooth SIG Cycling Speed and Cadence Service
+- Free, no account required, no data collection
+
+
+4. SETUP AND TESTING INSTRUCTIONS
+
+No login credentials, sample files, or external setup are required.
+
+To test on a physical iPhone or iPad (Bluetooth is not available in Simulator):
+1. Launch CSC Emulator.
+2. If prompted, grant Bluetooth permission.
+3. On the configuration screen, enable Speed and/or Cadence (at least one required).
+4. Tap "Start Emulator."
+5. On the running screen:
+   - Use the mode picker: Pedaling, Coasting, or Random
+   - In Pedaling mode, adjust speed and cadence sliders
+   - In Coasting mode, observe cadence drop to 0 and speed decay
+   - In Random mode, observe automatically varying cadence and derived speed
+6. Tap "Stop Emulator" to end the session and return to configuration.
+
+To verify BLE output (optional, second device):
+- On another device running any CSCS-compatible central app, scan for a peripheral
+  named "CSCS emulator" and connect. Speed and/or cadence measurements will update
+  based on the selected mode and slider values.
+
+macOS testing:
+- Same steps as above. Bluetooth must be enabled in System Settings.
+
+
+5. EXTERNAL SERVICES, TOOLS, AND PLATFORMS
+
+None. CSC Emulator is fully self-contained and operates entirely on-device.
+
+- No network access, servers, or cloud services
+- No authentication providers
+- No payment processors or subscriptions
+- No analytics, crash reporting, or advertising SDKs
+- No AI services or third-party data providers
+
+Core functionality uses only Apple platform APIs:
+- CoreBluetooth (BLE peripheral advertising and GATT service)
+- SwiftUI (user interface)
+- Standard Bluetooth SIG Cycling Speed and Cadence Service (0x1816)
+
+
+6. REGIONAL DIFFERENCES
+
+The app functions identically in all App Store territories. There are no region-
+specific features, content, pricing tiers, or restrictions. All simulation modes
+and BLE behavior are the same worldwide.
+
+
+7. REGULATED INDUSTRY / PROTECTED THIRD-PARTY MATERIAL
+
+Not applicable. CSC Emulator:
+- Does not operate in a regulated industry (healthcare, finance, gambling, etc.)
+- Does not include copyrighted media, licensed content, or protected third-party
+  material
+- Implements the publicly documented Bluetooth SIG Cycling Speed and Cadence
+  Service specification for interoperability testing only
+- Does not provide medical, fitness coaching, or health advice
+
+No additional authorization documentation is required.
+```
 
 ---
 
