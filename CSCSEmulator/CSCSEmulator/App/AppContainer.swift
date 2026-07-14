@@ -30,6 +30,7 @@ final class AppContainer {
         )
         simulationEngine = engine
         peripheralManager = CSCPeripheralManager { engine.state.vitals }
+        peripheralManager.prepare()
 
         #if DEBUG
         if ScreenshotLaunchMode.appState == .running {
@@ -48,6 +49,7 @@ final class AppContainer {
             simulation: simulationEngine,
             broadcaster: peripheralManager,
             appStateStore: appStateStore,
+            settingsOpener: SystemSettingsOpener(),
         )
     }
 

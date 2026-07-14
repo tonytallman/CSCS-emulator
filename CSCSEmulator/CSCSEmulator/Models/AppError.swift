@@ -8,6 +8,7 @@ import Foundation
 enum AppError: Error, LocalizedError, Equatable {
     case bluetoothUnavailable
     case bluetoothDisabled
+    case bluetoothPermissionDenied
     case advertisingFailed
     case connectionFailed
     case internalError
@@ -18,6 +19,8 @@ enum AppError: Error, LocalizedError, Equatable {
             "Bluetooth is not available on this device."
         case .bluetoothDisabled:
             "Bluetooth is turned off. Enable Bluetooth in Settings to use the emulator."
+        case .bluetoothPermissionDenied:
+            "Bluetooth permission is turned off. Enable Bluetooth access for CSCS Emulator in Settings to start the emulator."
         case .advertisingFailed:
             "Failed to start BLE advertising. Please try again."
         case .connectionFailed:

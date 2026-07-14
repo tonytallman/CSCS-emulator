@@ -23,6 +23,7 @@ import Testing
             simulation: engine,
             broadcaster: broadcaster,
             appStateStore: appStateStore,
+            settingsOpener: SettingsOpeningSpy(),
         )
         let runningViewModel = AppRunningViewModel(
             simulation: engine,
@@ -45,20 +46,24 @@ import Testing
     }
 
     @Test func appStateBecomesRunningAfterStartEmulator() {
-        let (viewModel, _, _) = makeViewModel()
+        let (viewModel, _, broadcaster) = makeViewModel()
         viewModel.configurationViewModel.supportsSpeed = true
         viewModel.configurationViewModel.supportsCadence = true
 
         viewModel.configurationViewModel.startEmulator()
+        broadcaster.isAdvertising = true
+        viewModel.configurationViewModel.handleStartOutcome()
 
         #expect(viewModel.appState == .running)
     }
 
     @Test func appStateBecomesConfiguringAfterStopEmulator() {
-        let (viewModel, _, _) = makeViewModel()
+        let (viewModel, _, broadcaster) = makeViewModel()
         viewModel.configurationViewModel.supportsSpeed = true
         viewModel.configurationViewModel.supportsCadence = true
         viewModel.configurationViewModel.startEmulator()
+        broadcaster.isAdvertising = true
+        viewModel.configurationViewModel.handleStartOutcome()
 
         viewModel.runningViewModel.stopEmulator()
 

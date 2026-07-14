@@ -9,8 +9,10 @@ import CoreBluetooth
 enum BluetoothStateMapper {
     static func error(for state: CBManagerState) -> AppError? {
         switch state {
-        case .unsupported, .unauthorized:
+        case .unsupported:
             .bluetoothUnavailable
+        case .unauthorized:
+            .bluetoothPermissionDenied
         case .poweredOff:
             .bluetoothDisabled
         case .poweredOn, .unknown, .resetting:

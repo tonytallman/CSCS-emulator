@@ -11,13 +11,20 @@ protocol ConfigurationViewModel: AnyObject, Observable {
     var supportsSpeed: Bool { get set }
     var supportsCadence: Bool { get set }
     var canStart: Bool { get }
+    var availability: BluetoothAvailability { get }
+    var isAdvertising: Bool { get }
+    var isStarting: Bool { get }
     var lastError: AppError? { get }
 
     func startEmulator()
+    func handleStartOutcome()
+    func openSettings()
+    func refreshAvailability()
 }
 
 struct ConfigurationView<ViewModel: ConfigurationViewModel>: View {
     @Bindable var viewModel: ViewModel
+    @Environment(\.scenePhase) private var scenePhase
     @State private var showError = false
 
     var body: some View {
@@ -26,6 +33,9 @@ struct ConfigurationView<ViewModel: ConfigurationViewModel>: View {
                 header
                 supportedMetricsSection
                 infoCallout
+                if viewModel.availability != .ready {
+                    availabilityCallout
+                }
                 startButton
             }
             .frame(maxWidth: 480)
@@ -35,6 +45,15 @@ struct ConfigurationView<ViewModel: ConfigurationViewModel>: View {
         .navigationTitle("CSCS BLE Emulator")
         .onChange(of: viewModel.lastError) { _, error in
             showError = error != nil
+            viewModel.handleStartOutcome()
+        }
+        .onChange(of: viewModel.isAdvertising) { _, _ in
+            viewModel.handleStartOutcome()
+        }
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .active {
+                viewModel.refreshAvailability()
+            }
         }
         .alert(
             "Error",
@@ -129,16 +148,53 @@ struct ConfigurationView<ViewModel: ConfigurationViewModel>: View {
         .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 
+    @ViewBuilder
+    private var availabilityCallout: some View {
+        if let error = viewModel.availability.appError {
+            VStack(alignment: .leading, spacing: 12) {
+                HStack(alignment: .top, spacing: 8) {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .foregroundStyle(.orange)
+                    Text(error.localizedDescription)
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
+
+                if viewModel.availability.showsSettingsButton {
+                    Button {
+                        viewModel.openSettings()
+                    } label: {
+                        Label("Open Settings", systemImage: "gear")
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.bordered)
+                    .controlSize(.large)
+                }
+            }
+            .padding()
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Color.orange.opacity(0.08))
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+        }
+    }
+
     private var startButton: some View {
         Button {
             viewModel.startEmulator()
         } label: {
-            Label("Start Emulator", systemImage: "play.fill")
-                .frame(maxWidth: .infinity)
+            Group {
+                if viewModel.isStarting {
+                    ProgressView()
+                        .frame(maxWidth: .infinity)
+                } else {
+                    Label("Start Emulator", systemImage: "play.fill")
+                        .frame(maxWidth: .infinity)
+                }
+            }
         }
         .buttonStyle(.borderedProminent)
         .controlSize(.large)
-        .disabled(!viewModel.canStart)
+        .disabled(!viewModel.canStart || viewModel.isStarting)
     }
 
     private var cardBackground: Color {
@@ -151,9 +207,25 @@ struct ConfigurationView<ViewModel: ConfigurationViewModel>: View {
 }
 
 #if DEBUG
-#Preview {
+#Preview("Ready") {
     NavigationStack {
         ConfigurationView(viewModel: PreviewConfigurationViewModel())
+    }
+}
+
+#Preview("Permission Denied") {
+    NavigationStack {
+        ConfigurationView(
+            viewModel: PreviewConfigurationViewModel(availability: .permissionDenied)
+        )
+    }
+}
+
+#Preview("Bluetooth Off") {
+    NavigationStack {
+        ConfigurationView(
+            viewModel: PreviewConfigurationViewModel(availability: .poweredOff)
+        )
     }
 }
 #endif

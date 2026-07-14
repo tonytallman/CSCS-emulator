@@ -16,6 +16,7 @@ final class CSCPeripheralManager: NSObject {
     private(set) var isAdvertising = false
     private(set) var isConnected = false
     private(set) var lastError: AppError?
+    private(set) var availability: BluetoothAvailability = .ready
 
     private let vitalsProvider: () -> SimulatorVitals
 
@@ -37,6 +38,20 @@ final class CSCPeripheralManager: NSObject {
         super.init()
     }
 
+    func prepare() {
+        if CBManager.authorization != .notDetermined, peripheralManager == nil {
+            peripheralManager = makePeripheralManager()
+        }
+        updateAvailability()
+    }
+
+    func refreshAvailability() {
+        if CBManager.authorization != .notDetermined, peripheralManager == nil {
+            peripheralManager = makePeripheralManager()
+        }
+        updateAvailability()
+    }
+
     func start(configuration: SimulatorConfiguration) {
         guard configuration.isValid else { return }
 
@@ -51,8 +66,10 @@ final class CSCPeripheralManager: NSObject {
         )
 
         if peripheralManager == nil {
-            peripheralManager = CBPeripheralManager(delegate: self, queue: nil)
+            peripheralManager = makePeripheralManager()
         }
+
+        updateAvailability()
 
         if peripheralManager?.state == .poweredOn {
             setupServiceAndAdvertise()
@@ -75,6 +92,22 @@ final class CSCPeripheralManager: NSObject {
 
         isAdvertising = false
         isConnected = false
+        updateAvailability()
+    }
+
+    private func makePeripheralManager() -> CBPeripheralManager {
+        CBPeripheralManager(
+            delegate: self,
+            queue: nil,
+            options: [CBPeripheralManagerOptionShowPowerAlertKey: false],
+        )
+    }
+
+    private func updateAvailability() {
+        availability = BluetoothAvailabilityMapper.availability(
+            authorization: CBManager.authorization,
+            state: peripheralManager?.state,
+        )
     }
 
     private func setupServiceAndAdvertise() {
@@ -113,8 +146,29 @@ final class CSCPeripheralManager: NSObject {
             CBAdvertisementDataLocalNameKey: CSCSIdentifiers.advertisedLocalName,
             CBAdvertisementDataServiceUUIDsKey: [CSCSIdentifiers.serviceUUID],
         ])
+    }
+
+    /// Handles the result of `startAdvertising`; exposed for unit tests.
+    func handleAdvertisingStartResult(error: Error?) {
+        if error != nil {
+            lastError = .advertisingFailed
+            stop()
+            return
+        }
+
         isAdvertising = true
         startNotifyLoop()
+    }
+
+    /// Handles the result of adding the CSCS service; exposed for unit tests.
+    func handleServiceAdded(error: Error?) {
+        if error != nil {
+            lastError = .advertisingFailed
+            stop()
+            return
+        }
+
+        beginAdvertising()
     }
 
     private func startNotifyLoop() {
@@ -157,6 +211,8 @@ final class CSCPeripheralManager: NSObject {
 extension CSCPeripheralManager: CBPeripheralManagerDelegate {
     nonisolated func peripheralManagerDidUpdateState(_ peripheral: CBPeripheralManager) {
         Task { @MainActor in
+            updateAvailability()
+
             if let error = BluetoothStateMapper.error(for: peripheral.state) {
                 lastError = error
                 stop()
@@ -171,21 +227,13 @@ extension CSCPeripheralManager: CBPeripheralManagerDelegate {
 
     nonisolated func peripheralManager(_ peripheral: CBPeripheralManager, didAdd service: CBService, error: Error?) {
         Task { @MainActor in
-            if error != nil {
-                lastError = .advertisingFailed
-                stop()
-                return
-            }
-            beginAdvertising()
+            handleServiceAdded(error: error)
         }
     }
 
     nonisolated func peripheralManagerDidStartAdvertising(_ peripheral: CBPeripheralManager, error: Error?) {
         Task { @MainActor in
-            if error != nil {
-                lastError = .advertisingFailed
-                stop()
-            }
+            handleAdvertisingStartResult(error: error)
         }
     }
 

@@ -38,26 +38,41 @@ final class PreviewRootViewModel: RootViewModel {
 final class PreviewConfigurationViewModel: ConfigurationViewModel {
     var supportsSpeed: Bool
     var supportsCadence: Bool
+    var availability: BluetoothAvailability
+    var isAdvertising: Bool
+    var isStarting: Bool
     var lastError: AppError?
 
     init(
         supportsSpeed: Bool = true,
         supportsCadence: Bool = true,
+        availability: BluetoothAvailability = .ready,
+        isAdvertising: Bool = false,
+        isStarting: Bool = false,
         lastError: AppError? = nil,
     ) {
         self.supportsSpeed = supportsSpeed
         self.supportsCadence = supportsCadence
+        self.availability = availability
+        self.isAdvertising = isAdvertising
+        self.isStarting = isStarting
         self.lastError = lastError
     }
 
     var canStart: Bool {
         SimulatorConfiguration(
             supportsSpeed: supportsSpeed,
-            supportsCadence: supportsCadence
-        ).isValid
+            supportsCadence: supportsCadence,
+        ).isValid && availability == .ready
     }
 
     func startEmulator() {}
+
+    func handleStartOutcome() {}
+
+    func openSettings() {}
+
+    func refreshAvailability() {}
 }
 
 @Observable

@@ -11,7 +11,10 @@ protocol MeasurementBroadcasting: AnyObject {
     var isAdvertising: Bool { get }
     var isConnected: Bool { get }
     var lastError: AppError? { get }
+    var availability: BluetoothAvailability { get }
 
+    func prepare()
+    func refreshAvailability()
     func start(configuration: SimulatorConfiguration)
     func stop()
 }

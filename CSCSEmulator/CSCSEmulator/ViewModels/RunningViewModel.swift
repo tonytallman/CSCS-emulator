@@ -116,7 +116,7 @@ final class AppRunningViewModel: RunningViewModel {
     func handleErrorChange() {
         guard let error = lastError else { return }
         switch error {
-        case .bluetoothUnavailable, .bluetoothDisabled:
+        case .bluetoothUnavailable, .bluetoothDisabled, .bluetoothPermissionDenied:
             stopEmulator()
         case .advertisingFailed, .connectionFailed, .internalError:
             break

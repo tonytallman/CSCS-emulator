@@ -19,7 +19,7 @@ CSCS Emulator simulates a Bluetooth Low Energy cycling speed and cadence sensor,
 - Real-time speed (0–50 MPH) and cadence (0–200 RPM) control via sliders
 - Supports one connected BLE central at a time
 - On iPhone and iPad, continues BLE advertising while the app runs in the background
-- Graceful error handling for Bluetooth unavailability, permission denials, and advertising failures
+- Graceful error handling for Bluetooth unavailability, permission denials, Bluetooth turned off, and advertising failures
 
 ## User Interface
 
@@ -34,6 +34,8 @@ Before starting the emulator, the user configures which metrics the simulated de
 | Start Emulator Button | Starts BLE advertising and simulation |
 
 At least one metric (speed or cadence) must be enabled before the emulator can start. Once running, the supported metrics are locked until the emulator is stopped.
+
+If Bluetooth permission is denied, Bluetooth is turned off, or BLE is unavailable on the device, the Start Emulator button is disabled and a message explains why. When permission is denied or Bluetooth is off, an **Open Settings** button helps the user fix the issue. On first launch, the system Bluetooth permission prompt still appears when the user taps Start.
 
 ### Running Screen
 

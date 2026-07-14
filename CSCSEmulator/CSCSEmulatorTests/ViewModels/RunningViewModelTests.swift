@@ -94,7 +94,11 @@ import Testing
         #expect(appStateStore.state == .configuring)
     }
 
-    @Test(arguments: [AppError.bluetoothUnavailable, AppError.bluetoothDisabled])
+    @Test(arguments: [
+        AppError.bluetoothUnavailable,
+        AppError.bluetoothDisabled,
+        AppError.bluetoothPermissionDenied,
+    ])
     func bluetoothUnavailableErrorStopsBroadcasterAndEngine(error: AppError) {
         let engine = makeEngine()
         let broadcaster = MeasurementBroadcastingSpy()

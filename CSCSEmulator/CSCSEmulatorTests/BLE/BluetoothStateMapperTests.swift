@@ -12,8 +12,8 @@ import Testing
         #expect(BluetoothStateMapper.error(for: .unsupported) == .bluetoothUnavailable)
     }
 
-    @Test func unauthorizedMapsToUnavailable() {
-        #expect(BluetoothStateMapper.error(for: .unauthorized) == .bluetoothUnavailable)
+    @Test func unauthorizedMapsToPermissionDenied() {
+        #expect(BluetoothStateMapper.error(for: .unauthorized) == .bluetoothPermissionDenied)
     }
 
     @Test func poweredOffMapsToDisabled() {
