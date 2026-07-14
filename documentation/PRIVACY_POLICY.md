@@ -1,8 +1,8 @@
-# Privacy Policy — CSC Emulator
+# Privacy Policy — CSCS Emulator
 
 Effective date: June 25, 2026
 
-CSC Emulator ("the app") is developed and maintained by Tallman Software.
+CSCS Emulator ("the app") is developed and maintained by Tallman Software.
 
 ## Data we collect
 

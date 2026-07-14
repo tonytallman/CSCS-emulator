@@ -44,7 +44,9 @@ struct RunningView<ViewModel: RunningViewModel>: View {
             .frame(maxWidth: .infinity)
             .padding()
         }
-        .navigationTitle("CSCS BLE Emulator")
+        #if os(macOS)
+        .navigationTitle(AppInfo.title)
+        #endif
         .background {
             if let simulationEngine = viewModel.simulationEngine {
                 SimulationObservation(engine: simulationEngine)
@@ -70,7 +72,7 @@ struct RunningView<ViewModel: RunningViewModel>: View {
             Image(systemName: "bicycle")
                 .font(.system(size: 48))
                 .foregroundStyle(.blue)
-            Text("CSCS BLE Emulator")
+            Text(AppInfo.title)
                 .font(.title2)
                 .fontWeight(.bold)
             HStack(spacing: 6) {

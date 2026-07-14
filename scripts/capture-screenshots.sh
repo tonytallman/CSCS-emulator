@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Capture App Store screenshots for CSC Emulator.
+# Capture App Store screenshots for CSCS Emulator.
 # Requires Xcode and the iOS Simulator. Mac screenshots are exported by the
 # Debug build itself (no Screen Recording permission required).
 

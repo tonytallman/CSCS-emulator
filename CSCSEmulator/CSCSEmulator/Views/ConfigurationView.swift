@@ -42,7 +42,9 @@ struct ConfigurationView<ViewModel: ConfigurationViewModel>: View {
             .frame(maxWidth: .infinity)
             .padding()
         }
-        .navigationTitle("CSCS BLE Emulator")
+        #if os(macOS)
+        .navigationTitle(AppInfo.title)
+        #endif
         .onChange(of: viewModel.lastError) { _, error in
             showError = error != nil
             viewModel.handleStartOutcome()
@@ -71,7 +73,7 @@ struct ConfigurationView<ViewModel: ConfigurationViewModel>: View {
             Image(systemName: "bicycle")
                 .font(.system(size: 48))
                 .foregroundStyle(.blue)
-            Text("CSCS BLE Emulator")
+            Text(AppInfo.title)
                 .font(.title2)
                 .fontWeight(.bold)
             Text("Choose which metrics this emulator will support. These choices cannot be changed after starting.")
