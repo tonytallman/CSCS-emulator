@@ -135,18 +135,18 @@ The app includes `PrivacyInfo.xcprivacy` declaring no tracking, no collected dat
 
 Screenshots are stored in `documentation/screenshots/`. Upload the appropriate sizes in App Store Connect.
 
-**Captured automatically (simulator):**
+**Captured automatically:**
 
-| File | Dimensions | Target requirement |
-| --- | --- | --- |
-| `iphone-configuration.png` | 1284 × 2778 | 1284 × 2778 (6.5" iPhone) |
-| `iphone-running.png` | 1284 × 2778 | 1284 × 2778 (6.5" iPhone) |
-| `ipad-configuration.png` | 2064 × 2752 | 2048 × 2732 (12.9" iPad) |
-| `ipad-running.png` | 2064 × 2752 | 2048 × 2732 (12.9" iPad) |
-| `mac-configuration.png` | 1280 × 2027 | 1280 × 800 minimum (Mac) |
-| `mac-running.png` | 1280 × 2027 | 1280 × 800 minimum (Mac) |
+| File | Dimensions | Target requirement | Source |
+| --- | --- | --- | --- |
+| `iphone-configuration.png` | 1284 × 2778 | 1284 × 2778 (6.5" iPhone) | Physical iPhone |
+| `iphone-running.png` | 1284 × 2778 | 1284 × 2778 (6.5" iPhone) | Physical iPhone |
+| `ipad-configuration.png` | 2064 × 2752 | 2048 × 2732 (12.9" iPad) | iOS Simulator |
+| `ipad-running.png` | 2064 × 2752 | 2048 × 2732 (12.9" iPad) | iOS Simulator |
+| `mac-configuration.png` | 1280 × 2027 | 1280 × 800 minimum (Mac) | Debug export |
+| `mac-running.png` | 1280 × 2027 | 1280 × 800 minimum (Mac) | Debug export |
 
-**Mac screenshots** are exported by the Debug build itself (no Screen Recording permission required). Regenerate with:
+**iPhone screenshots** require a connected physical device — the Simulator cannot represent Bluetooth permission UI correctly. Grant Bluetooth access for CSCS Emulator on the device before running the script. **Mac screenshots** are exported by the Debug build itself (no Screen Recording permission required). Regenerate all with:
 
 ```bash
 bash scripts/capture-screenshots.sh
@@ -170,7 +170,7 @@ done
 
 Required: **1284 × 2778 px** (portrait) or **2778 × 1284 px** (landscape). Also accepted: **1242 × 2688 px** / **2688 × 1242 px**.
 
-The capture script uses the iPhone 16 Pro Max simulator (1320 × 2868 raw) and resizes to 1284 × 2778 for App Store Connect.
+The capture script installs on a **physical iPhone** (Bluetooth permission must be granted), resizes to 1284 × 2778 for App Store Connect, and uses the iPad Pro 13-inch (M4) simulator for iPad captures.
 
 | File | Screen |
 | --- | --- |
@@ -195,7 +195,7 @@ Required: **1280 × 800 px** minimum (one of 1280×800, 1440×900, 2560×1600, o
 | `mac-configuration.png` | Configuration screen |
 | `mac-running.png` | Running screen |
 
-**Note:** Simulator captures may not match exact pixel dimensions. Resize or re-capture on the target device class if App Store Connect rejects them.
+**Note:** iPhone captures must come from a physical device for correct Bluetooth permission UI. iPad Simulator captures may not match exact pixel dimensions. Resize or re-capture on the target device class if App Store Connect rejects them.
 
 ### Regenerating screenshots
 
@@ -208,6 +208,21 @@ CSCS_SCREENSHOT_MODE=configuration
 # Running screen
 CSCS_SCREENSHOT_MODE=running
 ```
+
+---
+
+## Automated Pre-Submission
+
+Most pre-upload steps can be run from the repository root. In Cursor, invoke the **`prepare-app-store-build`** skill to orchestrate the full workflow; or run the scripts individually:
+
+| Step | Script | Output |
+| --- | --- | --- |
+| Bump build number | `bash scripts/bump-build-number.sh` | Updates `CURRENT_PROJECT_VERSION` in `project.pbxproj` |
+| Run unit tests | `bash scripts/run-unit-tests.sh` | **Stops on failure** — do not proceed if tests fail |
+| Archive and export | `bash scripts/archive-and-export.sh` | `build/export/ios/*.ipa`, `build/export/macos/*.pkg` |
+| Screenshots | `bash scripts/capture-screenshots.sh` | `documentation/screenshots/` (iPhone: physical device; iPad: Simulator; Mac: export) |
+
+After automation, upload the exported `.ipa` and `.pkg` via Xcode Organizer or Transporter, run **Validate App**, record the App Review screen recording manually, then complete the manual App Store Connect steps below.
 
 ---
 
@@ -240,6 +255,10 @@ Complete these steps in order:
 - [ ] Upload screenshots for iPhone, iPad, and Mac
 
 ### 3. Build and Upload (Xcode)
+
+**Automated (recommended):** Run `bash scripts/archive-and-export.sh` after unit tests pass (see [Automated Pre-Submission](#automated-pre-submission)). Upload the exported artifacts from `build/export/`.
+
+**Manual alternative:**
 
 - [ ] Open `CSCSEmulator/CSCSEmulator.xcodeproj` in Xcode
 - [ ] Select **Any iOS Device (arm64)** or a connected device for archive (not Simulator)
@@ -297,17 +316,9 @@ launch app -> Bluetooth permission prompt (first launch) -> Configuration screen
 enable Speed/Cadence -> "Start Emulator" -> Running screen, switch Pedaling/
 Coasting/Random modes, adjust sliders -> "Stop Emulator".
 
-Not applicable (app has none of these): account registration/login/deletion, paid
-content/subscriptions, user-generated content, location/contacts/camera/ATT
-prompts. Bluetooth is the only sensitive permission used
-(NSBluetoothAlwaysUsageDescription: "Advertises a simulated cycling speed and
-cadence sensor.").
-
 2. DEVICES AND OS TESTED
-[PASTE YOUR TESTING NOTES HERE, e.g.:]
-- iPhone [model], iOS [version]
-- iPad [model], iPadOS [version]
-- Mac [model], macOS [version]
+- iPhone SE (3rd generation), iOS 26.5
+- Mac mini, macOS 26.5.2 
 
 3. PURPOSE AND AUDIENCE
 Developers, QA engineers, and cyclists testing CSCS-compatible apps or bike
@@ -323,9 +334,12 @@ No credentials or sample files needed. On a physical iPhone/iPad (BLE peripheral
 mode is unavailable in Simulator): launch app, grant Bluetooth permission if
 prompted, enable Speed and/or Cadence, tap "Start Emulator", try each mode
 (Pedaling: adjust sliders; Coasting: cadence drops to 0 and speed decays; Random:
-cadence/speed vary automatically), then tap "Stop Emulator". Optional: connect from
-a second device running any CSCS-compatible app by scanning for "CSCS emulator".
-Same flow on Mac; enable Bluetooth in System Settings first.
+cadence/speed vary automatically), then tap "Stop Emulator".
+Optional interoperability check: on a second iOS device, use nRF Connect for Mobile 
+(generic BLE central) to scan for service 0x1816 / peripheral name 'CSCS emulator', 
+connect, and enable notifications on characteristic 0x2A5B. Measurement packets 
+update as speed/cadence change in the emulator UI. No third-party account or paid 
+app is required for review.
 
 5. EXTERNAL SERVICES
 None. Fully self-contained, on-device only: no network calls, servers,

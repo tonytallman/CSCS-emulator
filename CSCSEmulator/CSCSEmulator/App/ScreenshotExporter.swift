@@ -18,7 +18,7 @@ enum ScreenshotExporter {
     private static let exportHeight: CGFloat = 760
 
     static var shouldExport: Bool {
-        ScreenshotLaunchMode.appState != nil
+        ScreenshotLaunchMode.appState != nil && !ScreenshotLaunchMode.suppressScreenshotExport
     }
 
     @MainActor

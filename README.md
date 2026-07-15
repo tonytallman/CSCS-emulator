@@ -141,6 +141,8 @@ CSCSEmulator/
 
 See [documentation/APP_STORE_SUBMISSION.md](documentation/APP_STORE_SUBMISSION.md) for metadata, privacy answers, and the manual submission checklist. Privacy policy: [documentation/PRIVACY_POLICY.md](documentation/PRIVACY_POLICY.md).
 
+To prepare a new build, use the **`prepare-app-store-build`** Cursor skill (`.cursor/skills/prepare-app-store-build/`) or run the scripts under `scripts/` — bump build number, run unit tests, archive/export, and capture screenshots (iPhone requires a physical device). Upload, App Review recording, and App Store Connect steps remain manual.
+
 ## Future Enhancements
 
 - Wheel circumference and crank length configuration
