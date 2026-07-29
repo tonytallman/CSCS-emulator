@@ -18,6 +18,9 @@ xcuserdata/
 # Local archive/export output
 build/
 
+# App Store screenshots (regenerate with scripts/capture-screenshots.sh)
+documentation/screenshots/
+
 ## Playgrounds
 timeline.xctimeline
 playground.xcworkspace
@@ -65,3 +68,4 @@ fastlane/report.xml
 fastlane/Preview.html
 fastlane/screenshots/**/*.png
 fastlane/test_output
+APP_STORE_SUBMISSION.md

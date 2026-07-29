@@ -1,77 +1,42 @@
 #!/usr/bin/env bash
 # Capture App Store screenshots for Bike Sensor Emulator.
-# iPhone: physical device (Simulator cannot represent Bluetooth permission UI).
-# iPad: iOS Simulator. Mac: exported by the Debug build itself.
+# iPhone / iPad: named Simulators (Screenshot iPhone, Screenshot iPad).
+# Mac: exported by the Debug build itself.
+#
+# Before running: apply the temporary Simulator Bluetooth-availability bypass in
+# CSCPeripheralManager (see prepare-app-store-build skill Step 4). Undo it after.
 
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-# shellcheck source=resolve-ios-device.sh
-source "$ROOT/scripts/resolve-ios-device.sh"
 PROJECT="$ROOT/CSCSEmulator"
 OUT="$ROOT/documentation/screenshots"
 DERIVED="$HOME/Library/Developer/Xcode/DerivedData"
 BUNDLE_ID="com.tallmansoftware.csc-emulator"
-SCREENSHOT_SETTLE_SECONDS="${SCREENSHOT_SETTLE_SECONDS:-3}"
+# Short settles often capture SpringBoard instead of the app after simctl launch.
+SCREENSHOT_SETTLE_SECONDS="${SCREENSHOT_SETTLE_SECONDS:-6}"
+IPHONE_SIMULATOR_NAME="Screenshot iPhone"
+IPAD_SIMULATOR_NAME="Screenshot iPad"
 
 mkdir -p "$OUT"
 
-launch_ios_device_app() {
-  local mode="$1"
-  xcrun devicectl device process launch \
-    --device "$IOS_DEVICE" \
-    --terminate-existing \
-    -e "{\"CSCS_SCREENSHOT_MODE\": \"$mode\"}" \
-    "$BUNDLE_ID" >/dev/null
-}
-
-capture_iphone_device() {
-  echo "Building iOS device app (Debug)..."
-  cd "$PROJECT"
-  xcodebuild -scheme CSCSEmulator \
-    -destination "platform=iOS,id=$IOS_DEVICE" \
-    -configuration Debug build >/dev/null
-
-  local app_path
-  app_path="$(find "$DERIVED" ! -path '*/Index.noindex/*' -path '*/Build/Products/Debug-iphoneos/CSCSEmulator.app' -maxdepth 8 | head -1)"
-  if [[ -z "$app_path" ]]; then
-    echo "Could not locate built iOS device app." >&2
+resolve_sim_udid() {
+  local device_name="$1"
+  local device_id
+  device_id="$(xcrun simctl list devices available | rg "$device_name" | head -1 | rg -o '[A-F0-9-]{36}' || true)"
+  if [[ -z "$device_id" ]]; then
+    echo "Simulator not found: $device_name" >&2
+    echo "Create it in Xcode → Window → Devices and Simulators." >&2
     exit 1
   fi
-
-  echo "Installing on $IOS_DEVICE..."
-  xcrun devicectl device install app --device "$IOS_DEVICE" "$app_path"
-
-  echo "Capturing iPhone screenshots on $IOS_DEVICE..."
-  echo "Ensure Bluetooth permission is granted on the device (Settings → Bike Sensor)."
-
-  launch_ios_device_app configuration
-  sleep "$SCREENSHOT_SETTLE_SECONDS"
-  xcrun devicectl device capture screenshot \
-    --device "$IOS_DEVICE" \
-    --destination "$OUT/iphone-configuration.png"
-
-  launch_ios_device_app running
-  sleep "$SCREENSHOT_SETTLE_SECONDS"
-  xcrun devicectl device capture screenshot \
-    --device "$IOS_DEVICE" \
-    --destination "$OUT/iphone-running.png"
-
-  # App Store Connect 6.5" iPhone slot accepts 1284×2778 or 1242×2688.
-  sips -z 2778 1284 "$OUT/iphone-configuration.png" --out "$OUT/iphone-configuration.png" >/dev/null
-  sips -z 2778 1284 "$OUT/iphone-running.png" --out "$OUT/iphone-running.png" >/dev/null
-
-  echo "Captured iPhone (configuration, running) from $IOS_DEVICE"
+  printf '%s\n' "$device_id"
 }
 
-capture_ios_simulator() {
-  local device_name="$1"
-  local prefix="$2"
-
-  echo "Building iOS Simulator app..."
+build_ios_simulator_app() {
+  echo "Building iOS Simulator app (generic destination)..."
   cd "$PROJECT"
   xcodebuild -scheme CSCSEmulator \
-    -destination 'platform=iOS Simulator,name=iPhone 16 Pro Max,OS=18.5' \
+    -destination 'generic/platform=iOS Simulator' \
     -configuration Debug build >/dev/null
 
   local app_path
@@ -80,28 +45,49 @@ capture_ios_simulator() {
     echo "Could not locate built iOS Simulator app." >&2
     exit 1
   fi
+  printf '%s\n' "$app_path"
+}
 
+capture_ios_simulator() {
+  local device_name="$1"
+  local prefix="$2"
+  local app_path="$3"
   local device_id
-  device_id="$(xcrun simctl list devices available | rg "$device_name" | head -1 | rg -o '[A-F0-9-]{36}')"
+  device_id="$(resolve_sim_udid "$device_name")"
 
   echo "Capturing $prefix on $device_name ($device_id)..."
   xcrun simctl boot "$device_id" 2>/dev/null || true
   open -a Simulator --args -CurrentDeviceUDID "$device_id"
+  sleep 2
   xcrun simctl install "$device_id" "$app_path"
 
-  SIMCTL_CHILD_CSCS_SCREENSHOT_MODE=configuration xcrun simctl launch "$device_id" "$BUNDLE_ID" >/dev/null
+  xcrun simctl terminate "$device_id" "$BUNDLE_ID" >/dev/null 2>&1 || true
+  sleep 1
+  SIMCTL_CHILD_CSCS_SCREENSHOT_MODE=configuration \
+    xcrun simctl launch --terminate-running-process "$device_id" "$BUNDLE_ID" >/dev/null
   sleep "$SCREENSHOT_SETTLE_SECONDS"
   xcrun simctl io "$device_id" screenshot "$OUT/${prefix}-configuration.png"
-  xcrun simctl terminate "$device_id" "$BUNDLE_ID" >/dev/null || true
+  xcrun simctl terminate "$device_id" "$BUNDLE_ID" >/dev/null 2>&1 || true
 
-  SIMCTL_CHILD_CSCS_SCREENSHOT_MODE=running xcrun simctl launch "$device_id" "$BUNDLE_ID" >/dev/null
+  sleep 1
+  SIMCTL_CHILD_CSCS_SCREENSHOT_MODE=running \
+    xcrun simctl launch --terminate-running-process "$device_id" "$BUNDLE_ID" >/dev/null
   sleep "$SCREENSHOT_SETTLE_SECONDS"
   xcrun simctl io "$device_id" screenshot "$OUT/${prefix}-running.png"
-  xcrun simctl terminate "$device_id" "$BUNDLE_ID" >/dev/null || true
+  xcrun simctl terminate "$device_id" "$BUNDLE_ID" >/dev/null 2>&1 || true
+
+  echo "Captured $prefix (configuration, running) from $device_name"
 }
 
-capture_iphone_device
-capture_ios_simulator "iPad Pro 13-inch (M4)" ipad
+SIM_APP="$(build_ios_simulator_app)"
+echo "App: $SIM_APP"
+
+capture_ios_simulator "$IPHONE_SIMULATOR_NAME" iphone "$SIM_APP"
+capture_ios_simulator "$IPAD_SIMULATOR_NAME" ipad "$SIM_APP"
+
+# App Store Connect 6.5" iPhone slot accepts 1284×2778 or 1242×2688.
+sips -z 2778 1284 "$OUT/iphone-configuration.png" --out "$OUT/iphone-configuration.png" >/dev/null
+sips -z 2778 1284 "$OUT/iphone-running.png" --out "$OUT/iphone-running.png" >/dev/null
 
 echo "Building macOS app..."
 cd "$PROJECT"
