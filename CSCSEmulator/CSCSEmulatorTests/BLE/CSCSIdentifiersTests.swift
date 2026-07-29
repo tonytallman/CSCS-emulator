@@ -29,7 +29,7 @@ import Testing
         #expect(value[1] == 0x00)
     }
 
-    @Test func advertisedLocalNameIsBikeSensorEmulator() {
-        #expect(CSCSIdentifiers.advertisedLocalName == "Bike Sensor Emulator")
+    @Test func advertisedLocalNameIsCSCSEmulator() {
+        #expect(CSCSIdentifiers.advertisedLocalName == "CSCS Emulator")
     }
 }

@@ -295,7 +295,7 @@ Capture on a **physical device** running the **latest OS**. Begin at app launch 
 
 The only sensitive capability requested is Bluetooth (`NSBluetoothAlwaysUsageDescription`: "Advertises a simulated cycling speed and cadence sensor.").
 
-Optional second-device verification: any CSCS-compatible app on another phone, tablet, or bike computer can scan for a peripheral named **Bike Sensor Emulator** and connect. This is not required to verify the app itself functions correctly.
+Optional second-device verification: any CSCS-compatible app on another phone, tablet, or bike computer can scan for a peripheral named **CSCS Emulator** and connect. This is not required to verify the app itself functions correctly.
 
 **Important:** App Review testing of BLE requires a **physical device**. The Simulator cannot advertise as a BLE peripheral.
 
@@ -333,7 +333,7 @@ mode is unavailable in Simulator): launch app, grant Bluetooth permission if
 prompted, enable Speed and/or Cadence, tap "Start Emulator", try each mode
 (Random: cadence/speed vary automatically; Manual: adjust sliders), then tap "Stop Emulator".
 Optional interoperability check: on a second iOS device, use nRF Connect for Mobile 
-(generic BLE central) to scan for service 0x1816 / peripheral name 'Bike Sensor Emulator', 
+(generic BLE central) to scan for service 0x1816 / peripheral name 'CSCS Emulator',
 connect, and enable notifications on characteristic 0x2A5B. Measurement packets 
 update as speed/cadence change in the emulator UI. No third-party account or paid 
 app is required for review.
@@ -359,7 +359,7 @@ only. No additional authorization is required.
 
 ## Terminology Reference
 
-- **Emulator** — App Store product name and BLE local name (`Bike Sensor Emulator`); home-screen label is shortened to `Bike Sensor`
+- **Emulator** — App Store product name (`Bike Sensor Emulator`); BLE advertised local name (`CSCS Emulator`); home-screen label is shortened to `Bike Sensor`
 - **Simulated / simulation modes** — describes generated ride data and behavior, not a competing product name
 
 ---

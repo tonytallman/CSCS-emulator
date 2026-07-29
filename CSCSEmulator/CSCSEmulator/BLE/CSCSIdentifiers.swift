@@ -12,7 +12,7 @@ enum CSCSIdentifiers {
     static let measurementCharacteristicUUID = CBUUID(string: "2A5B")
     static let featureCharacteristicUUID = CBUUID(string: "2A5C")
 
-    static let advertisedLocalName = "Bike Sensor Emulator"
+    static let advertisedLocalName = "CSCS Emulator"
 
     /// CSC Feature characteristic value (uint16 LE): bit 0 = wheel rev data, bit 1 = crank rev data.
     static func featureValue(supportsSpeed: Bool, supportsCadence: Bool) -> Data {

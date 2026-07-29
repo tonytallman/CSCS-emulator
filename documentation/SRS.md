@@ -105,7 +105,7 @@ These ranges shall accommodate Random-mode derived speed (200 RPM corresponds to
 While advertising, the BLE device name shall be:
 
 ```text
-Bike Sensor Emulator
+CSCS Emulator
 ```
 
 ### 4.2 Advertising
