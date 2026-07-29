@@ -70,9 +70,11 @@ struct ConfigurationView<ViewModel: ConfigurationViewModel>: View {
 
     private var header: some View {
         VStack(spacing: 12) {
-            Image(systemName: "bicycle")
-                .font(.system(size: 48))
-                .foregroundStyle(.blue)
+            Image("BrandMark")
+                .resizable()
+                .scaledToFit()
+                .frame(height: 48)
+                .accessibilityLabel("Bike Sensor Emulator")
             Text(AppInfo.title)
                 .font(.title2)
                 .fontWeight(.bold)
