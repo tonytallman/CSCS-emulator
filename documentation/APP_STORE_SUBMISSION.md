@@ -1,6 +1,6 @@
-# App Store Submission Guide — CSCS Emulator
+# App Store Submission Guide — Bike Sensor Emulator
 
-This document contains everything needed to submit **CSCS Emulator** to the App Store. The build and upload steps require your Apple Developer account and must be completed manually in Xcode and App Store Connect.
+This document contains everything needed to submit **Bike Sensor Emulator** to the App Store. The build and upload steps require your Apple Developer account and must be completed manually in Xcode and App Store Connect.
 
 ---
 
@@ -8,7 +8,7 @@ This document contains everything needed to submit **CSCS Emulator** to the App 
 
 | Field | Value |
 | --- | --- |
-| **App Name** | CSCS Emulator |
+| **App Name** | Bike Sensor Emulator |
 | **Subtitle** | Virtual Cycling Sensor |
 | **Bundle ID** | `com.tallmansoftware.csc-emulator` |
 | **SKU** | `csc-emulator` (suggested; any unique string is fine) |
@@ -17,8 +17,8 @@ This document contains everything needed to submit **CSCS Emulator** to the App 
 | **Build** | 1 |
 | **Category** | Developer Tools |
 | **LSApplicationCategoryType** | `public.app-category.developer-tools` |
-| **Display Name (home screen)** | CSCS Emulator |
-| **In-app screen title** | CSCS Emulator (header on all platforms; macOS window/toolbar title only) |
+| **Display Name (home screen)** | Bike Sensor |
+| **In-app screen title** | Bike Sensor Emulator (header on all platforms; macOS window/toolbar title only) |
 | **Development Team** | `MYMYAX7K65` |
 | **Supported Platforms** | iPhone, iPad, Mac |
 | **Minimum OS** | iOS 17.6, macOS 14.6 |
@@ -49,7 +49,7 @@ This document contains everything needed to submit **CSCS Emulator** to the App 
 ```
 Turn your iPhone, iPad, or Mac into a Bluetooth Low Energy cycling sensor — no hardware required.
 
-CSCS Emulator advertises as a standard Cycling Speed and Cadence (CSCS) peripheral. Any app or bike computer that supports the Bluetooth SIG CSCS specification can connect and receive simulated data.
+Bike Sensor Emulator advertises as a standard Cycling Speed and Cadence (CSCS) peripheral. Any app or bike computer that supports the Bluetooth SIG CSCS specification can connect and receive simulated data.
 
 SIMULATION MODES
 
@@ -146,7 +146,7 @@ Screenshots are stored in `documentation/screenshots/`. Upload the appropriate s
 | `mac-configuration.png` | 1280 × 2027 | 1280 × 800 minimum (Mac) | Debug export |
 | `mac-running.png` | 1280 × 2027 | 1280 × 800 minimum (Mac) | Debug export |
 
-**iPhone screenshots** require a connected physical device — the Simulator cannot represent Bluetooth permission UI correctly. Grant Bluetooth access for CSCS Emulator on the device before running the script. **Mac screenshots** are exported by the Debug build itself (no Screen Recording permission required). Regenerate all with:
+**iPhone screenshots** require a connected physical device — the Simulator cannot represent Bluetooth permission UI correctly. Grant Bluetooth access for Bike Sensor Emulator on the device before running the script. **Mac screenshots** are exported by the Debug build itself (no Screen Recording permission required). Regenerate all with:
 
 ```bash
 bash scripts/capture-screenshots.sh
@@ -242,7 +242,7 @@ Complete these steps in order:
 - [ ] Sign in at [appstoreconnect.apple.com](https://appstoreconnect.apple.com)
 - [ ] Create a new app:
   - Platform: iOS (Mac is included via universal purchase / Mac Catalyst or native Mac target)
-  - Name: **CSCS Emulator**
+  - Name: **Bike Sensor Emulator**
   - Primary language: English (U.S.)
   - Bundle ID: `com.tallmansoftware.csc-emulator`
   - SKU: `csc-emulator`
@@ -285,7 +285,7 @@ Apple may reject new submissions under **Guideline 2.1 — Information Needed** 
 
 Capture on a **physical device** running the **latest OS**. Begin at app launch and show the typical user flow:
 
-1. Launch CSCS Emulator
+1. Launch Bike Sensor Emulator
 2. Bluetooth permission prompt (if shown on first launch)
 3. Configuration screen: enable Speed and/or Cadence
 4. Tap **Start Emulator**
@@ -297,7 +297,7 @@ Capture on a **physical device** running the **latest OS**. Begin at app launch 
 
 The only sensitive capability requested is Bluetooth (`NSBluetoothAlwaysUsageDescription`: "Advertises a simulated cycling speed and cadence sensor.").
 
-Optional second-device verification: any CSCS-compatible app on another phone, tablet, or bike computer can scan for a peripheral named **CSCS emulator** and connect. This is not required to verify the app itself functions correctly.
+Optional second-device verification: any CSCS-compatible app on another phone, tablet, or bike computer can scan for a peripheral named **Bike Sensor Emulator** and connect. This is not required to verify the app itself functions correctly.
 
 **Important:** App Review testing of BLE requires a **physical device**. The Simulator cannot advertise as a BLE peripheral.
 
@@ -306,7 +306,7 @@ Optional second-device verification: any CSCS-compatible app on another phone, t
 Paste into App Store Connect → **App Review Information** → **Notes**. Replace the device list placeholder with your actual test hardware. The Notes field has a **4000 character limit**; this template is kept under that limit.
 
 ```
-CSCS Emulator is a developer/testing utility that turns an iPhone, iPad, or Mac into
+Bike Sensor Emulator is a developer/testing utility that turns an iPhone, iPad, or Mac into
 a virtual Bluetooth Low Energy (BLE) Cycling Speed and Cadence (CSCS) sensor. No
 account, network access, or data collection is involved.
 
@@ -322,7 +322,7 @@ Coasting/Random modes, adjust sliders -> "Stop Emulator".
 
 3. PURPOSE AND AUDIENCE
 Developers, QA engineers, and cyclists testing CSCS-compatible apps or bike
-computers often lack a physical sensor. CSCS Emulator provides a controllable,
+computers often lack a physical sensor. Bike Sensor Emulator provides a controllable,
 standards-compliant CSCS peripheral without hardware. Audience: iOS/macOS
 developers building cycling/fitness apps, QA teams verifying BLE integrations, and
 cyclists evaluating apps before buying a sensor. It simulates speed (0-50 mph) and
@@ -336,7 +336,7 @@ prompted, enable Speed and/or Cadence, tap "Start Emulator", try each mode
 (Pedaling: adjust sliders; Coasting: cadence drops to 0 and speed decays; Random:
 cadence/speed vary automatically), then tap "Stop Emulator".
 Optional interoperability check: on a second iOS device, use nRF Connect for Mobile 
-(generic BLE central) to scan for service 0x1816 / peripheral name 'CSCS emulator', 
+(generic BLE central) to scan for service 0x1816 / peripheral name 'Bike Sensor Emulator', 
 connect, and enable notifications on characteristic 0x2A5B. Measurement packets 
 update as speed/cadence change in the emulator UI. No third-party account or paid 
 app is required for review.
@@ -362,7 +362,7 @@ only. No additional authorization is required.
 
 ## Terminology Reference
 
-- **Emulator** — product name (`CSCS Emulator`, `CSCS emulator` BLE local name)
+- **Emulator** — App Store product name and BLE local name (`Bike Sensor Emulator`); home-screen label is shortened to `Bike Sensor`
 - **Simulated / simulation modes** — describes generated ride data and behavior, not a competing product name
 
 ---

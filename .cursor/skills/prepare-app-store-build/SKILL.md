@@ -1,7 +1,7 @@
 ---
 name: prepare-app-store-build
 description: >-
-  Prepares a new CSCS Emulator App Store build: bumps the build number, runs
+  Prepares a new Bike Sensor Emulator App Store build: bumps the build number, runs
   unit tests (stops on failure), archives and exports iOS/macOS Release builds,
   and regenerates screenshots (iPhone on a physical device). Use when preparing
   a new build, preparing a release build, or when the user asks for App Store
@@ -11,14 +11,14 @@ disable-model-invocation: true
 
 # Prepare App Store Build
 
-Prepare a validated CSCS Emulator build for manual upload to App Store Connect.
+Prepare a validated Bike Sensor Emulator build for manual upload to App Store Connect.
 
 ## Prerequisites
 
 - Xcode installed with signing configured for team `MYMYAX7K65`
 - Active Apple Developer membership
 - Run from the repository root
-- For iPhone screenshots: a connected, unlocked physical iPhone with Bluetooth permission granted for CSCS Emulator
+- For iPhone screenshots: a connected, unlocked physical iPhone with Bluetooth permission granted for Bike Sensor Emulator
 
 ## Workflow
 
@@ -90,7 +90,7 @@ Writes App Store screenshots to `documentation/screenshots/`:
 | iPad | iOS Simulator (`iPad Pro 13-inch (M4)`) |
 | Mac | Debug build PNG export |
 
-Before running, connect and unlock the iPhone and grant Bluetooth access for CSCS Emulator (Settings → CSCS Emulator → Bluetooth, or accept the system prompt on first launch). Override the device if auto-detection fails:
+Before running, connect and unlock the iPhone and grant Bluetooth access for Bike Sensor Emulator (Settings → Bike Sensor → Bluetooth, or accept the system prompt on first launch). Override the device if auto-detection fails:
 
 ```bash
 IOS_DEVICE=00008110-001225620E32401E bash scripts/capture-screenshots.sh
@@ -143,6 +143,6 @@ When all automated steps succeed, report:
 
 **Simulator not found (unit tests / iPad screenshots):** Scripts pin `iPhone 16 Pro Max` to iOS 18.5 for the Simulator build used by iPad captures. Install that runtime in Xcode → Settings → Platforms, or update the device name/OS in the scripts.
 
-**iPhone screenshots show permission errors or launch fails:** iPhone captures require a connected, unlocked physical device with Bluetooth permission granted. Re-run after unlocking the device and enabling access in Settings → CSCS Emulator. Override auto-detection with `IOS_DEVICE=<udid>`.
+**iPhone screenshots show permission errors or launch fails:** iPhone captures require a connected, unlocked physical device with Bluetooth permission granted. Re-run after unlocking the device and enabling access in Settings → Bike Sensor. Override auto-detection with `IOS_DEVICE=<udid>`.
 
 **Build number already uploaded:** App Store Connect rejects duplicate build numbers. Re-run `bump-build-number.sh` before archiving again.

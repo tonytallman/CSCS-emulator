@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Archive and export CSCS Emulator for App Store Connect (iOS + macOS).
+# Archive and export Bike Sensor Emulator for App Store Connect (iOS + macOS).
 # Produces validated .ipa and .pkg files ready for manual upload.
 
 set -euo pipefail

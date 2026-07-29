@@ -1,8 +1,8 @@
-# Privacy Policy — CSCS Emulator
+# Privacy Policy — Bike Sensor Emulator
 
 Effective date: June 25, 2026
 
-CSCS Emulator ("the app") is developed and maintained by Tallman Software.
+Bike Sensor Emulator ("the app") is developed and maintained by Tallman Software.
 
 ## Data we collect
 

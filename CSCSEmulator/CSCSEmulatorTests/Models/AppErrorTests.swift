@@ -19,6 +19,11 @@ import Testing
         #expect(!description!.isEmpty)
     }
 
+    @Test func bluetoothPermissionDeniedReferencesAppName() {
+        let description = AppError.bluetoothPermissionDenied.errorDescription
+        #expect(description?.contains("Bike Sensor") == true)
+    }
+
     @Test func advertisingFailedHasUserFacingDescription() {
         let description = AppError.advertisingFailed.errorDescription
         #expect(description != nil)

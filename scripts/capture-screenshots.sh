@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Capture App Store screenshots for CSCS Emulator.
+# Capture App Store screenshots for Bike Sensor Emulator.
 # iPhone: physical device (Simulator cannot represent Bluetooth permission UI).
 # iPad: iOS Simulator. Mac: exported by the Debug build itself.
 
@@ -43,7 +43,7 @@ capture_iphone_device() {
   xcrun devicectl device install app --device "$IOS_DEVICE" "$app_path"
 
   echo "Capturing iPhone screenshots on $IOS_DEVICE..."
-  echo "Ensure Bluetooth permission is granted on the device (Settings → CSCS Emulator)."
+  echo "Ensure Bluetooth permission is granted on the device (Settings → Bike Sensor)."
 
   launch_ios_device_app configuration
   sleep "$SCREENSHOT_SETTLE_SECONDS"

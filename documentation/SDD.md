@@ -490,7 +490,7 @@ speed = Speed(value: speedMPH, unit: .milesPerHour)
 Advertised local name:
 
 ```text
-CSCS emulator
+Bike Sensor Emulator
 ```
 
 ---
@@ -578,7 +578,7 @@ Connection status display is a future enhancement. The running screen is not req
 
 The app declares the `bluetooth-peripheral` background mode on iPhone and iPad so advertising and measurement notifications can continue while the app is backgrounded.
 
-When backgrounded, iOS may stop including the local name (`CSCS emulator`) in advertisement packets and instead expose the CSCS service UUID in the overflow area. Centrals that scan by service UUID remain able to discover the emulator.
+When backgrounded, iOS may stop including the local name (`Bike Sensor Emulator`) in advertisement packets and instead expose the CSCS service UUID in the overflow area. Centrals that scan by service UUID remain able to discover the emulator.
 
 State restoration (`CBPeripheralManagerOptionRestoreIdentifierKey`) is not implemented in the initial release.
 

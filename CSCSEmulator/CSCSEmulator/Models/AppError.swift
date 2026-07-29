@@ -20,7 +20,7 @@ enum AppError: Error, LocalizedError, Equatable {
         case .bluetoothDisabled:
             "Bluetooth is turned off. Enable Bluetooth in Settings to use the emulator."
         case .bluetoothPermissionDenied:
-            "Bluetooth permission is turned off. Enable Bluetooth access for CSCS Emulator in Settings to start the emulator."
+            "Bluetooth permission is turned off. Enable Bluetooth access for Bike Sensor in Settings to start the emulator."
         case .advertisingFailed:
             "Failed to start BLE advertising. Please try again."
         case .connectionFailed:
