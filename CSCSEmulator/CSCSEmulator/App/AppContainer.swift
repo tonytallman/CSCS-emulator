@@ -25,7 +25,6 @@ final class AppContainer {
         self.appStateStore = appStateStore
 
         let engine = SimulationEngine(
-            coastingModel: CoastingModel(),
             randomCadenceGenerator: RandomCadenceGenerator(rng: SystemRandomNumberGenerator()),
         )
         simulationEngine = engine

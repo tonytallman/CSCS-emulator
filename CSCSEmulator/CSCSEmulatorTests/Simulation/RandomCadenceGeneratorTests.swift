@@ -32,7 +32,7 @@ private struct SplitMix64: RandomNumberGenerator {
             let previousRPM = cadence.converted(to: .revolutionsPerMinute).value
             cadence = generator.nextCadence(after: cadence)
             let delta = abs(cadence.converted(to: .revolutionsPerMinute).value - previousRPM)
-            #expect(delta <= 4.5)
+            #expect(delta <= 2.0)
         }
     }
 
@@ -80,12 +80,12 @@ private struct SplitMix64: RandomNumberGenerator {
         let generator = RandomCadenceGenerator(rng: SplitMix64(seed: 1))
 
         let speedAt45 = generator.derivedSpeed(from: .rpm(45))
-        #expect(abs(speedAt45.converted(to: .milesPerHour).value - 10.0) < 0.001)
+        #expect(abs(speedAt45.converted(to: .milesPerHour).value - 11.25) < 0.001)
 
         let speedAt90 = generator.derivedSpeed(from: .rpm(90))
-        #expect(abs(speedAt90.converted(to: .milesPerHour).value - 20.0) < 0.001)
+        #expect(abs(speedAt90.converted(to: .milesPerHour).value - 22.5) < 0.001)
 
         let speedAt135 = generator.derivedSpeed(from: .rpm(135))
-        #expect(abs(speedAt135.converted(to: .milesPerHour).value - 30.0) < 0.001)
+        #expect(abs(speedAt135.converted(to: .milesPerHour).value - 33.75) < 0.001)
     }
 }

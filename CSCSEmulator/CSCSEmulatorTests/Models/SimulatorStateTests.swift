@@ -24,11 +24,11 @@ import Testing
         #expect(!vitals.supportsCadence)
     }
 
-    @Test func pedalingStateExposesVitalsThroughProtocol() {
+    @Test func manualStateExposesVitalsThroughProtocol() {
         let vitals = SimulatorVitals.initial(supportsSpeed: true, supportsCadence: true)
-        let state: any SimulatorState = PedalingState(vitals: vitals)
+        let state: any SimulatorState = ManualState(vitals: vitals)
 
-        #expect(state.mode == .pedaling)
+        #expect(state.mode == .manual)
         #expect(state.speed == .stopped)
         #expect(state.cadence == .stopped)
         #expect(state.supportsSpeed)

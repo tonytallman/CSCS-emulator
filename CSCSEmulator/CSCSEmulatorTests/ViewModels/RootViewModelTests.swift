@@ -15,7 +15,6 @@ import Testing
     ) {
         let appStateStore = AppStateStore()
         let engine = SimulationEngine(
-            coastingModel: CoastingModel(),
             randomCadenceGenerator: RandomCadenceGenerator(rng: SystemRandomNumberGenerator()),
         )
         let broadcaster = MeasurementBroadcastingSpy()

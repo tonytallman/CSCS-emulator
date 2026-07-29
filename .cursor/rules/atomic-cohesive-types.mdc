@@ -25,9 +25,8 @@ State Pattern is one valid decomposition when modes have distinct rules—not ma
 final class Simulator {
     func tick() {
         switch mode {
-        case .pedaling: ...
-        case .coasting: ...
         case .random: ...
+        case .manual: ...
         }
     }
 }
@@ -46,9 +45,8 @@ protocol SimulatorState {
 }
 
 extension Simulator {
-    struct PedalingState: SimulatorState { ... }
-    struct CoastingState: SimulatorState { ... }
     struct RandomState: SimulatorState { ... }
+    struct ManualState: SimulatorState { ... }
 }
 ```
 

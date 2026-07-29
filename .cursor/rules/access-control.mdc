@@ -32,18 +32,18 @@ When adding or changing a type, method, or property, start at `private` and wide
 
 ```swift
 // ❌ BAD — internal detail exposed to all module code and tests via @testable
-struct CoastingModel {
-    func decayedSpeed(from speed: Speed) -> Speed { ... }
+struct RandomCadenceGenerator<RNG: RandomNumberGenerator> {
+    func nextCadence(after cadence: Cadence) -> Cadence { ... }
 }
 
 // test file
 @testable import CSCSEmulator
 
 // ✅ GOOD — explicit test-facing visibility without @testable
-package struct CoastingModel {
-    package init(decayFactor: Double = 0.98, zeroEpsilon: Double = 0.01) { ... }
+package struct RandomCadenceGenerator<RNG: RandomNumberGenerator> {
+    package init(rng: RNG) { ... }
 
-    package func decayedSpeed(from speed: Speed) -> Speed { ... }
+    package func nextCadence(after cadence: Cadence) -> Cadence { ... }
 }
 
 // test file

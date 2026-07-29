@@ -27,8 +27,8 @@ private struct StubSimulatorState: SimulatorState {
 @MainActor
 final class SimulationControllingSpy: SimulationControlling {
     var onStart: (() -> Void)?
-    private var internalState: any SimulatorState = PedalingState(
-        vitals: .initial(supportsSpeed: true, supportsCadence: true)
+    private var internalState: any SimulatorState = ManualState(
+        vitals: .initial(supportsSpeed: true, supportsCadence: true),
     )
 
     var state: any SimulatorState { internalState }
@@ -44,11 +44,11 @@ final class SimulationControllingSpy: SimulationControlling {
         onStart?()
         startCalls.append(configuration)
         isRunning = true
-        internalState = PedalingState(
+        internalState = ManualState(
             vitals: .initial(
                 supportsSpeed: configuration.supportsSpeed,
-                supportsCadence: configuration.supportsCadence
-            )
+                supportsCadence: configuration.supportsCadence,
+            ),
         )
     }
 
@@ -61,12 +61,10 @@ final class SimulationControllingSpy: SimulationControlling {
         setModeCalls.append(mode)
         let vitals = internalState.vitals
         switch mode {
-        case .pedaling:
-            internalState = PedalingState(vitals: vitals)
-        case .coasting:
-            internalState = CoastingState(vitals: vitals, coastingModel: CoastingModel())
         case .random:
             internalState = StubSimulatorState(mode: .random, vitals: vitals)
+        case .manual:
+            internalState = ManualState(vitals: vitals)
         }
     }
 

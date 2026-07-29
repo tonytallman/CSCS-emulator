@@ -10,19 +10,18 @@ import Testing
 @Suite @MainActor struct SimulationEngineTests {
     private func makeEngine() -> SimulationEngine<SplitMix64> {
         SimulationEngine(
-            coastingModel: CoastingModel(),
-            randomCadenceGenerator: RandomCadenceGenerator(rng: SplitMix64(seed: 1))
+            randomCadenceGenerator: RandomCadenceGenerator(rng: SplitMix64(seed: 1)),
         )
     }
 
-    @Test func startSetsRunningAndResetsState() {
+    @Test func startSetsRunningAndRandomMode() {
         let engine = makeEngine()
         engine.start(configuration: SimulatorConfiguration(supportsSpeed: true, supportsCadence: true))
 
         #expect(engine.isRunning)
         #expect(engine.state.supportsSpeed)
         #expect(engine.state.supportsCadence)
-        #expect(engine.state.mode == .pedaling)
+        #expect(engine.state.mode == .random)
         #expect(engine.state.speed == .stopped)
         #expect(engine.state.cadence == .stopped)
 
@@ -37,9 +36,10 @@ import Testing
         #expect(!engine.isRunning)
     }
 
-    @Test func pedalingAcceptsSliderInputAndTickIsNoOp() {
+    @Test func manualAcceptsSliderInputAndTickIsNoOp() {
         let engine = makeEngine()
         engine.start(configuration: SimulatorConfiguration(supportsSpeed: true, supportsCadence: true))
+        engine.setMode(.manual)
 
         engine.setSpeed(.milesPerHour(25))
         engine.setCadence(.rpm(85))
@@ -51,9 +51,10 @@ import Testing
         engine.stop()
     }
 
-    @Test func pedalingClampsSliderInputToRanges() {
+    @Test func manualClampsSliderInputToRanges() {
         let engine = makeEngine()
         engine.start(configuration: SimulatorConfiguration(supportsSpeed: true, supportsCadence: true))
+        engine.setMode(.manual)
 
         engine.setSpeed(.milesPerHour(100))
         engine.setCadence(.rpm(250))
@@ -64,11 +65,10 @@ import Testing
         engine.stop()
     }
 
-    @Test func sliderInputIgnoredOutsidePedalingMode() {
+    @Test func sliderInputIgnoredOutsideManualMode() {
         let engine = makeEngine()
         engine.start(configuration: SimulatorConfiguration(supportsSpeed: true, supportsCadence: true))
 
-        engine.setMode(.coasting)
         engine.setSpeed(.milesPerHour(30))
         engine.setCadence(.rpm(100))
 
@@ -78,46 +78,11 @@ import Testing
         engine.stop()
     }
 
-    @Test func enteringCoastingZerosCadenceAndRetainsSpeed() {
-        let engine = makeEngine()
-        engine.start(configuration: SimulatorConfiguration(supportsSpeed: true, supportsCadence: true))
-        engine.setSpeed(.milesPerHour(28))
-        engine.setCadence(.rpm(85))
-
-        engine.setMode(.coasting)
-
-        #expect(engine.state.cadence == .stopped)
-        #expect(engine.state.speed.converted(to: .milesPerHour).value == 28)
-
-        engine.stop()
-    }
-
-    @Test func coastingTicksDecaySpeedToZero() {
-        let engine = makeEngine()
-        engine.start(configuration: SimulatorConfiguration(supportsSpeed: true, supportsCadence: true))
-        engine.setSpeed(.milesPerHour(20))
-        engine.setMode(.coasting)
-
-        var previousMPH = engine.state.speed.converted(to: .milesPerHour).value
-        for _ in 0..<500 {
-            engine.tick()
-            let mph = engine.state.speed.converted(to: .milesPerHour).value
-            #expect(mph <= previousMPH)
-            previousMPH = mph
-        }
-
-        #expect(engine.state.speed == .stopped)
-
-        engine.stop()
-    }
-
     @Test func randomModeAdvancesCadenceAndDerivedSpeed() {
         let engine = SimulationEngine(
-            coastingModel: CoastingModel(),
-            randomCadenceGenerator: RandomCadenceGenerator(rng: SplitMix64(seed: 123))
+            randomCadenceGenerator: RandomCadenceGenerator(rng: SplitMix64(seed: 123)),
         )
         engine.start(configuration: SimulatorConfiguration(supportsSpeed: true, supportsCadence: true))
-        engine.setMode(.random)
 
         let initialCadence = engine.state.cadence.converted(to: .revolutionsPerMinute).value
         for _ in 0..<10 {
@@ -126,7 +91,7 @@ import Testing
 
         let cadenceRPM = engine.state.cadence.converted(to: .revolutionsPerMinute).value
         let speedMPH = engine.state.speed.converted(to: .milesPerHour).value
-        let expectedSpeed = cadenceRPM * 20.0 / 90.0
+        let expectedSpeed = cadenceRPM * 50.0 / 200.0
 
         #expect(cadenceRPM != initialCadence || cadenceRPM == 90)
         #expect(abs(speedMPH - expectedSpeed) < 0.001)
@@ -136,11 +101,9 @@ import Testing
 
     @Test func randomModeAdvancesInternalCadenceWhenCadenceUnsupported() {
         let engine = SimulationEngine(
-            coastingModel: CoastingModel(),
-            randomCadenceGenerator: RandomCadenceGenerator(rng: SplitMix64(seed: 456))
+            randomCadenceGenerator: RandomCadenceGenerator(rng: SplitMix64(seed: 456)),
         )
         engine.start(configuration: SimulatorConfiguration(supportsSpeed: true, supportsCadence: false))
-        engine.setMode(.random)
 
         for _ in 0..<10 {
             engine.tick()

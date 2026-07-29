@@ -53,11 +53,9 @@ Bike Sensor Emulator advertises as a standard Cycling Speed and Cadence (CSCS) p
 
 SIMULATION MODES
 
-Pedaling — set speed (0–50 mph) and cadence (0–200 rpm) in real time using on-screen sliders.
+Random (default) — cadence follows a natural random walk centered around 90 rpm, with speed derived automatically.
 
-Coasting — simulates a rider who has stopped pedaling. Cadence drops to zero immediately; speed decays gradually to a stop.
-
-Random — cadence follows a natural random walk centered around 90 rpm, with speed derived automatically.
+Manual — set speed (0–50 mph) and cadence (0–200 rpm) in real time using on-screen sliders.
 
 FEATURES
 
@@ -289,8 +287,8 @@ Capture on a **physical device** running the **latest OS**. Begin at app launch 
 2. Bluetooth permission prompt (if shown on first launch)
 3. Configuration screen: enable Speed and/or Cadence
 4. Tap **Start Emulator**
-5. Running screen: switch between Pedaling, Coasting, and Random modes
-6. Adjust speed/cadence sliders (Pedaling mode)
+5. Running screen: Random mode is active by default; switch to Manual to adjust sliders
+6. Adjust speed/cadence sliders (Manual mode)
 7. Tap **Stop Emulator**
 
 **Not applicable to this app** (none of these features exist): account registration/login/deletion, paid content or subscriptions, user-generated content, location/contacts/camera/App Tracking Transparency prompts.
@@ -313,8 +311,8 @@ account, network access, or data collection is involved.
 1. SCREEN RECORDING
 Attached, captured on a physical device on the latest OS, starting at app launch:
 launch app -> Bluetooth permission prompt (first launch) -> Configuration screen,
-enable Speed/Cadence -> "Start Emulator" -> Running screen, switch Pedaling/
-Coasting/Random modes, adjust sliders -> "Stop Emulator".
+enable Speed/Cadence -> "Start Emulator" -> Running screen (Random mode by default),
+switch to Manual mode, adjust sliders -> "Stop Emulator".
 
 2. DEVICES AND OS TESTED
 - iPhone SE (3rd generation), iOS 26.5
@@ -326,15 +324,14 @@ computers often lack a physical sensor. Bike Sensor Emulator provides a controll
 standards-compliant CSCS peripheral without hardware. Audience: iOS/macOS
 developers building cycling/fitness apps, QA teams verifying BLE integrations, and
 cyclists evaluating apps before buying a sensor. It simulates speed (0-50 mph) and
-cadence (0-200 rpm) via three modes (Pedaling, Coasting, Random) and advertises the
+cadence (0-200 rpm) via two modes (Random, Manual) and advertises the
 standard Bluetooth SIG CSCS service. Free, no account required.
 
 4. SETUP AND TESTING
 No credentials or sample files needed. On a physical iPhone/iPad (BLE peripheral
 mode is unavailable in Simulator): launch app, grant Bluetooth permission if
 prompted, enable Speed and/or Cadence, tap "Start Emulator", try each mode
-(Pedaling: adjust sliders; Coasting: cadence drops to 0 and speed decays; Random:
-cadence/speed vary automatically), then tap "Stop Emulator".
+(Random: cadence/speed vary automatically; Manual: adjust sliders), then tap "Stop Emulator".
 Optional interoperability check: on a second iOS device, use nRF Connect for Mobile 
 (generic BLE central) to scan for service 0x1816 / peripheral name 'Bike Sensor Emulator', 
 connect, and enable notifications on characteristic 0x2A5B. Measurement packets 

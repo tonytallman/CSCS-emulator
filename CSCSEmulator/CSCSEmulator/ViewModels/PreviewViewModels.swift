@@ -90,7 +90,7 @@ final class PreviewRunningViewModel: RunningViewModel {
     let simulationEngine: SimulationEngine<SystemRandomNumberGenerator>? = nil
 
     init(
-        mode: OperatingMode = .pedaling,
+        mode: OperatingMode = .random,
         supportsSpeed: Bool = true,
         supportsCadence: Bool = true,
         isConnected: Bool = true,
@@ -110,7 +110,7 @@ final class PreviewRunningViewModel: RunningViewModel {
     }
 
     var slidersEnabled: Bool {
-        mode == .pedaling
+        mode == .manual
     }
 
     var formattedSpeed: String {
@@ -123,9 +123,6 @@ final class PreviewRunningViewModel: RunningViewModel {
 
     func setMode(_ mode: OperatingMode) {
         self.mode = mode
-        if mode == .coasting {
-            cadenceRPM = 0
-        }
     }
 
     func stopEmulator() {}

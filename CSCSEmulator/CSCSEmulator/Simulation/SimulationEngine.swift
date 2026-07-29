@@ -31,17 +31,18 @@ final class SimulationEngine<RNG: RandomNumberGenerator> {
     private(set) var state: any SimulatorState
     private(set) var isRunning = false
 
-    private let coastingModel: CoastingModel
     private var randomCadenceGenerator: RandomCadenceGenerator<RNG>
     private let tickTaskHolder = TickTaskHolder()
 
     init(
-        coastingModel: CoastingModel,
         randomCadenceGenerator: RandomCadenceGenerator<RNG>,
     ) {
-        self.state = PedalingState(vitals: .initial(supportsSpeed: false, supportsCadence: false))
-        self.coastingModel = coastingModel
         self.randomCadenceGenerator = randomCadenceGenerator
+        self.state = Self.makeState(
+            for: .random,
+            from: .initial(supportsSpeed: false, supportsCadence: false),
+            randomCadenceGenerator: randomCadenceGenerator,
+        )
     }
 
     @inline(never)
@@ -53,11 +54,13 @@ final class SimulationEngine<RNG: RandomNumberGenerator> {
         guard configuration.isValid else { return }
 
         stop()
-        state = PedalingState(
-            vitals: .initial(
+        state = Self.makeState(
+            for: .random,
+            from: .initial(
                 supportsSpeed: configuration.supportsSpeed,
                 supportsCadence: configuration.supportsCadence,
-            )
+            ),
+            randomCadenceGenerator: randomCadenceGenerator,
         )
         isRunning = true
 
@@ -95,22 +98,31 @@ final class SimulationEngine<RNG: RandomNumberGenerator> {
     }
 
     private func makeState(for mode: OperatingMode, from vitals: SimulatorVitals) -> any SimulatorState {
+        Self.makeState(
+            for: mode,
+            from: vitals,
+            randomCadenceGenerator: randomCadenceGenerator,
+        )
+    }
+
+    private static func makeState(
+        for mode: OperatingMode,
+        from vitals: SimulatorVitals,
+        randomCadenceGenerator: RandomCadenceGenerator<RNG>,
+    ) -> any SimulatorState {
         switch mode {
-        case .pedaling:
-            return PedalingState(vitals: vitals)
-        case .coasting:
-            var coastingVitals = vitals
-            return CoastingState(vitals: coastingVitals, coastingModel: coastingModel)
         case .random:
             return RandomState(
                 vitals: vitals,
                 randomCadenceGenerator: randomCadenceGenerator,
                 internalCadence: seededRandomCadence(from: vitals.cadence),
             )
+        case .manual:
+            return ManualState(vitals: vitals)
         }
     }
 
-    private func seededRandomCadence(from cadence: Cadence) -> Cadence {
+    private static func seededRandomCadence(from cadence: Cadence) -> Cadence {
         let rpm = cadence.converted(to: .revolutionsPerMinute).value
         if rpm > 0 {
             return cadence

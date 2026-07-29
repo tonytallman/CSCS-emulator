@@ -72,7 +72,7 @@ See ./designs/running.png (visual reference only; screen mockups currently cover
 
 | Control                | Description                                             |
 | ---------------------- | ------------------------------------------------------- |
-| Mode Segmented Control | Selects Pedaling, Coasting, or Random mode              |
+| Mode Segmented Control | Selects Random or Manual mode                              |
 | Speed Slider           | Controls simulated speed                                |
 | Cadence Slider         | Controls simulated cadence                              |
 | Stop Emulator Button   | Stops BLE advertising and returns to configuration mode |
@@ -145,46 +145,9 @@ macOS does not require a background mode entitlement for this behavior.
 
 ## 5. Operating Modes
 
-### 5.1 Pedaling Mode
+The emulator starts in Random mode. The user may switch to Manual mode at any time.
 
-Pedaling mode represents active cycling.
-
-#### Behavior
-
-* All visible sliders shall be enabled.
-* User adjustments immediately affect transmitted values.
-* Published values remain constant until changed by the user.
-
----
-
-### 5.2 Coasting Mode
-
-Coasting mode represents a rider no longer pedaling.
-
-#### Behavior
-
-* All visible sliders shall be disabled.
-* Cadence shall immediately become zero RPM.
-* Speed shall decay toward zero.
-
-#### Speed Decay
-
-The exact decay profile is implementation-defined.
-
-Acceptable examples include:
-
-* Linear decay
-* Exponential decay
-* Simple physics-inspired decay
-
-Requirements:
-
-* Speed shall monotonically decrease toward zero.
-* Speed shall never increase while in Coasting mode.
-
----
-
-### 5.3 Random Mode
+### 5.1 Random Mode
 
 Random mode represents a rider pedaling with naturally varying cadence.
 
@@ -226,22 +189,36 @@ where:
 Speed shall be derived from cadence using:
 
 ```text
-speed = cadence × 20 MPH / 90 RPM
+speed = cadence × speedMax / cadenceMax
 ```
+
+where `speedMax` is 50 MPH and `cadenceMax` is 200 RPM.
 
 Equivalent form:
 
 ```text
-speed = cadence × 0.222222...
+speed = cadence × 0.25
 ```
 
 Examples:
 
 | Cadence (RPM) | Speed (MPH) |
 | ------------- | ----------- |
-| 45            | 10.0        |
-| 90            | 20.0        |
-| 135           | 30.0        |
+| 45            | 11.25       |
+| 90            | 22.5        |
+| 135           | 33.75       |
+
+---
+
+### 5.2 Manual Mode
+
+Manual mode represents user-controlled speed and cadence.
+
+#### Behavior
+
+* All visible sliders shall be enabled.
+* User adjustments immediately affect transmitted values.
+* Published values remain constant until changed by the user.
 
 ---
 

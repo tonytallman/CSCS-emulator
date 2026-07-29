@@ -11,7 +11,7 @@ All unit tests use Swift Testing and mirror the relative folder structure of the
 
 - Use [Swift Testing](https://developer.apple.com/documentation/testing) (`import Testing`), not XCTest.
 - Use `@Test`, `#expect`, and `@Suite` where appropriate.
-- Name test types `{TypeUnderTest}Tests` (e.g. `CoastingModelTests`).
+- Name test types `{TypeUnderTest}Tests` (e.g. `ManualStateTests`).
 
 ```swift
 import Testing
@@ -36,7 +36,7 @@ Use `@testable import CSCSEmulator` only when a type under test cannot be marked
 
 Examples:
 
-- `CSCSEmulator/Simulation/CoastingModel.swift` -> `CSCSEmulatorTests/Simulation/CoastingModelTests.swift`
+- `CSCSEmulator/Simulation/ManualState.swift` -> `CSCSEmulatorTests/Simulation/ManualStateTests.swift`
 - `CSCSEmulator/BLE/CSCSMeasurementEncoder.swift` -> `CSCSEmulatorTests/BLE/CSCSMeasurementEncoderTests.swift`
 - `CSCSEmulator/ViewModels/RunningViewModel.swift` -> `CSCSEmulatorTests/ViewModels/RunningViewModelTests.swift`
 

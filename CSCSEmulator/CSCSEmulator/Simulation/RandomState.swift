@@ -5,8 +5,8 @@
 
 import Foundation
 
-/// Simulation ticks at 10 Hz; random cadence updates once per second.
-private let randomCadenceUpdateIntervalTicks = 10
+/// Simulation ticks at 10 Hz; random cadence updates every tick.
+private let randomCadenceUpdateIntervalTicks = 1
 
 /// Bounded random-walk cadence with derived speed; user input ignored (SDD section 10).
 struct RandomState<RNG: RandomNumberGenerator>: SimulatorState {

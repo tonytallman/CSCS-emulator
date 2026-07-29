@@ -103,9 +103,8 @@ struct RunningView<ViewModel: RunningViewModel>: View {
                 get: { viewModel.mode },
                 set: { viewModel.setMode($0) }
             )) {
-                Text("Pedaling").tag(OperatingMode.pedaling)
-                Text("Coasting").tag(OperatingMode.coasting)
                 Text("Random").tag(OperatingMode.random)
+                Text("Manual").tag(OperatingMode.manual)
             }
             .pickerStyle(.segmented)
 
@@ -118,12 +117,10 @@ struct RunningView<ViewModel: RunningViewModel>: View {
     @ViewBuilder
     private var modeHelperText: some View {
         switch viewModel.mode {
-        case .pedaling:
-            Text("Pedaling: normal riding (speed and cadence active)")
-        case .coasting:
-            Text("Coasting: not pedaling (cadence = 0, speed decays to 0)")
         case .random:
             Text("Random: cadence varies around 90 rpm, speed derived from cadence")
+        case .manual:
+            Text("Manual: set speed and cadence with the sliders")
         }
     }
 

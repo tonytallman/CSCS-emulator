@@ -235,11 +235,9 @@ enum AppState {
 
 ```text
 SimulationEngine
-PedalingState
-CoastingState
+ManualState
 RandomState
 RandomCadenceGenerator
-CoastingModel
 ```
 
 ---
@@ -291,11 +289,12 @@ Configuration is immutable while the simulator is running.
 
 ```swift
 enum OperatingMode {
-    case pedaling
-    case coasting
     case random
+    case manual
 }
 ```
+
+Random mode is the default when the emulator starts.
 
 ---
 
@@ -329,9 +328,8 @@ protocol SimulatorState {
 Concrete implementations:
 
 ```text
-PedalingState   — user-controlled speed/cadence; tick is a no-op
-CoastingState   — zero cadence on entry; decays speed each tick
-RandomState     — random-walk cadence with derived speed; input ignored
+RandomState     — random-walk cadence with derived speed; input ignored; default on start
+ManualState     — user-controlled speed/cadence; tick is a no-op
 ```
 
 The Simulation Engine owns the active `any SimulatorState` and the running lifecycle (`isRunning`).
@@ -361,61 +359,15 @@ This interval may be adjusted in future versions.
 
 ---
 
-# 8. Pedaling Mode
-
-## Behavior
-
-* User controls speed slider
-* User controls cadence slider
-* Values remain fixed until changed
-
-No automatic updates occur.
-
----
-
-# 9. Coasting Mode
-
-## Entry Actions
-
-Immediately upon entering coasting mode:
-
-```text
-cadence = 0 rpm
-```
-
-The current speed value is retained.
-
-## Update Behavior
-
-Each simulation tick:
-
-```text
-speed = decay(speed)
-```
-
-until speed reaches zero.
-
-### Initial Decay Algorithm
-
-The initial implementation may use:
-
-```text
-speed = Speed(value: speed.converted(to: .milesPerHour).value * 0.98, unit: .milesPerHour)
-```
-
-per simulation tick.
-
-The decay model may be refined later without affecting architecture.
-
----
-
-# 10. Random Mode
+# 8. Random Mode
 
 ## Overview
 
 Random mode simulates a rider pedaling continuously with natural cadence variations.
 
 The user cannot directly manipulate speed or cadence.
+
+Random mode is the default when the emulator starts.
 
 ---
 
@@ -440,7 +392,7 @@ The cadence is simply not displayed or published.
 
 ## Cadence Generation
 
-The cadence generator shall implement a bounded random walk.
+The cadence generator shall implement a bounded random walk, updating every simulation tick (10 Hz).
 
 Example update:
 
@@ -454,8 +406,8 @@ cadence =
 Where:
 
 ```text
-randomDelta ∈ [-2,+2] rpm
-biasToward90 = (90 - cadenceInRPM) * 0.02
+randomDelta ∈ [-1.5,+1.5] rpm
+biasToward90 = (90 - cadenceInRPM) * 0.005
 ```
 
 The exact constants may be tuned. Cadence values are stored as `Cadence` measurements using `.revolutionsPerMinute`.
@@ -464,16 +416,28 @@ The exact constants may be tuned. Cadence values are stored as `Cadence` measure
 
 ## Speed Generation
 
-Speed is derived from cadence:
+Speed is derived from cadence proportionally across the operating ranges:
 
 ```text
-speedMPH = cadenceInRPM * 20.0 / 90.0
+speedMPH = cadenceInRPM * speedMaxMPH / cadenceMaxRPM
 speed = Speed(value: speedMPH, unit: .milesPerHour)
 ```
 
 ---
 
-# 11. BLE Subsystem
+# 9. Manual Mode
+
+## Behavior
+
+* User controls speed slider
+* User controls cadence slider
+* Values remain fixed until changed
+
+No automatic updates occur.
+
+---
+
+# 10. BLE Subsystem
 
 ## Responsibilities
 
@@ -540,7 +504,7 @@ Crank Data Present = true
 
 ---
 
-# 12. Connection Management
+# 11. Connection Management
 
 ## Supported Connections
 
@@ -584,7 +548,7 @@ State restoration (`CBPeripheralManagerOptionRestoreIdentifierKey`) is not imple
 
 ---
 
-# 13. CSCS Encoder
+# 12. CSCS Encoder
 
 ## Responsibilities
 
@@ -610,7 +574,7 @@ This allows independent unit testing.
 
 ---
 
-# 14. Error Handling
+# 13. Error Handling
 
 Errors shall be surfaced through a shared application error model.
 
@@ -630,7 +594,7 @@ Errors should be user-visible and logged.
 
 ---
 
-# 15. Suggested Project Structure
+# 14. Suggested Project Structure
 
 ```text
 CSCSEmulator/
@@ -660,11 +624,9 @@ CSCSEmulator/
 │
 ├── Simulation/
 │   ├── SimulationEngine.swift
-│   ├── PedalingState.swift
-│   ├── CoastingState.swift
+│   ├── ManualState.swift
 │   ├── RandomState.swift
-│   ├── RandomCadenceGenerator.swift
-│   └── CoastingModel.swift
+│   └── RandomCadenceGenerator.swift
 │
 ├── BLE/
 │   ├── CSCPeripheralManager.swift
@@ -676,7 +638,7 @@ CSCSEmulator/
 
 ---
 
-# 16. Future Enhancements
+# 15. Future Enhancements
 
 The architecture should support future additions including:
 

@@ -10,7 +10,6 @@ import Testing
 @Suite @MainActor struct RunningViewModelTests {
     private func makeEngine() -> SimulationEngine<SystemRandomNumberGenerator> {
         let engine = SimulationEngine(
-            coastingModel: CoastingModel(),
             randomCadenceGenerator: RandomCadenceGenerator(rng: SystemRandomNumberGenerator()),
         )
         engine.start(configuration: SimulatorConfiguration(supportsSpeed: true, supportsCadence: true))
@@ -40,16 +39,16 @@ import Testing
     }
 
     @Test(arguments: OperatingMode.allCases)
-    func slidersEnabledOnlyInPedaling(mode: OperatingMode) {
+    func slidersEnabledOnlyInManual(mode: OperatingMode) {
         let (viewModel, engine, _, _) = makeViewModel()
         engine.setMode(mode)
 
-        #expect(viewModel.slidersEnabled == (mode == .pedaling))
+        #expect(viewModel.slidersEnabled == (mode == .manual))
     }
 
     @Test func speedSetterForwardsClampedValueToEngine() {
         let (viewModel, engine, _, _) = makeViewModel()
-        engine.setMode(.pedaling)
+        engine.setMode(.manual)
 
         viewModel.speedMPH = 100
 
@@ -58,7 +57,7 @@ import Testing
 
     @Test func cadenceSetterForwardsClampedValueToEngine() {
         let (viewModel, engine, _, _) = makeViewModel()
-        engine.setMode(.pedaling)
+        engine.setMode(.manual)
 
         viewModel.cadenceRPM = 250
 
@@ -67,7 +66,7 @@ import Testing
 
     @Test func sliderGettersReflectVitals() {
         let (viewModel, engine, _, _) = makeViewModel()
-        engine.setMode(.pedaling)
+        engine.setMode(.manual)
         engine.setSpeed(.milesPerHour(22.5))
         engine.setCadence(.rpm(95))
 
@@ -78,9 +77,9 @@ import Testing
     @Test func setModeForwardsToEngine() {
         let (viewModel, engine, _, _) = makeViewModel()
 
-        viewModel.setMode(.coasting)
+        viewModel.setMode(.manual)
 
-        #expect(engine.state.mode == .coasting)
+        #expect(engine.state.mode == .manual)
     }
 
     @Test func stopEmulatorStopsBroadcasterAndEngine() {

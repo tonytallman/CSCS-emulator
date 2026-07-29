@@ -15,7 +15,7 @@ Bike Sensor Emulator simulates a Bluetooth Low Energy cycling speed and cadence 
 ## Features
 
 - Advertise a BLE CSCS peripheral with configurable speed and/or cadence support
-- Three simulation modes: Pedaling, Coasting, and Random
+- Two simulation modes: Random (default) and Manual
 - Real-time speed (0–50 MPH) and cadence (0–200 RPM) control via sliders
 - Supports one connected BLE central at a time
 - On iPhone and iPad, continues BLE advertising while the app runs in the background
@@ -43,34 +43,30 @@ After starting, the app transitions to the running screen:
 
 | Control | Description |
 | --- | --- |
-| Mode Segmented Control | Selects Pedaling, Coasting, or Random mode |
+| Mode Segmented Control | Selects Random or Manual mode |
 | Speed Slider | Controls simulated speed (visible only when speed was enabled) |
 | Cadence Slider | Controls simulated cadence (visible only when cadence was enabled) |
 | Stop Emulator Button | Stops BLE advertising and returns to configuration |
 
 ## Operating Modes
 
-### Pedaling
-
-Active cycling. All visible sliders are enabled. Values remain constant until the user adjusts them.
-
-### Coasting
-
-Rider has stopped pedaling. All sliders are disabled. Cadence immediately drops to 0 RPM and speed decays monotonically toward zero.
-
 ### Random
 
-Simulates a rider pedaling with naturally varying cadence. All sliders are disabled. Cadence follows a bounded random-walk model with a weak tendency toward 90 RPM, updating once per second. Speed is derived from cadence using:
+Default mode on start. Simulates a rider pedaling with naturally varying cadence. All sliders are disabled. Cadence follows a bounded random-walk model with a weak tendency toward 90 RPM, updating every simulation tick (10 Hz). Speed is derived from cadence using:
 
 ```
-speed (MPH) = cadence (RPM) × 20 / 90
+speed (MPH) = cadence (RPM) × 50 / 200
 ```
 
 | Cadence (RPM) | Speed (MPH) |
 | --- | --- |
-| 45 | 10.0 |
-| 90 | 20.0 |
-| 135 | 30.0 |
+| 45 | 11.25 |
+| 90 | 22.5 |
+| 135 | 33.75 |
+
+### Manual
+
+User-controlled speed and cadence. All visible sliders are enabled. Values remain constant until the user adjusts them.
 
 ## BLE Behavior
 
@@ -88,7 +84,7 @@ The app follows MVVM with a clear separation of concerns:
 | --- | --- |
 | UI | `RootView`, `ConfigurationView`, `RunningView` |
 | View Models | `RootViewModel`, `ConfigurationViewModel`, `RunningViewModel` |
-| Simulation | `SimulationEngine`, `RandomCadenceGenerator`, `CoastingModel` |
+| Simulation | `SimulationEngine`, `RandomCadenceGenerator`, `ManualState`, `RandomState` |
 | BLE | `CSCPeripheralManager`, `CSCSMeasurementEncoder`, `CentralSubscriptionTracker` |
 
 Dependencies are wired at a single composition root (`AppContainer`) using constructor injection — no singletons or service locators.
@@ -124,11 +120,9 @@ CSCSEmulator/
 │   └── RunningViewModel.swift
 ├── Simulation/
 │   ├── SimulationEngine.swift
-│   ├── PedalingState.swift
-│   ├── CoastingState.swift
+│   ├── ManualState.swift
 │   ├── RandomState.swift
-│   ├── RandomCadenceGenerator.swift
-│   └── CoastingModel.swift
+│   └── RandomCadenceGenerator.swift
 ├── BLE/
 │   ├── CSCPeripheralManager.swift
 │   ├── CSCSMeasurementEncoder.swift

@@ -62,7 +62,7 @@ final class AppRunningViewModel: RunningViewModel {
     }
 
     var slidersEnabled: Bool {
-        mode == .pedaling
+        mode == .manual
     }
 
     var formattedSpeed: String {
