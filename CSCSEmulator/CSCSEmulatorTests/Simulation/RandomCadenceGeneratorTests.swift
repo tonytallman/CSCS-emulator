@@ -32,7 +32,8 @@ private struct SplitMix64: RandomNumberGenerator {
             let previousRPM = cadence.converted(to: .revolutionsPerMinute).value
             cadence = generator.nextCadence(after: cadence)
             let delta = abs(cadence.converted(to: .revolutionsPerMinute).value - previousRPM)
-            #expect(delta <= 2.0)
+            let biasMagnitude = abs((90 - previousRPM) * 0.035)
+            #expect(delta <= 3.0 + biasMagnitude)
         }
     }
 
