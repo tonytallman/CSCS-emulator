@@ -18,11 +18,12 @@ The application should remain simple enough for a single developer to maintain.
 
 ## 2.2 Cross-Platform Support
 
-A single codebase shall support:
+A single codebase using SwiftUI shall support:
 
 * iOS
 * iPadOS
-* macOS
+
+The iPad app may also run on Apple Silicon Macs via “iPhone and iPad Apps on Mac.” There is no separate native macOS app.
 
 ## 2.3 Separation of Concerns
 
@@ -154,7 +155,7 @@ Long-lived collaborators (`AppStateStore`, `SimulationEngine`, `CSCPeripheralMan
 
 * iOS
 * iPadOS
-* macOS
+* Apple Silicon Mac (via the iPad app on Mac)
 
 ---
 
@@ -169,7 +170,7 @@ Long-lived collaborators (`AppStateStore`, `SimulationEngine`, `CSCPeripheralMan
 * Display current speed and cadence
 * Display error messages
 
-Screen mockups in `./designs/` are visual references only (currently iPhone layout). iPadOS and macOS layouts are required but not yet mocked.
+Screen mockups in `./designs/` are visual references only (currently iPhone layout). iPadOS layouts are required but not yet mocked.
 
 ### Components
 
@@ -352,7 +353,7 @@ The simulation engine shall execute at a fixed interval.
 Initial target:
 
 ```text
-10 Hz
+1 Hz
 ```
 
 This interval may be adjusted in future versions.
@@ -392,7 +393,7 @@ The cadence is simply not displayed or published.
 
 ## Cadence Generation
 
-The cadence generator shall implement a bounded random walk, updating every simulation tick (10 Hz).
+The cadence generator shall implement a bounded random walk, updating every simulation tick (1 Hz).
 
 Example update:
 

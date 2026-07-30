@@ -2,7 +2,7 @@
 name: prepare-app-store-build
 description: >-
   Prepares a new Bike Sensor Emulator App Store build: bumps the build number, runs
-  unit tests (stops on failure), archives and exports iOS/macOS Release builds,
+  unit tests (stops on failure), archives and exports the iOS Release build,
   regenerates screenshots (iPhone and iPad on named Simulators), and updates
   "What's New in This Version?" from commits since the last version tag. Use when
   preparing a new build, preparing a release build, or when the user asks for
@@ -31,7 +31,7 @@ Copy this checklist and track progress:
 Task Progress:
 - [ ] Step 1: Bump build number
 - [ ] Step 2: Run unit tests (STOP on failure)
-- [ ] Step 3: Archive and export (iOS + macOS)
+- [ ] Step 3: Archive and export (iOS)
 - [ ] Step 4: Regenerate screenshots
 - [ ] Step 5: Update "What's New in This Version"
 - [ ] Step 6: Manual upload, App Review recording, and App Store Connect steps
@@ -55,7 +55,7 @@ Report the old and new build numbers to the user.
 bash scripts/run-unit-tests.sh
 ```
 
-Runs `CSCSEmulatorTests` on iOS Simulator and macOS.
+Runs `CSCSEmulatorTests` on iOS Simulator.
 
 **If any test fails:**
 
@@ -69,14 +69,12 @@ Runs `CSCSEmulatorTests` on iOS Simulator and macOS.
 bash scripts/archive-and-export.sh
 ```
 
-Creates Release archives and exports App Store Connect-ready artifacts:
+Creates a Release archive and exports an App Store Connect-ready `.ipa`:
 
 | Output | Path |
 | --- | --- |
 | iOS archive | `build/archives/CSCSEmulator-iOS.xcarchive` |
-| macOS archive | `build/archives/CSCSEmulator-macOS.xcarchive` |
 | iOS export | `build/export/ios/` (`.ipa`) |
-| macOS export | `build/export/macos/` (`.pkg`) |
 
 Export success validates signing and entitlements locally. Report the exported file paths.
 
@@ -101,7 +99,6 @@ Simulator screenshots need a **temporary** Bluetooth-availability bypass in `CSC
    | --- | --- |
    | iPhone | Simulator **Screenshot iPhone** (6.5") |
    | iPad | Simulator **Screenshot iPad** (13") |
-   | Mac | Debug build PNG export |
 
    Launch modes use `CSCS_SCREENSHOT_MODE=configuration|running` (via `SIMCTL_CHILD_CSCS_SCREENSHOT_MODE` for Simulator). The script resizes iPhone captures to **1284 × 2778** for App Store Connect’s 6.5" slot.
 
@@ -149,7 +146,7 @@ Update [documentation/APP_STORE_SUBMISSION.md](../../documentation/APP_STORE_SUB
 
 After automation completes, direct the user to [documentation/APP_STORE_SUBMISSION.md](../../documentation/APP_STORE_SUBMISSION.md) for:
 
-- Uploading `.ipa` / `.pkg` via Xcode Organizer or Transporter
+- Uploading `.ipa` via Xcode Organizer or Transporter
 - Running **Validate App** in Organizer (contacts App Store Connect)
 - Uploading screenshots from `documentation/screenshots/`
 - Pasting **What's New in This Version?** from the submission doc into App Store Connect
@@ -166,10 +163,9 @@ When all automated steps succeed, report:
 ## App Store build ready
 
 - **Build number:** [old] → [new]
-- **Unit tests:** passed (iOS + macOS)
+- **Unit tests:** passed (iOS Simulator)
 - **iOS export:** build/export/ios/*.ipa
-- **macOS export:** build/export/macos/*.pkg
-- **Screenshots:** documentation/screenshots/ (Screenshot iPhone + Screenshot iPad Simulators, Mac export)
+- **Screenshots:** documentation/screenshots/ (Screenshot iPhone + Screenshot iPad Simulators)
 - **Bluetooth bypass:** temporary Simulator patch in `CSCPeripheralManager` applied for screenshots, then restored
 - **What's New:** [1–3 sentence summary or bullet list drafted into APP_STORE_SUBMISSION.md]
 
@@ -181,11 +177,10 @@ When all automated steps succeed, report:
 | Script | Purpose |
 | --- | --- |
 | `scripts/bump-build-number.sh` | Increment build number |
-| `scripts/run-unit-tests.sh` | Unit tests (iOS + macOS) |
-| `scripts/archive-and-export.sh` | Release archive + export |
-| `scripts/capture-screenshots.sh` | App Store screenshots (Screenshot iPhone / Screenshot iPad Simulators; Mac export) |
+| `scripts/run-unit-tests.sh` | Unit tests (iOS Simulator) |
+| `scripts/archive-and-export.sh` | iOS Release archive + export |
+| `scripts/capture-screenshots.sh` | App Store screenshots (Screenshot iPhone / Screenshot iPad Simulators) |
 | `scripts/ExportOptions-iOS.plist` | iOS export options |
-| `scripts/ExportOptions-macOS.plist` | macOS export options |
 
 ## Screenshot workarounds
 
@@ -197,7 +192,7 @@ The Simulator has no usable BLE peripheral stack, so real Bluetooth availability
 
 **During Step 4 only**, temporarily patch `CSCPeripheralManager` so Debug Simulator builds treat availability as `.ready` and skip Bluetooth state error handling (`#if DEBUG && targetEnvironment(simulator)`). After `capture-screenshots.sh` finishes (success or failure), **undo** that patch so it is never committed or left in the working tree.
 
-Release, device, and normal Debug builds must keep real Bluetooth gating.
+Release and device builds must keep real Bluetooth gating.
 
 ### Simulator launch / settle
 

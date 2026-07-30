@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
-# Capture a screen recording demonstrating the app UI flow on Mac (default) or a
-# physical iPhone. Uses CSCS_SCREENSHOT_MODE launch states (Configuration, then
-# Running). On Mac, CSCS_DEMO_MODE keeps the app open instead of exporting a PNG.
+# Capture a screen recording demonstrating the app UI flow on a physical iPhone.
+# Uses CSCS_SCREENSHOT_MODE launch states (Configuration, then Running).
 
 set -euo pipefail
 
@@ -12,7 +11,6 @@ PROJECT="$ROOT/CSCSEmulator"
 OUT="$ROOT/build/recording"
 DERIVED="$HOME/Library/Developer/Xcode/DerivedData"
 BUNDLE_ID="com.tallmansoftware.csc-emulator"
-RECORDING_TARGET="${RECORDING_TARGET:-mac}"
 CONFIGURATION_SECONDS="${CONFIGURATION_SECONDS:-5}"
 RUNNING_SECONDS="${RUNNING_SECONDS:-12}"
 WARMUP_SECONDS="${WARMUP_SECONDS:-2}"
@@ -22,76 +20,6 @@ mkdir -p "$OUT"
 
 recording_duration() {
   echo $((WARMUP_SECONDS + CONFIGURATION_SECONDS + TRANSITION_SECONDS + RUNNING_SECONDS + TRANSITION_SECONDS))
-}
-
-terminate_mac_app() {
-  pkill -x CSCSEmulator 2>/dev/null || true
-  sleep 1
-}
-
-launch_mac_app() {
-  local mode="$1"
-  CSCS_DEMO_MODE=1 CSCS_SCREENSHOT_MODE="$mode" "$MAC_APP/Contents/MacOS/CSCSEmulator" &
-  echo $!
-}
-
-record_mac() {
-  local recording="$OUT/mac-flow.mov"
-  local total
-  total="$(recording_duration)"
-
-  echo "Building macOS app (Debug)..."
-  cd "$PROJECT"
-  xcodebuild -scheme CSCSEmulator \
-    -destination 'platform=macOS' \
-    -configuration Debug build >/dev/null
-
-  MAC_APP="$(find "$DERIVED" ! -path '*/Index.noindex/*' -path '*/Build/Products/Debug/CSCSEmulator.app' -maxdepth 8 | head -1)"
-  if [[ -z "$MAC_APP" ]]; then
-    echo "Could not locate built macOS app." >&2
-    exit 1
-  fi
-
-  terminate_mac_app
-  rm -f "$recording"
-
-  echo "Recording Mac screen to $recording (${total}s)..."
-  echo "Grant Screen Recording permission to Terminal/Cursor if prompted."
-  screencapture -V "$total" -m -x -C "$recording" &
-  local record_pid=$!
-
-  cleanup() {
-    terminate_mac_app
-    if kill -0 "$record_pid" 2>/dev/null; then
-      wait "$record_pid" 2>/dev/null || true
-    fi
-  }
-  trap cleanup EXIT
-
-  sleep "$WARMUP_SECONDS"
-
-  echo "Launching Configuration screen..."
-  launch_mac_app configuration >/dev/null
-  sleep "$CONFIGURATION_SECONDS"
-
-  terminate_mac_app
-
-  echo "Launching Running screen..."
-  launch_mac_app running >/dev/null
-  sleep "$RUNNING_SECONDS"
-
-  terminate_mac_app
-  wait "$record_pid"
-  trap - EXIT
-
-  if [[ ! -f "$recording" ]]; then
-    echo "Recording file was not created." >&2
-    echo "Check System Settings → Privacy & Security → Screen Recording." >&2
-    exit 1
-  fi
-
-  echo "Done. Recording saved to $recording"
-  ls -lh "$recording"
 }
 
 launch_ios_app() {
@@ -154,15 +82,4 @@ record_ios() {
   ls -lh "$recording"
 }
 
-case "$RECORDING_TARGET" in
-  mac)
-    record_mac
-    ;;
-  ios)
-    record_ios
-    ;;
-  *)
-    echo "Unknown RECORDING_TARGET: $RECORDING_TARGET (use mac or ios)" >&2
-    exit 1
-    ;;
-esac
+record_ios

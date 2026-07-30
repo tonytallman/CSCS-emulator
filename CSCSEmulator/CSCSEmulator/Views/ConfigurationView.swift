@@ -42,9 +42,6 @@ struct ConfigurationView<ViewModel: ConfigurationViewModel>: View {
             .frame(maxWidth: .infinity)
             .padding()
         }
-        #if os(macOS)
-        .navigationTitle(AppInfo.title)
-        #endif
         .onChange(of: viewModel.lastError) { _, error in
             showError = error != nil
             viewModel.handleStartOutcome()
@@ -202,11 +199,7 @@ struct ConfigurationView<ViewModel: ConfigurationViewModel>: View {
     }
 
     private var cardBackground: Color {
-        #if os(macOS)
-        Color(nsColor: .controlBackgroundColor)
-        #else
         Color(.secondarySystemGroupedBackground)
-        #endif
     }
 }
 

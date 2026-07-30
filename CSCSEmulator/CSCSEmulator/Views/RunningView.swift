@@ -44,9 +44,6 @@ struct RunningView<ViewModel: RunningViewModel>: View {
             .frame(maxWidth: .infinity)
             .padding()
         }
-        #if os(macOS)
-        .navigationTitle(AppInfo.title)
-        #endif
         .background {
             if let simulationEngine = viewModel.simulationEngine {
                 SimulationObservation(engine: simulationEngine)
@@ -227,11 +224,7 @@ struct RunningView<ViewModel: RunningViewModel>: View {
     }
 
     private var cardBackground: Color {
-        #if os(macOS)
-        Color(nsColor: .controlBackgroundColor)
-        #else
         Color(.secondarySystemGroupedBackground)
-        #endif
     }
 }
 

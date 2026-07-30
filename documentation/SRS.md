@@ -10,7 +10,8 @@ The application shall support:
 
 * iOS
 * iPadOS
-* macOS
+
+The iPad app may also run on Apple Silicon Macs via “iPhone and iPad Apps on Mac.” There is no separate native macOS app.
 
 A single codebase using SwiftUI is preferred.
 
@@ -138,8 +139,6 @@ The emulator shall support at most one connected BLE central device at a time.
 On iPhone and iPad, while the emulator is running, the application shall continue advertising the CSCS service and publishing measurements when moved to the background.
 
 When backgrounded on iOS, CoreBluetooth may omit the advertised local name and expose the service UUID in the overflow area instead. This is expected platform behavior and shall not prevent centrals from discovering and connecting to the emulator.
-
-macOS does not require a background mode entitlement for this behavior.
 
 ---
 

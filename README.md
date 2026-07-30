@@ -1,6 +1,6 @@
 # Bike Sensor Emulator
 
-A cross-platform BLE Cycling Speed and Cadence Service (CSCS) emulator for iOS, iPadOS, and macOS, built with SwiftUI.
+A BLE Cycling Speed and Cadence Service (CSCS) emulator for iOS and iPadOS, built with SwiftUI. The iPad app also runs on Apple Silicon Macs via “iPhone and iPad Apps on Mac.”
 
 ## Overview
 
@@ -10,7 +10,7 @@ Bike Sensor Emulator simulates a Bluetooth Low Energy cycling speed and cadence 
 
 - iOS
 - iPadOS
-- macOS
+- Apple Silicon Mac (via the iPad app on Mac)
 
 ## Features
 
@@ -52,7 +52,7 @@ After starting, the app transitions to the running screen:
 
 ### Random
 
-Default mode on start. Simulates a rider pedaling with naturally varying cadence. All sliders are disabled. Cadence follows a bounded random-walk model with a weak tendency toward 90 RPM, updating every simulation tick (10 Hz). Speed is derived from cadence using:
+Default mode on start. Simulates a rider pedaling with naturally varying cadence. All sliders are disabled. Cadence follows a bounded random-walk model with a weak tendency toward 90 RPM, updating once per second. Speed is derived from cadence using:
 
 ```
 speed (MPH) = cadence (RPM) × 50 / 200

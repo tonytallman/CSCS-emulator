@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 # Capture App Store screenshots for Bike Sensor Emulator.
 # iPhone / iPad: named Simulators (Screenshot iPhone, Screenshot iPad).
-# Mac: exported by the Debug build itself.
 #
 # Before running: apply the temporary Simulator Bluetooth-availability bypass in
 # CSCPeripheralManager (see prepare-app-store-build skill Step 4). Undo it after.
@@ -88,34 +87,6 @@ capture_ios_simulator "$IPAD_SIMULATOR_NAME" ipad "$SIM_APP"
 # App Store Connect 6.5" iPhone slot accepts 1284×2778 or 1242×2688.
 sips -z 2778 1284 "$OUT/iphone-configuration.png" --out "$OUT/iphone-configuration.png" >/dev/null
 sips -z 2778 1284 "$OUT/iphone-running.png" --out "$OUT/iphone-running.png" >/dev/null
-
-echo "Building macOS app..."
-cd "$PROJECT"
-xcodebuild -scheme CSCSEmulator -destination 'platform=macOS' -configuration Debug build >/dev/null
-MAC_APP="$(find "$DERIVED" ! -path '*/Index.noindex/*' -path '*/Build/Products/Debug/CSCSEmulator.app' -maxdepth 8 | head -1)"
-
-capture_mac() {
-  local mode="$1"
-  local file="$2"
-  pkill -x CSCSEmulator 2>/dev/null || true
-  sleep 1
-  local output
-  output="$(CSCS_SCREENSHOT_MODE="$mode" "$MAC_APP/Contents/MacOS/CSCSEmulator" 2>&1 || true)"
-  local exported
-  exported="$(printf '%s\n' "$output" | rg 'CSCS_SCREENSHOT_EXPORT=' | tail -1 | cut -d= -f2-)"
-  if [[ -n "$exported" && -f "$exported" ]]; then
-    cp "$exported" "$file"
-    sips -z 2027 1280 "$file" --out "$file" >/dev/null
-    echo "Captured Mac ($mode): $file"
-  else
-    echo "Mac screenshot export failed for $mode" >&2
-    printf '%s\n' "$output" >&2
-    return 1
-  fi
-}
-
-capture_mac configuration "$OUT/mac-configuration.png"
-capture_mac running "$OUT/mac-running.png"
 
 echo "Done. Screenshots in $OUT:"
 ls -la "$OUT"
