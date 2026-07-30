@@ -32,7 +32,7 @@ resolve_sim_udid() {
 }
 
 build_ios_simulator_app() {
-  echo "Building iOS Simulator app (generic destination)..."
+  echo "Building iOS Simulator app (generic destination)..." >&2
   cd "$PROJECT"
   xcodebuild -scheme CSCSEmulator \
     -destination 'generic/platform=iOS Simulator' \
