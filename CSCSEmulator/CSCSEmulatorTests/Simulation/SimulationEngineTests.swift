@@ -85,9 +85,7 @@ import Testing
         engine.start(configuration: SimulatorConfiguration(supportsSpeed: true, supportsCadence: true))
 
         let initialCadence = engine.state.cadence.converted(to: .revolutionsPerMinute).value
-        for _ in 0..<10 {
-            engine.tick()
-        }
+        engine.tick()
 
         let cadenceRPM = engine.state.cadence.converted(to: .revolutionsPerMinute).value
         let speedMPH = engine.state.speed.converted(to: .milesPerHour).value
@@ -105,9 +103,7 @@ import Testing
         )
         engine.start(configuration: SimulatorConfiguration(supportsSpeed: true, supportsCadence: false))
 
-        for _ in 0..<10 {
-            engine.tick()
-        }
+        engine.tick()
 
         #expect(engine.state.speed.converted(to: .milesPerHour).value > 0)
 

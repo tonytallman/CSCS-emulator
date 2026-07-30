@@ -6,7 +6,7 @@
 import Foundation
 import Observation
 
-private let simulationTickInterval: Duration = .milliseconds(100)
+private let simulationTickInterval: Duration = .seconds(1)
 
 /// Holds the simulation tick task so it can be cancelled from `deinit` without MainActor isolation.
 private final class TickTaskHolder: @unchecked Sendable {

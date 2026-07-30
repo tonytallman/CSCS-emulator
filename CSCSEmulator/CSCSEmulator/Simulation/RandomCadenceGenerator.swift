@@ -15,8 +15,8 @@ struct RandomCadenceGenerator<RNG: RandomNumberGenerator> {
 
     mutating func nextCadence(after cadence: Cadence) -> Cadence {
         let rpm = cadence.converted(to: .revolutionsPerMinute).value
-        let randomDelta = Double.random(in: -1.5...1.5, using: &rng)
-        let biasToward90 = (90 - rpm) * 0.005
+        let randomDelta = Double.random(in: -3...3, using: &rng)
+        let biasToward90 = (90 - rpm) * 0.035
         let newRPM = min(
             max(rpm + randomDelta + biasToward90, SimulatorRanges.cadenceMin.converted(to: .revolutionsPerMinute).value),
             SimulatorRanges.cadenceMax.converted(to: .revolutionsPerMinute).value
