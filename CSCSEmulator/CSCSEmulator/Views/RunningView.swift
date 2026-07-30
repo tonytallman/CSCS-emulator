@@ -44,6 +44,7 @@ struct RunningView<ViewModel: RunningViewModel>: View {
             .frame(maxWidth: .infinity)
             .padding()
         }
+        .scrollBounceBehavior(.basedOnSize)
         .background {
             if let simulationEngine = viewModel.simulationEngine {
                 SimulationObservation(engine: simulationEngine)

@@ -42,6 +42,7 @@ struct ConfigurationView<ViewModel: ConfigurationViewModel>: View {
             .frame(maxWidth: .infinity)
             .padding()
         }
+        .scrollBounceBehavior(.basedOnSize)
         .onChange(of: viewModel.lastError) { _, error in
             showError = error != nil
             viewModel.handleStartOutcome()
