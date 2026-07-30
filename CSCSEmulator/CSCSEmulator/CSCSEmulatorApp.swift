@@ -14,12 +14,6 @@ struct CSCSEmulatorApp: App {
     var body: some Scene {
         WindowGroup {
             RootView(viewModel: container.makeRootViewModel())
-                #if DEBUG
-                .onAppear {
-                    ScreenshotExporter.exportIfNeeded()
-                }
-                #endif
         }
-        .defaultSize(width: 480, height: 760)
     }
 }
