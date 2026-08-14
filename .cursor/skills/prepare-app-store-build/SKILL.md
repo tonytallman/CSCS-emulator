@@ -3,10 +3,11 @@ name: prepare-app-store-build
 description: >-
   Prepares a new Bike Sensor Emulator App Store build: bumps the build number, runs
   unit tests (stops on failure), archives and exports the iOS Release build,
-  regenerates screenshots (iPhone and iPad on named Simulators), and updates
-  "What's New in This Version?" from commits since the last version tag. Use when
-  preparing a new build, preparing a release build, or when the user asks for
-  App Store build preparation automation.
+  regenerates screenshots (iPhone and iPad on named Simulators), updates
+  "What's New in This Version?" from commits since the last version tag, and
+  checks tallmansoftware.com for website copy drift (writes an agent-ready brief
+  when updates are needed). Use when preparing a new build, preparing a release
+  build, or when the user asks for App Store build preparation automation.
 disable-model-invocation: true
 ---
 
@@ -34,7 +35,8 @@ Task Progress:
 - [ ] Step 3: Archive and export (iOS)
 - [ ] Step 4: Regenerate screenshots
 - [ ] Step 5: Update "What's New in This Version"
-- [ ] Step 6: Manual upload, App Review recording, and App Store Connect steps
+- [ ] Step 6: Check tallmansoftware.com for website drift
+- [ ] Step 7: Manual upload, App Review recording, and App Store Connect steps
 ```
 
 Execute steps in order. Do not skip ahead if a step fails.
@@ -142,7 +144,83 @@ Update [documentation/APP_STORE_SUBMISSION.md](../../documentation/APP_STORE_SUB
 
 5. Show the drafted notes in the final summary so the user can review before pasting into App Store Connect.
 
-### Step 6: Manual upload and App Store Connect
+### Step 6: Check tallmansoftware.com for website drift
+
+Compare the live Tallman Software website to this app repo. If the site is missing Bike Sensor Emulator content or copy is stale, write a self-contained brief for a **separate website agent** that will edit the tallmansoftware.com repo.
+
+**Do not hard-stop** the workflow on website drift — report findings and continue to Step 7.
+
+#### Fetch live pages
+
+Use `WebFetch` on (do **not** use the preview worker):
+
+| URL | Purpose |
+| --- | --- |
+| `https://www.tallmansoftware.com/` | Featured project section |
+| `https://www.tallmansoftware.com/projects/` | Bike Sensor Emulator project listing |
+| `https://www.tallmansoftware.com/projects/bike-sensor-emulator` | Case study |
+
+Treat HTTP 404 or a missing Featured project section as findings. Do not fall back to preview URLs.
+
+#### Compare against this repo
+
+Extract **factual claims** only (ignore marketing tone). Verify against:
+
+- [README.md](../../README.md) — name, platforms, features, BLE advertised name, architecture
+- Code — `AppInfo.title`, `CFBundleDisplayName`, `CSCSIdentifiers.advertisedLocalName`, `SimulatorRanges`, Random-mode behavior, type names (`CSCPeripheralManager`, `SimulationEngine`, `AppContainer`, etc.)
+- [documentation/PRIVACY_POLICY.md](../../documentation/PRIVACY_POLICY.md) — free / no data collected
+- Step 5 **What's New** — user-visible changes the site copy does not yet reflect
+
+Typical claim buckets: product name, platforms, App Store vs BLE name (“CSC Emulator” / “CSCS Emulator”), slider ranges (0–50 mph, 0–200 rpm), Random ~90 rpm, one central, background advertising, architecture type names, privacy.
+
+#### Write the brief (only when updates are needed)
+
+If the site matches the app, report **no updates needed** and do **not** create a file.
+
+If updates are needed, write [documentation/WEBSITE_UPDATES.md](../../documentation/WEBSITE_UPDATES.md) (not gitignored) so it appears as a new/changed file in Git. The website agent will **not** have this iOS repo — put correct facts and proposed copy in the file itself. Do not write “see README” or “see `SimulatorRanges.swift`.”
+
+If `WEBSITE_UPDATES.md` already exists from a prior run and the current check is clean, leave it (do not delete).
+
+Required document structure:
+
+1. **Instructions for the website agent** — short block at the top:
+   - You are updating [tallmansoftware.com](https://www.tallmansoftware.com/) so Bike Sensor Emulator copy matches the shipping app.
+   - Apply only the tasks below. Do not redesign unrelated pages or invent features.
+   - Preserve the live site’s voice and layout; change facts, names, ranges, platforms, and missing sections — not marketing tone.
+   - Prefer the **Proposed copy** blocks; adapt only to match surrounding voice.
+
+2. **Canonical facts** — source-of-truth table (no repo references). Include at least:
+   - Product name (`Bike Sensor Emulator`), home-screen name (`Bike Sensor`), BLE advertised name (`CSCS Emulator`)
+   - App Store listing name if it still differs from the product name
+   - Platforms (iPhone, iPad, Apple Silicon Mac via iPad app)
+   - Slider ranges (0–50 mph, 0–200 rpm), Random mode (~90 rpm, speed derived)
+   - One BLE central, background advertising on iPhone/iPad
+   - Free / no data collected
+   - App Store URL and GitHub URL if known from this repo
+   - Marketing version and build checked (`MARKETING_VERSION` / `CURRENT_PROJECT_VERSION` from `project.pbxproj`)
+
+3. **Scope** — URLs to touch; explicitly out of scope (home services/about, contact, unrelated projects).
+
+4. **Per-page tasks** — one subsection each for `/`, `/projects/`, `/projects/bike-sensor-emulator`:
+   - **Status:** live and current / live but stale / missing (404 or section absent)
+   - **Current copy:** verbatim quotes from the fetch (or “page not found”)
+   - **Task:** Create | Update | No change
+   - **Proposed copy:** paste-ready text (card title, tagline, blurb, platforms line, CTAs). For the case study, section-level proposed paragraphs (What is it, How it behaves, Result, etc.).
+   - **Must include / must not claim:** bullet facts for that page (e.g. must mention iPad-on-Mac; must not claim ANT+ or multiple sensors)
+
+5. **What's New that the site should reflect** — user-visible changes from Step 5 as website copy implications, not commit subjects.
+
+6. **Assets** — if the case study or cards use screenshots, note that fresh App Store shots are in `documentation/screenshots/` (human attaches them). Do not embed binaries.
+
+Copy quality:
+
+- Match the live site’s voice (if project pages 404, match other live home copy rather than inventing a new register).
+- Keep home and `/projects/` cards short; put detail on the case study only.
+- Do not dump internal type names unless the live case study already uses them; if it does, keep names accurate.
+
+Report whether the brief was written in the final summary.
+
+### Step 7: Manual upload and App Store Connect
 
 After automation completes, direct the user to [documentation/APP_STORE_SUBMISSION.md](../../documentation/APP_STORE_SUBMISSION.md) for:
 
@@ -168,8 +246,9 @@ When all automated steps succeed, report:
 - **Screenshots:** documentation/screenshots/ (Screenshot iPhone + Screenshot iPad Simulators)
 - **Bluetooth bypass:** temporary Simulator patch in `CSCPeripheralManager` applied for screenshots, then restored
 - **What's New:** [1–3 sentence summary or bullet list drafted into APP_STORE_SUBMISSION.md]
+- **Website:** documentation/WEBSITE_UPDATES.md (brief for website agent) | no updates needed
 
-**Next:** Upload via Organizer/Transporter, validate, paste What's New, complete App Store Connect metadata, record and attach App Review screen recording manually, submit for review.
+**Next:** Upload via Organizer/Transporter, validate, paste What's New, complete App Store Connect metadata, record and attach App Review screen recording manually, submit for review. If `WEBSITE_UPDATES.md` exists, hand it to the website agent as the starting brief.
 ```
 
 ## Script reference
@@ -226,3 +305,7 @@ Resize iPhone PNGs to **1284 × 2778** with `sips` so they match App Store Conne
 **Build number already uploaded:** App Store Connect rejects duplicate build numbers. Re-run `bump-build-number.sh` before archiving again.
 
 **No version tags / empty What's New:** Tags use the form `MARKETING_VERSION(CURRENT_PROJECT_VERSION)` (e.g. `1.1(3)`). If none exist, draft a first-release blurb. If `HEAD` matches the latest tag, use commits from the previous tag so notes cover the current version’s changes.
+
+**Website fetch fails:** Report the error and continue the workflow. If partial fetches succeed, write `WEBSITE_UPDATES.md` from what was retrieved and note which URLs could not be checked.
+
+**Stale `WEBSITE_UPDATES.md` after a clean check:** Leave the existing file; report that the current check found no updates needed.

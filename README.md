@@ -135,7 +135,7 @@ CSCSEmulator/
 
 See [documentation/APP_STORE_SUBMISSION.md](documentation/APP_STORE_SUBMISSION.md) for metadata, privacy answers, and the manual submission checklist. Privacy policy: [documentation/PRIVACY_POLICY.md](documentation/PRIVACY_POLICY.md).
 
-To prepare a new build, use the **`prepare-app-store-build`** Cursor skill (`.cursor/skills/prepare-app-store-build/`) or run the scripts under `scripts/` — bump build number, run unit tests, archive/export, and capture screenshots (named `Screenshot iPhone` / `Screenshot iPad` Simulators). Upload, App Review recording, and App Store Connect steps remain manual.
+To prepare a new build, use the **`prepare-app-store-build`** Cursor skill (`.cursor/skills/prepare-app-store-build/`) or run the scripts under `scripts/` — bump build number, run unit tests, archive/export, capture screenshots (named `Screenshot iPhone` / `Screenshot iPad` Simulators), and check [tallmansoftware.com](https://www.tallmansoftware.com/) for website copy drift (writes `documentation/WEBSITE_UPDATES.md` when updates are needed). Upload, App Review recording, and App Store Connect steps remain manual.
 
 ## Future Enhancements
 
