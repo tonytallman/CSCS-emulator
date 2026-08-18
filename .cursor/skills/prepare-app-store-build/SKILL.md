@@ -2,8 +2,8 @@
 name: prepare-app-store-build
 description: >-
   Prepares a new Bike Sensor Emulator App Store build: bumps the build number, runs
-  unit tests (stops on failure), archives and exports the iOS Release build,
-  regenerates screenshots (iPhone and iPad on named Simulators), updates
+  unit tests (stops on failure), archives the iOS Release build directly into
+  Xcode Organizer, regenerates screenshots (iPhone and iPad on named Simulators),
   "What's New in This Version?" from commits since the last version tag,
   checks tallmansoftware.com for website copy drift (writes an agent-ready brief
   when updates are needed), then commits those changes and tags the commit
@@ -33,7 +33,7 @@ Copy this checklist and track progress:
 Task Progress:
 - [ ] Step 1: Bump build number
 - [ ] Step 2: Run unit tests (STOP on failure)
-- [ ] Step 3: Archive and export (iOS)
+- [ ] Step 3: Archive to Xcode Organizer (iOS)
 - [ ] Step 4: Regenerate screenshots
 - [ ] Step 5: Update "What's New in This Version"
 - [ ] Step 6: Check tallmansoftware.com for website drift
@@ -51,6 +51,8 @@ bash scripts/bump-build-number.sh
 
 Increments `CURRENT_PROJECT_VERSION` across all targets in `project.pbxproj`. Does **not** change `MARKETING_VERSION` — bump that manually when shipping a new App Store version.
 
+**Build number only is enough while the current `MARKETING_VERSION` train is still open** (not yet approved on the App Store). Once Apple approves a version, that train closes: further uploads must use a **strictly higher** `MARKETING_VERSION` in `project.pbxproj` (e.g. 1.1 approved → ship 1.2). A higher build number alone cannot reopen a closed train.
+
 Report the old and new build numbers to the user.
 
 ### Step 2: Run unit tests — hard stop on failure
@@ -67,20 +69,19 @@ Runs `CSCSEmulatorTests` on iOS Simulator.
 2. **Stop the workflow** — do not proceed to archive or screenshots
 3. Do not revert the build number bump unless the user asks
 
-### Step 3: Archive and export
+### Step 3: Archive to Xcode Organizer
 
 ```bash
 bash scripts/archive-and-export.sh
 ```
 
-Creates a Release archive and exports an App Store Connect-ready `.ipa`:
+Creates a Release archive in Xcode Organizer for **Validate App** / **Distribute App**:
 
 | Output | Path |
 | --- | --- |
-| iOS archive | `build/archives/CSCSEmulator-iOS.xcarchive` |
-| iOS export | `build/export/ios/` (`.ipa`) |
+| Xcode Organizer | `~/Library/Developer/Xcode/Archives/YYYY-mm-dd/CSCSEmulator M-D-YY, H.MM AM\|PM.xcarchive` |
 
-Export success validates signing and entitlements locally. Report the exported file paths.
+The script does **not** write to `build/archives/` or export a `.ipa` to `build/export/ios/`. Report the Organizer path. The archive lives outside the repo and is not committed.
 
 ### Step 4: Regenerate screenshots
 
@@ -263,8 +264,7 @@ This step is authorized by the skill — do not ask for extra confirmation. **Ne
 
 After automation completes, direct the user to [documentation/APP_STORE_SUBMISSION.md](../../documentation/APP_STORE_SUBMISSION.md) for:
 
-- Uploading `.ipa` via Xcode Organizer or Transporter
-- Running **Validate App** in Organizer (contacts App Store Connect)
+- Opening **Window → Organizer** in Xcode, selecting the copied archive, and running **Validate App** / **Distribute App**
 - Uploading screenshots from `documentation/screenshots/`
 - Pasting **What's New in This Version?** from the submission doc into App Store Connect
 - Recording and attaching the **App Review screen recording** manually (see [App Review Information](../../documentation/APP_STORE_SUBMISSION.md#app-review-information))
@@ -281,14 +281,14 @@ When all automated steps succeed, report:
 
 - **Build number:** [old] → [new]
 - **Unit tests:** passed (iOS Simulator)
-- **iOS export:** build/export/ios/*.ipa
+- **Xcode Organizer:** ~/Library/Developer/Xcode/Archives/YYYY-mm-dd/*.xcarchive
 - **Screenshots:** documentation/screenshots/ (Screenshot iPhone + Screenshot iPad Simulators)
 - **Bluetooth bypass:** temporary Simulator patch in `CSCPeripheralManager` applied for screenshots, then restored
 - **What's New:** [1–3 sentence summary or bullet list drafted into APP_STORE_SUBMISSION.md]
 - **Website:** documentation/WEBSITE_UPDATES.md (brief for website agent) | no updates needed
 - **Git:** committed and tagged `[MARKETING_VERSION(BUILD)]` locally (not pushed)
 
-**Next:** Upload via Organizer/Transporter, validate, paste What's New, complete App Store Connect metadata, record and attach App Review screen recording manually, submit for review. Push the commit and tag when ready. If `WEBSITE_UPDATES.md` exists, hand it to the website agent as the starting brief.
+**Next:** Open Xcode Organizer, validate and distribute the archive, paste What's New, complete App Store Connect metadata, record and attach App Review screen recording manually, submit for review. Push the commit and tag when ready. If `WEBSITE_UPDATES.md` exists, hand it to the website agent as the starting brief.
 ```
 
 ## Script reference
@@ -297,9 +297,9 @@ When all automated steps succeed, report:
 | --- | --- |
 | `scripts/bump-build-number.sh` | Increment build number |
 | `scripts/run-unit-tests.sh` | Unit tests (iOS Simulator) |
-| `scripts/archive-and-export.sh` | iOS Release archive + export |
+| `scripts/archive-and-export.sh` | iOS Release archive into Xcode Organizer |
 | `scripts/capture-screenshots.sh` | App Store screenshots (Screenshot iPhone / Screenshot iPad Simulators) |
-| `scripts/ExportOptions-iOS.plist` | iOS export options |
+| `scripts/ExportOptions-iOS.plist` | Unused legacy export options (Organizer Distribute replaces IPA export) |
 
 ## Screenshot workarounds
 
@@ -330,7 +330,9 @@ Resize iPhone PNGs to **1284 × 2778** with `sips` so they match App Store Conne
 
 ## Troubleshooting
 
-**Signing errors during archive/export:** Confirm team `MYMYAX7K65` is selected in Xcode and the App ID `com.tallmansoftware.csc-emulator` is registered with Bluetooth capability.
+**Signing errors during archive:** Confirm team `MYMYAX7K65` is selected in Xcode and the App ID `com.tallmansoftware.csc-emulator` is registered with Bluetooth capability.
+
+**Archive not visible in Organizer:** Confirm the script printed an Organizer path under `~/Library/Developer/Xcode/Archives/YYYY-mm-dd/`. Quit and reopen Organizer if needed.
 
 **Screenshot Simulator not found:** Create devices named exactly `Screenshot iPhone` and `Screenshot iPad` in Xcode. Verify with `xcrun simctl list devices available | rg Screenshot`.
 
@@ -343,6 +345,8 @@ Resize iPhone PNGs to **1284 × 2778** with `sips` so they match App Store Conne
 **Unit-test Simulator not found:** `scripts/run-unit-tests.sh` may pin a specific device/OS. Install that runtime in Xcode → Settings → Platforms, or update the destination in the script.
 
 **Build number already uploaded:** App Store Connect rejects duplicate build numbers. Re-run `bump-build-number.sh` before archiving again.
+
+**Closed pre-release train (90186 / 90062):** Apple closed the version train because that `MARKETING_VERSION` is already approved (or otherwise closed). Error 90186: “Invalid Pre-Release Train … closed for new build submissions.” Error 90062: `CFBundleShortVersionString` must be higher than the previously approved version. Bump `MARKETING_VERSION` in `project.pbxproj` for all targets, create the new version in App Store Connect (e.g. 1.2), then archive and upload. Do not rely on a build-number bump alone after approval.
 
 **No version tags / empty What's New:** Tags use the form `MARKETING_VERSION(CURRENT_PROJECT_VERSION)` (e.g. `1.1(3)`). If none exist, draft a first-release blurb. If `HEAD` matches the latest tag, use commits from the previous tag so notes cover the current version’s changes.
 

@@ -26,7 +26,7 @@ Prefer the **Proposed copy** blocks; adapt only to match surrounding voice.
 | Price / privacy | Free; no data collected |
 | GitHub | https://github.com/tonytallman/CSCS-emulator |
 | App Store URL | Use the existing “View on the App Store” URL already on the live site (numeric ID is not stored in the app repo) |
-| Version checked | Marketing version **1.1**, build **5** |
+| Version checked | Marketing version **1.2**, build **6** |
 | Localizations | App UI: English, Spanish, Simplified Chinese, Traditional Chinese, Japanese, German, French, Portuguese (Brazil), Korean, Italian |
 
 ## Scope
@@ -127,7 +127,7 @@ Remove the line “App Store listing currently appears as CSC Emulator.” The A
 
 ## What's New that the site should reflect
 
-From App Store 1.1 (5):
+From App Store 1.2 (6):
 
 - **Localization** — the UI now ships in nine languages besides English. Mention this on the case study (see proposed “What is it” paragraph). Home and `/projects/` cards can stay short; do not cram a language list onto the cards.
 - **Scroll bounce** — when content already fits on screen, the UI no longer rubber-bands. Too minor for website copy; skip.
