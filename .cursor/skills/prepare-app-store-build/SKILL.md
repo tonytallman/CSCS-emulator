@@ -4,9 +4,10 @@ description: >-
   Prepares a new Bike Sensor Emulator App Store build: bumps the build number, runs
   unit tests (stops on failure), archives and exports the iOS Release build,
   regenerates screenshots (iPhone and iPad on named Simulators), updates
-  "What's New in This Version?" from commits since the last version tag, and
+  "What's New in This Version?" from commits since the last version tag,
   checks tallmansoftware.com for website copy drift (writes an agent-ready brief
-  when updates are needed). Use when preparing a new build, preparing a release
+  when updates are needed), then commits those changes and tags the commit
+  locally without pushing. Use when preparing a new build, preparing a release
   build, or when the user asks for App Store build preparation automation.
 disable-model-invocation: true
 ---
@@ -36,7 +37,8 @@ Task Progress:
 - [ ] Step 4: Regenerate screenshots
 - [ ] Step 5: Update "What's New in This Version"
 - [ ] Step 6: Check tallmansoftware.com for website drift
-- [ ] Step 7: Manual upload, App Review recording, and App Store Connect steps
+- [ ] Step 7: Commit and tag (do not push)
+- [ ] Step 8: Manual upload, App Review recording, and App Store Connect steps
 ```
 
 Execute steps in order. Do not skip ahead if a step fails.
@@ -220,7 +222,44 @@ Copy quality:
 
 Report whether the brief was written in the final summary.
 
-### Step 7: Manual upload and App Store Connect
+### Step 7: Commit and tag (do not push)
+
+This step is authorized by the skill — do not ask for extra confirmation. **Never push** the commit or the tag (`git push`, `git push --tags`, or equivalent).
+
+1. Confirm the Bluetooth bypass is gone (`git diff` / `git status` show no `suppressBluetoothAvailabilityCheck`). If it is still present, restore `CSCPeripheralManager.swift` and do not commit until it is gone.
+
+2. Read `MARKETING_VERSION` and `CURRENT_PROJECT_VERSION` from `project.pbxproj`. The tag name is `MARKETING_VERSION(CURRENT_PROJECT_VERSION)` (e.g. `1.1(5)`). The commit message is `version MARKETING_VERSION (BUILD)` (e.g. `version 1.1 (5)`).
+
+3. If that tag already exists, **stop** — report it and do not overwrite with `-f`.
+
+4. Stage **only** files produced by Steps 1–6 of this run. Typical paths:
+   - `CSCSEmulator/CSCSEmulator.xcodeproj/project.pbxproj` (build number)
+   - `documentation/app-store/*.md` (What's New)
+   - `documentation/WEBSITE_UPDATES.md` if this run created or updated it
+
+   Leave unrelated uncommitted work unstaged. Do not stage the Bluetooth bypass, `build/` artifacts, or gitignored paths (`documentation/screenshots/`, `documentation/APP_STORE_SUBMISSION.md`).
+
+5. Commit with a HEREDOC (do not skip hooks):
+
+   ```bash
+   git commit -m "$(cat <<'EOF'
+   version 1.1 (5)
+
+   EOF
+   )"
+   ```
+
+   Substitute the actual marketing version and build. If the commit is rejected by a hook, fix the issue and create a **new** commit; do not amend.
+
+6. Create an annotated tag on that commit (quote the tag name):
+
+   ```bash
+   git tag -a '1.1(5)' -m 'version 1.1 (5)'
+   ```
+
+7. Verify with `git status`, `git log -1`, and `git tag -l --sort=-v:refname | head -3`. Report the commit and tag in the final summary. Do not push.
+
+### Step 8: Manual upload and App Store Connect
 
 After automation completes, direct the user to [documentation/APP_STORE_SUBMISSION.md](../../documentation/APP_STORE_SUBMISSION.md) for:
 
@@ -247,8 +286,9 @@ When all automated steps succeed, report:
 - **Bluetooth bypass:** temporary Simulator patch in `CSCPeripheralManager` applied for screenshots, then restored
 - **What's New:** [1–3 sentence summary or bullet list drafted into APP_STORE_SUBMISSION.md]
 - **Website:** documentation/WEBSITE_UPDATES.md (brief for website agent) | no updates needed
+- **Git:** committed and tagged `[MARKETING_VERSION(BUILD)]` locally (not pushed)
 
-**Next:** Upload via Organizer/Transporter, validate, paste What's New, complete App Store Connect metadata, record and attach App Review screen recording manually, submit for review. If `WEBSITE_UPDATES.md` exists, hand it to the website agent as the starting brief.
+**Next:** Upload via Organizer/Transporter, validate, paste What's New, complete App Store Connect metadata, record and attach App Review screen recording manually, submit for review. Push the commit and tag when ready. If `WEBSITE_UPDATES.md` exists, hand it to the website agent as the starting brief.
 ```
 
 ## Script reference
@@ -309,3 +349,9 @@ Resize iPhone PNGs to **1284 × 2778** with `sips` so they match App Store Conne
 **Website fetch fails:** Report the error and continue the workflow. If partial fetches succeed, write `WEBSITE_UPDATES.md` from what was retrieved and note which URLs could not be checked.
 
 **Stale `WEBSITE_UPDATES.md` after a clean check:** Leave the existing file; report that the current check found no updates needed.
+
+**Tag already exists:** Do not force-update (`-f`). Stop, report the existing tag, and wait for the user.
+
+**Do not push:** This workflow never runs `git push` or `git push --tags`. The local commit and tag stay on the machine until the user pushes.
+
+**Bluetooth bypass staged for commit:** Restore `CSCPeripheralManager.swift` and unstage it. Never commit `suppressBluetoothAvailabilityCheck`.
