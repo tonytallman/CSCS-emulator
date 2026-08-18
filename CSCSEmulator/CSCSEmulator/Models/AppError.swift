@@ -16,17 +16,22 @@ enum AppError: Error, LocalizedError, Equatable {
     var errorDescription: String? {
         switch self {
         case .bluetoothUnavailable:
-            "Bluetooth is not available on this device."
+            String(localized: "Bluetooth is not available on this device.")
         case .bluetoothDisabled:
-            "Bluetooth is turned off. Enable Bluetooth in Settings to use the emulator."
+            String(localized: "Bluetooth is turned off. Enable Bluetooth in Settings to use the emulator.")
         case .bluetoothPermissionDenied:
-            "Bluetooth permission is turned off. Enable Bluetooth access for Bike Sensor in Settings to start the emulator."
+            String(
+                format: String(
+                    localized: "Bluetooth permission is turned off. Enable Bluetooth access for %@ in Settings to start the emulator."
+                ),
+                AppInfo.displayName,
+            )
         case .advertisingFailed:
-            "Failed to start BLE advertising. Please try again."
+            String(localized: "Failed to start BLE advertising. Please try again.")
         case .connectionFailed:
-            "A BLE connection could not be established."
+            String(localized: "A BLE connection could not be established.")
         case .internalError:
-            "An unexpected error occurred. Please try again."
+            String(localized: "An unexpected error occurred. Please try again.")
         }
     }
 }

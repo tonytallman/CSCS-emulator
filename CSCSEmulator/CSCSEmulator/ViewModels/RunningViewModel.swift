@@ -22,13 +22,6 @@ final class AppRunningViewModel: RunningViewModel {
         return formatter
     }()
 
-    private static let cadenceFormatter: MeasurementFormatter = {
-        let formatter = MeasurementFormatter()
-        formatter.unitOptions = .providedUnit
-        formatter.numberFormatter.maximumFractionDigits = 0
-        return formatter
-    }()
-
     init(
         simulation: SimulationControlling,
         broadcaster: MeasurementBroadcasting,
@@ -70,7 +63,17 @@ final class AppRunningViewModel: RunningViewModel {
     }
 
     var formattedCadence: String {
-        Self.cadenceFormatter.string(from: simulation.state.cadence)
+        let rpm = simulation.state.cadence.converted(to: .revolutionsPerMinute).value
+        let number = rpm.formatted(.number.precision(.fractionLength(0)))
+        return "\(number) \(cadenceUnit)"
+    }
+
+    var speedUnit: String {
+        Self.speedFormatter.string(from: UnitSpeed.milesPerHour)
+    }
+
+    var cadenceUnit: String {
+        String(localized: "rpm")
     }
 
     var speedRangeMPH: ClosedRange<Double> {

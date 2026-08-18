@@ -72,7 +72,7 @@ struct ConfigurationView<ViewModel: ConfigurationViewModel>: View {
                 .resizable()
                 .scaledToFit()
                 .frame(height: 48)
-                .accessibilityLabel("Bike Sensor Emulator")
+                .accessibilityLabel(AppInfo.title)
             Text(AppInfo.title)
                 .font(.title2)
                 .fontWeight(.bold)
@@ -86,9 +86,10 @@ struct ConfigurationView<ViewModel: ConfigurationViewModel>: View {
 
     private var supportedMetricsSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("SUPPORTED METRICS")
+            Text("Supported Metrics")
                 .font(.caption)
                 .foregroundStyle(.secondary)
+                .textCase(.uppercase)
 
             VStack(spacing: 0) {
                 metricRow(
@@ -112,8 +113,8 @@ struct ConfigurationView<ViewModel: ConfigurationViewModel>: View {
 
     private func metricRow(
         icon: String,
-        title: String,
-        subtitle: String,
+        title: LocalizedStringKey,
+        subtitle: LocalizedStringKey,
         isOn: Binding<Bool>
     ) -> some View {
         HStack(spacing: 12) {

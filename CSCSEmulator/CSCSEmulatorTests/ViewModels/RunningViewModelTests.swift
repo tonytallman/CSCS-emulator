@@ -74,6 +74,18 @@ import Testing
         #expect(viewModel.cadenceRPM == 95)
     }
 
+    @Test func unitLabelsAreNonEmptyInEnglish() {
+        let (viewModel, _, _, _) = makeViewModel()
+        let formatter = MeasurementFormatter()
+        formatter.unitOptions = .providedUnit
+        let expectedSpeedUnit = formatter.string(from: UnitSpeed.milesPerHour)
+
+        #expect(!viewModel.speedUnit.isEmpty)
+        #expect(!viewModel.cadenceUnit.isEmpty)
+        #expect(viewModel.speedUnit == expectedSpeedUnit)
+        #expect(viewModel.cadenceUnit == "rpm")
+    }
+
     @Test func setModeForwardsToEngine() {
         let (viewModel, engine, _, _) = makeViewModel()
 

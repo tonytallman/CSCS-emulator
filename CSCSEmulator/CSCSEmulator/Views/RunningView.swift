@@ -16,6 +16,8 @@ protocol RunningViewModel: AnyObject, Observable {
     var slidersEnabled: Bool { get }
     var formattedSpeed: String { get }
     var formattedCadence: String { get }
+    var speedUnit: String { get }
+    var cadenceUnit: String { get }
     var speedRangeMPH: ClosedRange<Double> { get }
     var cadenceRangeRPM: ClosedRange<Double> { get }
     var speedMPH: Double { get set }
@@ -71,7 +73,7 @@ struct RunningView<ViewModel: RunningViewModel>: View {
                 .resizable()
                 .scaledToFit()
                 .frame(height: 48)
-                .accessibilityLabel("Bike Sensor Emulator")
+                .accessibilityLabel(AppInfo.title)
             Text(AppInfo.title)
                 .font(.title2)
                 .fontWeight(.bold)
@@ -93,9 +95,10 @@ struct RunningView<ViewModel: RunningViewModel>: View {
 
     private var modeSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("MODE")
+            Text("Mode")
                 .font(.caption)
                 .foregroundStyle(.secondary)
+                .textCase(.uppercase)
 
             Picker("Mode", selection: Binding(
                 get: { viewModel.mode },
@@ -126,15 +129,16 @@ struct RunningView<ViewModel: RunningViewModel>: View {
     private var metricsSection: some View {
         if viewModel.supportsSpeed || viewModel.supportsCadence {
             VStack(alignment: .leading, spacing: 12) {
-                Text("METRICS")
+                Text("Metrics")
                     .font(.caption)
                     .foregroundStyle(.secondary)
+                    .textCase(.uppercase)
 
                 if viewModel.supportsSpeed {
                     metricCard(
                         icon: "speedometer",
-                        title: "Speed",
-                        unit: "mph",
+                        title: String(localized: "Speed"),
+                        unit: viewModel.speedUnit,
                         value: viewModel.formattedSpeed,
                         range: viewModel.speedRangeMPH,
                         valueBinding: Binding(
@@ -148,8 +152,8 @@ struct RunningView<ViewModel: RunningViewModel>: View {
                 if viewModel.supportsCadence {
                     metricCard(
                         icon: "gearshape.2",
-                        title: "Cadence",
-                        unit: "rpm",
+                        title: String(localized: "Cadence"),
+                        unit: viewModel.cadenceUnit,
                         value: viewModel.formattedCadence,
                         range: viewModel.cadenceRangeRPM,
                         valueBinding: Binding(

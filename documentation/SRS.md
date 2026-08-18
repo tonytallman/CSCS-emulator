@@ -103,11 +103,7 @@ These ranges shall accommodate Random-mode derived speed (200 RPM corresponds to
 
 ### 4.1 Device Name
 
-While advertising, the BLE device name shall be:
-
-```text
-CSCS Emulator
-```
+While advertising, the BLE device local name shall be localized to the device language. In every locale it shall include the untranslated Bluetooth SIG acronym **CSCS** plus a localized equivalent of “Emulator.” English is `CSCS Emulator` (for example, Spanish `Emulador CSCS`, German `CSCS-Emulator`). The acronym **CSCS** shall never be translated.
 
 ### 4.2 Advertising
 

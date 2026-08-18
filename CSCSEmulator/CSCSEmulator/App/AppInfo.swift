@@ -6,5 +6,11 @@
 import Foundation
 
 enum AppInfo {
-    static let title = "Bike Sensor Emulator"
+    static var title: String {
+        String(localized: "Bike Sensor Emulator")
+    }
+
+    static var displayName: String {
+        String(localized: "Bike Sensor")
+    }
 }

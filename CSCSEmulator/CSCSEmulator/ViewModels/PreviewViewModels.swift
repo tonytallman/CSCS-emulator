@@ -78,6 +78,14 @@ final class PreviewConfigurationViewModel: ConfigurationViewModel {
 @Observable
 @MainActor
 final class PreviewRunningViewModel: RunningViewModel {
+    private static let speedFormatter: MeasurementFormatter = {
+        let formatter = MeasurementFormatter()
+        formatter.unitOptions = .providedUnit
+        formatter.numberFormatter.maximumFractionDigits = 1
+        formatter.numberFormatter.minimumFractionDigits = 0
+        return formatter
+    }()
+
     var mode: OperatingMode
     var supportsSpeed: Bool
     var supportsCadence: Bool
@@ -114,11 +122,19 @@ final class PreviewRunningViewModel: RunningViewModel {
     }
 
     var formattedSpeed: String {
-        speedMPH.formatted(.number.precision(.fractionLength(0...1))) + " mph"
+        speedMPH.formatted(.number.precision(.fractionLength(0...1))) + " " + speedUnit
     }
 
     var formattedCadence: String {
-        cadenceRPM.formatted(.number.precision(.fractionLength(0))) + " rpm"
+        cadenceRPM.formatted(.number.precision(.fractionLength(0))) + " " + cadenceUnit
+    }
+
+    var speedUnit: String {
+        Self.speedFormatter.string(from: UnitSpeed.milesPerHour)
+    }
+
+    var cadenceUnit: String {
+        String(localized: "rpm")
     }
 
     func setMode(_ mode: OperatingMode) {

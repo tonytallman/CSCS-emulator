@@ -452,11 +452,7 @@ No automatic updates occur.
 
 ## Device Name
 
-Advertised local name:
-
-```text
-CSCS Emulator
-```
+Advertised local name is localized to the device language. Every locale includes the untranslated Bluetooth SIG acronym **CSCS** plus a localized equivalent of “Emulator.” English is `CSCS Emulator`.
 
 ---
 
@@ -543,13 +539,23 @@ Connection status display is a future enhancement. The running screen is not req
 
 The app declares the `bluetooth-peripheral` background mode on iPhone and iPad so advertising and measurement notifications can continue while the app is backgrounded.
 
-When backgrounded, iOS may stop including the local name (`CSCS Emulator`) in advertisement packets and instead expose the CSCS service UUID in the overflow area. Centrals that scan by service UUID remain able to discover the emulator.
+When backgrounded, iOS may stop including the localized advertised local name in advertisement packets and instead expose the CSCS service UUID in the overflow area. Centrals that scan by service UUID remain able to discover the emulator.
 
 State restoration (`CBPeripheralManagerOptionRestoreIdentifierKey`) is not implemented in the initial release.
 
 ---
 
-# 12. CSCS Encoder
+# 12. Localization
+
+The app UI, home-screen name, BLE advertised local name, and Bluetooth permission prompt are localized using Xcode String Catalogs (`Localizable.xcstrings`, `InfoPlist.xcstrings`).
+
+Supported languages: English (development language), Spanish, Simplified Chinese, Traditional Chinese, Japanese, German, French, Portuguese (Brazil), Korean, and Italian.
+
+The Bluetooth SIG acronym **CSCS** is never translated. App Store listing metadata for each locale is stored under `documentation/app-store/`. Screenshots remain English-only for all storefronts (App Store Connect falls back to the primary-language set).
+
+---
+
+# 13. CSCS Encoder
 
 ## Responsibilities
 

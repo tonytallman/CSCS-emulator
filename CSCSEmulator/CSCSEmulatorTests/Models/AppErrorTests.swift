@@ -3,6 +3,7 @@
 //  CSCSEmulatorTests
 //
 
+import Foundation
 import Testing
 @testable import CSCSEmulator
 
@@ -20,8 +21,10 @@ import Testing
     }
 
     @Test func bluetoothPermissionDeniedReferencesAppName() {
+        let english = Locale(components: Locale.Components(languageCode: Locale.LanguageCode("en")))
+        let displayName = String(localized: "Bike Sensor", locale: english)
         let description = AppError.bluetoothPermissionDenied.errorDescription
-        #expect(description?.contains("Bike Sensor") == true)
+        #expect(description?.contains(displayName) == true)
     }
 
     @Test func advertisingFailedHasUserFacingDescription() {

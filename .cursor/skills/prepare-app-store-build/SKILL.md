@@ -140,7 +140,7 @@ Update [documentation/APP_STORE_SUBMISSION.md](../../documentation/APP_STORE_SUB
    - Stay within App Store Connect’s 4000-character limit (aim much shorter)
    - For the first release / no prior tag: use a brief first-release blurb instead of an empty section
 
-4. Write the draft into the **What's New in This Version?** section of `documentation/APP_STORE_SUBMISSION.md` (create the section if missing — place it after **Promotional Text**). Also sync **Version** and **Build** in the App Identity table from `MARKETING_VERSION` / `CURRENT_PROJECT_VERSION` in `project.pbxproj`.
+4. Write the draft into the **What's New in This Version?** section of `documentation/APP_STORE_SUBMISSION.md` (create the section if missing — place it after **Promotional Text**). Also sync the same bullet in each `documentation/app-store/*.md` localization file. Sync **Version** and **Build** in the App Identity table from `MARKETING_VERSION` / `CURRENT_PROJECT_VERSION` in `project.pbxproj`.
 
 5. Show the drafted notes in the final summary so the user can review before pasting into App Store Connect.
 
@@ -190,7 +190,7 @@ Required document structure:
    - Prefer the **Proposed copy** blocks; adapt only to match surrounding voice.
 
 2. **Canonical facts** — source-of-truth table (no repo references). Include at least:
-   - Product name (`Bike Sensor Emulator`), home-screen name (`Bike Sensor`), BLE advertised name (`CSCS Emulator`)
+   - Product name (`Bike Sensor Emulator`), home-screen name (`Bike Sensor`), BLE advertised name (localized; English `CSCS Emulator`; **CSCS** never translated)
    - App Store listing name if it still differs from the product name
    - Platforms (iPhone, iPad, Apple Silicon Mac via iPad app)
    - Slider ranges (0–50 mph, 0–200 rpm), Random mode (~90 rpm, speed derived)
