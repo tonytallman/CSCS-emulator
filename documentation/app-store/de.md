@@ -1,6 +1,6 @@
 # App Store Metadata — German
 
-Paste into App Store Connect for the **German** localization.
+Source for `scripts/upload-app-store-localizations.py` — **German** localization (`de-DE`).
 
 | Field | Value |
 | --- | --- |

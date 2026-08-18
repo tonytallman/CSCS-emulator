@@ -1,6 +1,6 @@
 # App Store Metadata — French
 
-Paste into App Store Connect for the **French** localization.
+Source for `scripts/upload-app-store-localizations.py` — **French** localization (`fr-FR`).
 
 | Field | Value |
 | --- | --- |

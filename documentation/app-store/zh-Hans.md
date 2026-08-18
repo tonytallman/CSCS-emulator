@@ -1,6 +1,6 @@
 # App Store Metadata — Chinese (Simplified)
 
-Paste into App Store Connect for the **Chinese (Simplified)** localization.
+Source for `scripts/upload-app-store-localizations.py` — **Chinese (Simplified)** localization (`zh-Hans`).
 
 | Field | Value |
 | --- | --- |

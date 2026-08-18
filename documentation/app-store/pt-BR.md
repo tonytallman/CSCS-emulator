@@ -1,10 +1,10 @@
 # App Store Metadata — Portuguese (Brazil)
 
-Paste into App Store Connect for the **Portuguese (Brazil)** localization.
+Source for `scripts/upload-app-store-localizations.py` — **Portuguese (Brazil)** localization (`pt-BR`).
 
 | Field | Value |
 | --- | --- |
-| **App Name** | Emulador de sensor de bicicleta |
+| **App Name** | Emulador sensor de bike |
 | **Subtitle** | Sensor de ciclismo virtual |
 
 ## Promotional Text (170 char max)

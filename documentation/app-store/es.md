@@ -1,10 +1,10 @@
 # App Store Metadata — Spanish (Mexico)
 
-Paste into App Store Connect for the **Spanish (Mexico)** localization.
+Source for `scripts/upload-app-store-localizations.py` — **Spanish (Mexico)** localization (`es-MX`; same file also uploads `es-ES`).
 
 | Field | Value |
 | --- | --- |
-| **App Name** | Emulador de sensor de bicicleta |
+| **App Name** | Emulador sensor de bici |
 | **Subtitle** | Sensor de ciclismo virtual |
 
 ## Promotional Text (170 char max)

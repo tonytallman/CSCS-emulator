@@ -69,3 +69,7 @@ fastlane/Preview.html
 fastlane/screenshots/**/*.png
 fastlane/test_output
 APP_STORE_SUBMISSION.md
+
+# App Store Connect API keys (keep in ~/.appstoreconnect/; never commit)
+*.p8
+.appstoreconnect/

@@ -1,6 +1,6 @@
 # App Store Metadata — Korean
 
-Paste into App Store Connect for the **Korean** localization.
+Source for `scripts/upload-app-store-localizations.py` — **Korean** localization (`ko`).
 
 | Field | Value |
 | --- | --- |

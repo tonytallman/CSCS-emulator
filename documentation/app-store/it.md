@@ -1,6 +1,6 @@
 # App Store Metadata — Italian
 
-Paste into App Store Connect for the **Italian** localization.
+Source for `scripts/upload-app-store-localizations.py` — **Italian** localization (`it`).
 
 | Field | Value |
 | --- | --- |

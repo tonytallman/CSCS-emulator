@@ -1,6 +1,6 @@
 # App Store Metadata — Japanese
 
-Paste into App Store Connect for the **Japanese** localization.
+Source for `scripts/upload-app-store-localizations.py` — **Japanese** localization (`ja`).
 
 | Field | Value |
 | --- | --- |

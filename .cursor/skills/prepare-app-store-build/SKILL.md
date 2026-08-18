@@ -5,6 +5,7 @@ description: >-
   unit tests (stops on failure), archives the iOS Release build directly into
   Xcode Organizer, regenerates screenshots (iPhone and iPad on named Simulators),
   "What's New in This Version?" from commits since the last version tag,
+  uploads localized App Store listing copy via App Store Connect API,
   checks tallmansoftware.com for website copy drift (writes an agent-ready brief
   when updates are needed), then commits those changes and tags the commit
   locally without pushing. Use when preparing a new build, preparing a release
@@ -14,13 +15,18 @@ disable-model-invocation: true
 
 # Prepare App Store Build
 
-Prepare a validated Bike Sensor Emulator build for manual upload to App Store Connect.
+Prepare a validated Bike Sensor Emulator build for manual upload to App Store Connect. Listing metadata is uploaded automatically; the archive and submit-for-review steps remain manual.
 
 ## Prerequisites
 
 - Xcode installed with signing configured for team `MYMYAX7K65`
 - Active Apple Developer membership
 - Run from the repository root
+- **App Store Connect API** (listing upload only — does not upload the binary):
+  - API key (`.p8`) in `~/.appstoreconnect/private_keys/AuthKey_<KEY_ID>.p8` (Transporter/Xcode default path), or set `APP_STORE_CONNECT_KEY_PATH`
+  - **Issuer ID** in `~/.appstoreconnect/issuer_id` or `APP_STORE_CONNECT_ISSUER_ID` (UUID from App Store Connect → Users and Access → Integrations → App Store Connect API)
+  - **Listing upload key:** set `APP_STORE_CONNECT_KEY_ID=3MFS277D3W` (App Manager). Keep `AuthKey_93SR5Z9F9D.p8` (Developer) for Transporter/Xcode — do not delete it.
+  - `python3 -m pip install --user PyJWT cryptography certifi` if not already installed
 - Named Simulators available (create once in Xcode → Window → Devices and Simulators if missing):
   - **Screenshot iPhone** — 6.5" display (e.g. iPhone 14 Plus) for App Store Connect’s 6.5" slot
   - **Screenshot iPad** — 13" display (e.g. iPad Pro 13-inch M4) for App Store Connect’s 13" iPad slot
@@ -36,9 +42,10 @@ Task Progress:
 - [ ] Step 3: Archive to Xcode Organizer (iOS)
 - [ ] Step 4: Regenerate screenshots
 - [ ] Step 5: Update "What's New in This Version"
-- [ ] Step 6: Check tallmansoftware.com for website drift
-- [ ] Step 7: Commit and tag (do not push)
-- [ ] Step 8: Manual upload, App Review recording, and App Store Connect steps
+- [ ] Step 6: Upload App Store listing localizations
+- [ ] Step 7: Check tallmansoftware.com for website drift
+- [ ] Step 8: Commit and tag (do not push)
+- [ ] Step 9: Manual upload, App Review recording, and App Store Connect steps
 ```
 
 Execute steps in order. Do not skip ahead if a step fails.
@@ -120,7 +127,7 @@ Simulator screenshots need a **temporary** Bluetooth-availability bypass in `CSC
 
 ### Step 5: Update "What's New in This Version"
 
-Update [documentation/APP_STORE_SUBMISSION.md](../../documentation/APP_STORE_SUBMISSION.md) so App Store Connect release notes are ready to paste.
+Update [documentation/APP_STORE_SUBMISSION.md](../../documentation/APP_STORE_SUBMISSION.md) so release notes are ready for Step 6 upload.
 
 1. Resolve the latest version tag (tags look like `1.0(1)`, `1.1(3)`):
 
@@ -145,13 +152,44 @@ Update [documentation/APP_STORE_SUBMISSION.md](../../documentation/APP_STORE_SUB
 
 4. Write the draft into the **What's New in This Version?** section of `documentation/APP_STORE_SUBMISSION.md` (create the section if missing — place it after **Promotional Text**). Also sync the same bullet in each `documentation/app-store/*.md` localization file. Sync **Version** and **Build** in the App Identity table from `MARKETING_VERSION` / `CURRENT_PROJECT_VERSION` in `project.pbxproj`.
 
-5. Show the drafted notes in the final summary so the user can review before pasting into App Store Connect.
+5. Show the drafted notes in the final summary so the user can review before upload.
 
-### Step 6: Check tallmansoftware.com for website drift
+### Step 6: Upload App Store listing localizations
+
+Push listing copy to App Store Connect for the current `MARKETING_VERSION`. Does **not** upload the binary, screenshots, or submit for review.
+
+Skip only when the user explicitly asks to skip localization upload (same pattern as skipping screenshots).
+
+1. Confirm `documentation/APP_STORE_SUBMISSION.md` exists locally (gitignored; English source).
+
+2. Run validation, then upload:
+
+   ```bash
+   python3 scripts/upload-app-store-localizations.py --self-test
+   APP_STORE_CONNECT_KEY_ID=3MFS277D3W python3 scripts/upload-app-store-localizations.py
+   ```
+
+   Source files:
+
+   | Locale | File |
+   | --- | --- |
+   | English (U.S.) | `documentation/APP_STORE_SUBMISSION.md` |
+   | Spanish (Mexico / Spain) | `documentation/app-store/es.md` (uploaded as `es-MX` and `es-ES`) |
+   | French, German, Italian, etc. | Matching file in `documentation/app-store/` |
+
+   Uploads **App Name**, **Subtitle**, **Promotional Text**, **Description**, **Keywords**, **What's New**, and URLs (Support, Marketing, Privacy Policy) via App Store Connect API.
+
+3. **If upload fails:** report the error and **stop** — do not proceed to commit. Do not revert the build number bump unless the user asks.
+
+4. Report locales uploaded in the final summary.
+
+Use `--dry-run` to print payloads without calling the API.
+
+### Step 7: Check tallmansoftware.com for website drift
 
 Compare the live Tallman Software website to this app repo. If the site is missing Bike Sensor Emulator content or copy is stale, write a self-contained brief for a **separate website agent** that will edit the tallmansoftware.com repo.
 
-**Do not hard-stop** the workflow on website drift — report findings and continue to Step 7.
+**Do not hard-stop** the workflow on website drift — report findings and continue to Step 8.
 
 #### Fetch live pages
 
@@ -223,7 +261,7 @@ Copy quality:
 
 Report whether the brief was written in the final summary.
 
-### Step 7: Commit and tag (do not push)
+### Step 8: Commit and tag (do not push)
 
 This step is authorized by the skill — do not ask for extra confirmation. **Never push** the commit or the tag (`git push`, `git push --tags`, or equivalent).
 
@@ -233,7 +271,7 @@ This step is authorized by the skill — do not ask for extra confirmation. **Ne
 
 3. If that tag already exists, **stop** — report it and do not overwrite with `-f`.
 
-4. Stage **only** files produced by Steps 1–6 of this run. Typical paths:
+4. Stage **only** files produced by Steps 1–7 of this run. Typical paths:
    - `CSCSEmulator/CSCSEmulator.xcodeproj/project.pbxproj` (build number)
    - `documentation/app-store/*.md` (What's New)
    - `documentation/WEBSITE_UPDATES.md` if this run created or updated it
@@ -260,13 +298,12 @@ This step is authorized by the skill — do not ask for extra confirmation. **Ne
 
 7. Verify with `git status`, `git log -1`, and `git tag -l --sort=-v:refname | head -3`. Report the commit and tag in the final summary. Do not push.
 
-### Step 8: Manual upload and App Store Connect
+### Step 9: Manual upload and App Store Connect
 
 After automation completes, direct the user to [documentation/APP_STORE_SUBMISSION.md](../../documentation/APP_STORE_SUBMISSION.md) for:
 
-- Opening **Window → Organizer** in Xcode, selecting the copied archive, and running **Validate App** / **Distribute App**
-- Uploading screenshots from `documentation/screenshots/`
-- Pasting **What's New in This Version?** from the submission doc into App Store Connect
+- Opening **Window → Organizer** in Xcode, selecting the archive, and running **Validate App** / **Distribute App**
+- Uploading screenshots from `documentation/screenshots/` (if not skipped)
 - Recording and attaching the **App Review screen recording** manually (see [App Review Information](../../documentation/APP_STORE_SUBMISSION.md#app-review-information))
 - Pasting review notes and submitting for review
 
@@ -285,10 +322,11 @@ When all automated steps succeed, report:
 - **Screenshots:** documentation/screenshots/ (Screenshot iPhone + Screenshot iPad Simulators)
 - **Bluetooth bypass:** temporary Simulator patch in `CSCPeripheralManager` applied for screenshots, then restored
 - **What's New:** [1–3 sentence summary or bullet list drafted into APP_STORE_SUBMISSION.md]
+- **Listing upload:** [N locales uploaded via App Store Connect API | skipped per user request]
 - **Website:** documentation/WEBSITE_UPDATES.md (brief for website agent) | no updates needed
 - **Git:** committed and tagged `[MARKETING_VERSION(BUILD)]` locally (not pushed)
 
-**Next:** Open Xcode Organizer, validate and distribute the archive, paste What's New, complete App Store Connect metadata, record and attach App Review screen recording manually, submit for review. Push the commit and tag when ready. If `WEBSITE_UPDATES.md` exists, hand it to the website agent as the starting brief.
+**Next:** Open Xcode Organizer, validate and distribute the archive, complete App Store Connect steps (screenshots, App Review recording, submit for review). Push the commit and tag when ready. If `WEBSITE_UPDATES.md` exists, hand it to the website agent as the starting brief.
 ```
 
 ## Script reference
@@ -299,6 +337,7 @@ When all automated steps succeed, report:
 | `scripts/run-unit-tests.sh` | Unit tests (iOS Simulator) |
 | `scripts/archive-and-export.sh` | iOS Release archive into Xcode Organizer |
 | `scripts/capture-screenshots.sh` | App Store screenshots (Screenshot iPhone / Screenshot iPad Simulators) |
+| `scripts/upload-app-store-localizations.py` | Upload listing metadata via App Store Connect API (`--self-test`, `--dry-run`) |
 | `scripts/ExportOptions-iOS.plist` | Unused legacy export options (Organizer Distribute replaces IPA export) |
 
 ## Screenshot workarounds
@@ -359,3 +398,13 @@ Resize iPhone PNGs to **1284 × 2778** with `sips` so they match App Store Conne
 **Do not push:** This workflow never runs `git push` or `git push --tags`. The local commit and tag stay on the machine until the user pushes.
 
 **Bluetooth bypass staged for commit:** Restore `CSCPeripheralManager.swift` and unstage it. Never commit `suppressBluetoothAvailabilityCheck`.
+
+**Missing Issuer ID:** Create `~/.appstoreconnect/issuer_id` with the UUID from App Store Connect → Users and Access → Integrations → App Store Connect API, or set `APP_STORE_CONNECT_ISSUER_ID`.
+
+**Localization upload 403:** Set `APP_STORE_CONNECT_KEY_ID=3MFS277D3W` (App Manager key). The Developer key (`93SR5Z9F9D`) cannot write listing metadata.
+
+**Version locked during review:** Listing metadata cannot be edited while the version is Waiting for Review or In Review. Wait for rejection or approval, or edit before submitting.
+
+**Multiple API keys:** Always set `APP_STORE_CONNECT_KEY_ID=3MFS277D3W` for listing upload when both Developer and App Manager keys are present.
+
+**PyJWT or certifi missing:** Run `python3 -m pip install --user PyJWT cryptography certifi`.

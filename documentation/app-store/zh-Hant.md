@@ -1,6 +1,6 @@
 # App Store Metadata — Chinese (Traditional)
 
-Paste into App Store Connect for the **Chinese (Traditional)** localization.
+Source for `scripts/upload-app-store-localizations.py` — **Chinese (Traditional)** localization (`zh-Hant`).
 
 | Field | Value |
 | --- | --- |
