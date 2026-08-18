@@ -125,12 +125,16 @@ import Testing
     ]
 
     private static let infoPlistPermissionTranslations: [String: String] = [
+        "en": "Advertises a simulated cycling speed and cadence sensor.",
         "de": "Stellt über Bluetooth einen simulierten Fahrrad-Geschwindigkeits- und Trittfrequenzsensor bereit.",
         "es": "Proporciona por Bluetooth un sensor simulado de velocidad y cadencia de ciclismo.",
         "fr": "Fournit via Bluetooth un capteur simulé de vitesse et de cadence cyclistes.",
         "it": "Fornisce tramite Bluetooth un sensore simulato di velocità e cadenza per il ciclismo.",
+        "ja": "シミュレートされた自転車の速度・ケイデンスセンサーをアドバタイズします。",
         "pt-BR": "Disponibiliza via Bluetooth um sensor simulado de velocidade e cadência de ciclismo.",
         "ko": "시뮬레이션된 자전거 속도 및 케이던스 센서를 BLE로 어드버타이징합니다.",
+        "zh-Hans": "广播模拟的骑行速度与踏频传感器。",
+        "zh-Hant": "廣播模擬的騎行速度與踏頻感測器。",
     ]
 
     private static let bleNameTranslations: [String: String] = [
