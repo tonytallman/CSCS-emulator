@@ -14,8 +14,8 @@ Paste into App Store Connect for the **Italian** localization.
 ## What's New in This Version?
 
 ```
-• Modalità casuale più fluida — la cadenza cambia in modo più naturale durante la simulazione
 • Interfaccia localizzata in nove lingue
+• Lo schermo non rimbalza più quando tutto il contenuto è già visibile
 ```
 
 ## Description

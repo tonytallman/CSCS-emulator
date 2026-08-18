@@ -14,8 +14,8 @@ Paste into App Store Connect for the **Chinese (Simplified)** localization.
 ## What's New in This Version?
 
 ```
-• 更流畅的随机模式 — 模拟过程中踏频变化更自然
 • 界面支持九种语言
+• 内容已完全显示时，屏幕不再回弹
 ```
 
 ## Description

@@ -14,8 +14,8 @@ Paste into App Store Connect for the **Portuguese (Brazil)** localization.
 ## What's New in This Version?
 
 ```
-• Modo aleatório mais suave — cadência muda de forma mais natural durante a simulação
 • Interface localizada em nove idiomas
+• A tela não salta mais quando todo o conteúdo já cabe
 ```
 
 ## Description

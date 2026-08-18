@@ -14,8 +14,8 @@ Paste into App Store Connect for the **German** localization.
 ## What's New in This Version?
 
 ```
-• Flüssigerer Zufallsmodus – Trittfrequenz ändert sich natürlicher während der Simulation
 • Benutzeroberfläche in neun Sprachen lokalisiert
+• Der Bildschirm federt nicht mehr, wenn der gesamte Inhalt bereits sichtbar ist
 ```
 
 ## Description

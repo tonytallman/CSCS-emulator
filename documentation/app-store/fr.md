@@ -14,8 +14,8 @@ Paste into App Store Connect for the **French** localization.
 ## What's New in This Version?
 
 ```
-• Mode aléatoire plus fluide — la cadence évolue plus naturellement pendant la simulation
 • Interface localisée en neuf langues
+• L’écran ne rebondit plus lorsque tout le contenu est déjà visible
 ```
 
 ## Description

@@ -14,8 +14,8 @@ Paste into App Store Connect for the **Japanese** localization.
 ## What's New in This Version?
 
 ```
-• ランダムモードを改善 — シミュレーション中のケイデンス変化がより自然に
 • 9言語のUIローカライズ
+• コンテンツが画面に収まるときはバウンスしなくなりました
 ```
 
 ## Description

@@ -14,8 +14,8 @@ Paste into App Store Connect for the **Spanish (Mexico)** localization.
 ## What's New in This Version?
 
 ```
-• Modo aleatorio más fluido: la cadencia cambia de forma más natural durante la simulación
 • Interfaz localizada en nueve idiomas
+• La pantalla ya no rebota cuando todo el contenido cabe
 ```
 
 ## Description

@@ -14,8 +14,8 @@ Paste into App Store Connect for the **Korean** localization.
 ## What's New in This Version?
 
 ```
-• 더 자연스러운 랜덤 모드 — 시뮬레이션 중 케이던스 변화가 더 부드럽게
 • 9개 언어 UI 현지화
+• 콘텐츠가 화면에 모두 표시될 때 화면이 튕기지 않습니다
 ```
 
 ## Description
