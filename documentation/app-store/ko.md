@@ -16,6 +16,7 @@ Source for `scripts/upload-app-store-localizations.py` — **Korean** localizati
 ```
 • 9개 언어 UI 현지화
 • 콘텐츠가 화면에 모두 표시될 때 화면이 튕기지 않습니다
+• 영어 기기에서 홈 화면 이름 수정(Bike Sensor 표시)
 ```
 
 ## Description

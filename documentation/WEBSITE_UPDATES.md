@@ -26,7 +26,7 @@ Prefer the **Proposed copy** blocks; adapt only to match surrounding voice.
 | Price / privacy | Free; no data collected |
 | GitHub | https://github.com/tonytallman/CSCS-emulator |
 | App Store URL | Use the existing “View on the App Store” URL already on the live site (numeric ID is not stored in the app repo) |
-| Version checked | Marketing version **1.2**, build **6** |
+| Version checked | Marketing version **1.2**, build **8** |
 | Localizations | App UI: English, Spanish, Simplified Chinese, Traditional Chinese, Japanese, German, French, Portuguese (Brazil), Korean, Italian |
 
 ## Scope
@@ -127,9 +127,10 @@ Remove the line “App Store listing currently appears as CSC Emulator.” The A
 
 ## What's New that the site should reflect
 
-From App Store 1.2 (6):
+From App Store 1.2 (8):
 
 - **Localization** — the UI now ships in nine languages besides English. Mention this on the case study (see proposed “What is it” paragraph). Home and `/projects/` cards can stay short; do not cram a language list onto the cards.
+- **Home screen name** — English devices now show **Bike Sensor** on the home screen (fixed a bug where the label showed incorrectly). The case study should document home-screen name **Bike Sensor** vs App Store name **Bike Sensor Emulator**.
 - **Scroll bounce** — when content already fits on screen, the UI no longer rubber-bands. Too minor for website copy; skip.
 
 ## Assets

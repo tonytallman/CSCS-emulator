@@ -16,6 +16,7 @@ Source for `scripts/upload-app-store-localizations.py` — **Japanese** localiza
 ```
 • 9言語のUIローカライズ
 • コンテンツが画面に収まるときはバウンスしなくなりました
+• 英語環境のホーム画面名を修正（Bike Sensor と表示）
 ```
 
 ## Description

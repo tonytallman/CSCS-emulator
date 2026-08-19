@@ -16,6 +16,7 @@ Source for `scripts/upload-app-store-localizations.py` — **Italian** localizat
 ```
 • Interfaccia localizzata in nove lingue
 • Lo schermo non rimbalza più quando tutto il contenuto è già visibile
+• Corretto il nome sulla schermata Home su dispositivi in inglese (ora mostra Bike Sensor)
 ```
 
 ## Description

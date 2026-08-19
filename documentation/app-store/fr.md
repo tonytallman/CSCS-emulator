@@ -16,6 +16,7 @@ Source for `scripts/upload-app-store-localizations.py` — **French** localizati
 ```
 • Interface localisée en neuf langues
 • L’écran ne rebondit plus lorsque tout le contenu est déjà visible
+• Correction du nom sur l’écran d’accueil en anglais (affiche maintenant Bike Sensor)
 ```
 
 ## Description

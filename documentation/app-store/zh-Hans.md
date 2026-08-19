@@ -16,6 +16,7 @@ Source for `scripts/upload-app-store-localizations.py` — **Chinese (Simplified
 ```
 • 界面支持九种语言
 • 内容已完全显示时，屏幕不再回弹
+• 修复英语设备主屏幕名称（现显示 Bike Sensor）
 ```
 
 ## Description

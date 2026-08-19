@@ -16,6 +16,7 @@ Source for `scripts/upload-app-store-localizations.py` — **German** localizati
 ```
 • Benutzeroberfläche in neun Sprachen lokalisiert
 • Der Bildschirm federt nicht mehr, wenn der gesamte Inhalt bereits sichtbar ist
+• Home-Screen-Name auf englischen Geräten korrigiert (zeigt jetzt Bike Sensor)
 ```
 
 ## Description

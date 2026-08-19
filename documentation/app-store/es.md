@@ -16,6 +16,7 @@ Source for `scripts/upload-app-store-localizations.py` — **Spanish (Mexico)** 
 ```
 • Interfaz localizada en nueve idiomas
 • La pantalla ya no rebota cuando todo el contenido cabe
+• Corregido el nombre en la pantalla de inicio en dispositivos en inglés (ahora muestra Bike Sensor)
 ```
 
 ## Description

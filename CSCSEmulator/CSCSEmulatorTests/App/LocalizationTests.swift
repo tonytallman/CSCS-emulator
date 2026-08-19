@@ -113,6 +113,7 @@ import Testing
     ]
 
     private static let infoPlistDisplayNameTranslations: [String: String] = [
+        "en": "Bike Sensor",
         "es": "Sensor de bicicleta",
         "zh-Hans": "自行车传感器",
         "zh-Hant": "自行車感測器",
@@ -384,7 +385,7 @@ import Testing
         #expect(!AppInfo.displayName.isEmpty)
     }
 
-    @Test(arguments: supportedLocales)
+    @Test(arguments: Array(infoPlistDisplayNameTranslations.keys))
     func infoPlistDisplayNameIsTranslated(localeIdentifier: String) throws {
         let catalog = try loadCatalog(named: "InfoPlist")
         expectCatalogTranslation(

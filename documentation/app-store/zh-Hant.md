@@ -16,6 +16,7 @@ Source for `scripts/upload-app-store-localizations.py` — **Chinese (Traditiona
 ```
 • 介面支援九種語言
 • 內容已完全顯示時，畫面不再回彈
+• 修正英文裝置主畫面名稱（現顯示 Bike Sensor）
 ```
 
 ## Description

@@ -10,6 +10,12 @@
             "value" : "Fahrradsensor"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bike Sensor"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -62,11 +68,11 @@
     },
     "CFBundleName" : {
       "comment" : "Bundle name",
-      "extractionState" : "manual",
+      "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "new",
             "value" : "CSCSEmulator"
           }
         }
@@ -75,16 +81,16 @@
     "NSBluetoothAlwaysUsageDescription" : {
       "extractionState" : "manual",
       "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Advertises a simulated cycling speed and cadence sensor."
-          }
-        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Stellt über Bluetooth einen simulierten Fahrrad-Geschwindigkeits- und Trittfrequenzsensor bereit."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Advertises a simulated cycling speed and cadence sensor."
           }
         },
         "es" : {

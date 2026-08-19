@@ -16,6 +16,7 @@ Source for `scripts/upload-app-store-localizations.py` — **Portuguese (Brazil)
 ```
 • Interface localizada em nove idiomas
 • A tela não salta mais quando todo o conteúdo já cabe
+• Nome na tela inicial corrigido em dispositivos em inglês (agora mostra Bike Sensor)
 ```
 
 ## Description
