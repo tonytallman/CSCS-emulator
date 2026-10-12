@@ -22,22 +22,22 @@ final class ServerToMeasurementServer: MeasurementServer {
             )
             // Counters are cumulative, so a replaced element loses no revolutions.
             input = { sample in
-                continuation.yield(
-                    WheelAndCrankRevolution(
-                        wheel: sample.wheel.map {
-                            WheelRevolution(
-                                cumulativeRevolutions: $0.cumulativeRevolutions,
-                                lastEventTime: $0.lastEventTime,
-                            )
-                        },
-                        crank: sample.crank.map {
-                            CrankRevolution(
-                                cumulativeRevolutions: $0.cumulativeRevolutions,
-                                lastEventTime: $0.lastEventTime,
-                            )
-                        },
-                    ),
+                let revolution = WheelAndCrankRevolution(
+                    wheel: sample.wheel.map {
+                        WheelRevolution(
+                            cumulativeRevolutions: $0.cumulativeRevolutions,
+                            lastEventTime: $0.lastEventTime,
+                        )
+                    },
+                    crank: sample.crank.map {
+                        CrankRevolution(
+                            cumulativeRevolutions: $0.cumulativeRevolutions,
+                            lastEventTime: $0.lastEventTime,
+                        )
+                    },
                 )
+                guard revolution.wheel != nil || revolution.crank != nil else { return }
+                continuation.yield(revolution)
             }
             finish = { continuation.finish() }
             server = Server.wheelAndCrankRevolutions(stream, setCumulativeWheelRevolutions: reject).build()
