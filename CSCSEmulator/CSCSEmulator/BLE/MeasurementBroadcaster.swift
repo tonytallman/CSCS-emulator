@@ -42,6 +42,13 @@ final class MeasurementBroadcaster: MeasurementBroadcasting {
         bluetooth.onStateChange = { [weak self] in self?.handleStateChange($0) }
     }
 
+    nonisolated deinit {
+        MainActor.assumeIsolated {
+            runTask?.cancel()
+            notifyTask?.cancel()
+        }
+    }
+
     func prepare() {
         if bluetooth.authorization != .notDetermined {
             bluetooth.activate()
@@ -114,11 +121,13 @@ final class MeasurementBroadcaster: MeasurementBroadcasting {
 
     private func startNotifyLoop() {
         notifyTask?.cancel()
+        let notifySleep = sleep
         notifyTask = Task { [weak self] in
             while !Task.isCancelled {
-                try? await self?.sleep(measurementNotifyInterval)
+                guard let self else { return }
+                try? await notifySleep(measurementNotifyInterval)
                 guard !Task.isCancelled else { break }
-                self?.publishSample()
+                self.publishSample()
             }
         }
     }

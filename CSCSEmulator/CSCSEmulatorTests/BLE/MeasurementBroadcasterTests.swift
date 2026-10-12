@@ -11,13 +11,13 @@ import Testing
 @Suite(.timeLimit(.minutes(1))) @MainActor struct MeasurementBroadcasterTests {
     private func makeFakeServer(
         label: String = "server",
-        slot: FakeServerSlot = FakeServerSlot(),
+        slot: FakeServerSlot? = nil,
         script: FakeMeasurementServer.Script = .succeed,
         eventLog: SharedEventLog? = nil,
     ) -> FakeMeasurementServer {
         FakeMeasurementServer(
             label: label,
-            slot: slot,
+            slot: slot ?? FakeServerSlot(),
             script: script,
             eventLog: eventLog ?? SharedEventLog(),
         )
@@ -309,7 +309,12 @@ import Testing
             supportsSpeed: true,
             supportsCadence: true,
         )
-        let broadcaster = makeBroadcaster(makeServer: { _ in server }, vitals: { vitals })
+        let notifySleep = PausedNotifySleep()
+        let broadcaster = makeBroadcaster(
+            makeServer: { _ in server },
+            vitals: { vitals },
+            sleep: { duration in try await notifySleep.sleep(for: duration) },
+        )
         broadcaster.start(configuration: SimulatorConfiguration(supportsSpeed: true, supportsCadence: true))
         await server.waitUntilObservingSubscribers()
         server.setSubscriberCount(1)
@@ -319,6 +324,7 @@ import Testing
         #expect(server.publishes.last?.wheel != nil)
         #expect(server.publishes.last?.crank != nil)
         broadcaster.stop()
+        notifySleep.cancelAll()
         await broadcaster.runTask?.value
     }
 
@@ -391,46 +397,38 @@ private final class FakeBluetoothStateMonitor: BluetoothStateMonitoring {
     }
 }
 
-private final class SharedEventLog: @unchecked Sendable {
-    private let lock = NSLock()
+@MainActor
+private final class SharedEventLog {
     private var events: [String] = []
 
     func append(_ event: String) {
-        lock.lock()
         events.append(event)
-        lock.unlock()
     }
 
     func snapshot() -> [String] {
-        lock.lock()
-        defer { lock.unlock() }
-        return events
+        events
     }
 }
 
-private final class FakeServerSlot: @unchecked Sendable {
-    private let lock = NSLock()
+@MainActor
+private final class FakeServerSlot {
     private var occupied = false
 
     var isOccupied: Bool {
-        lock.lock()
-        defer { lock.unlock() }
-        return occupied
+        occupied
     }
 
     func claim() {
-        lock.lock()
-        defer { lock.unlock() }
-        if occupied {
-            Issue.record("FakeServerSlot already claimed")
-            return
+        let alreadyClaimed = occupied
+        if !alreadyClaimed {
+            occupied = true
         }
-        occupied = true
+        if alreadyClaimed {
+            Issue.record("FakeServerSlot already claimed")
+        }
     }
 
     func release() {
-        lock.lock()
-        defer { lock.unlock() }
         occupied = false
     }
 }

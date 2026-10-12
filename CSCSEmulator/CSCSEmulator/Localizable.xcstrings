@@ -1625,7 +1625,7 @@
         }
       }
     },
-    "rpm": {
+        "rpm": {
       "localizations": {
         "de": {
           "stringUnit": {
