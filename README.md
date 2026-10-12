@@ -21,7 +21,7 @@ The app UI is localized for English, Spanish, Simplified Chinese, Traditional Ch
 - Advertise a BLE CSCS peripheral with configurable speed and/or cadence support
 - Two simulation modes: Random (default) and Manual
 - Real-time speed (0–50 MPH) and cadence (0–200 RPM) control via sliders
-- Supports one connected BLE central at a time
+- Serves every connected BLE central
 - On iPhone and iPad, continues BLE advertising while the app runs in the background
 - Graceful error handling for Bluetooth unavailability, permission denials, Bluetooth turned off, and advertising failures
 
@@ -76,7 +76,7 @@ User-controlled speed and cadence. All visible sliders are enabled. Values remai
 
 - **Service:** Cycling Speed and Cadence Service (Bluetooth SIG standard)
 - **Published data:** Only the metrics selected during configuration (speed only, cadence only, or both)
-- **Connections:** At most one BLE central at a time; additional connection requests are rejected
+- **Connections:** Every central that subscribes receives measurements.
 - **Background (iOS / iPadOS):** Continues advertising while backgrounded; iOS may move the service UUID to the overflow area, and centrals scanning for the CSCS service still find it.
 
 ## Architecture
@@ -88,7 +88,7 @@ The app follows MVVM with a clear separation of concerns:
 | UI | `RootView`, `ConfigurationView`, `RunningView` |
 | View Models | `RootViewModel`, `ConfigurationViewModel`, `RunningViewModel` |
 | Simulation | `SimulationEngine`, `RandomCadenceGenerator`, `ManualState`, `RandomState` |
-| BLE | `CSCPeripheralManager`, `CSCSMeasurementEncoder`, `CentralSubscriptionTracker` |
+| BLE | `MeasurementBroadcaster`, `RevolutionCounters`, `CoreBluetoothStateMonitor`, `ServerToMeasurementServer` |
 
 Dependencies are wired at a single composition root (`AppContainer`) using constructor injection — no singletons or service locators.
 
@@ -96,7 +96,7 @@ Dependencies are wired at a single composition root (`AppContainer`) using const
 
 - **UI:** SwiftUI
 - **Architecture:** MVVM
-- **BLE:** CoreBluetooth
+- **BLE:** CoreBluetooth plus the `CSCServer` package (BluetoothBikeSensorSwift 1.1.0+)
 - **Concurrency:** Swift Concurrency, `MainActor` for UI updates
 - **Units:** Foundation `Measurement` (`UnitSpeed`, `UnitFrequency`) for type-safe speed and cadence values
 
@@ -129,9 +129,12 @@ CSCSEmulator/
 │   ├── RandomState.swift
 │   └── RandomCadenceGenerator.swift
 ├── BLE/
-│   ├── CSCPeripheralManager.swift
-│   ├── CSCSMeasurementEncoder.swift
-│   └── CentralSubscriptionTracker.swift
+│   ├── MeasurementBroadcaster.swift
+│   ├── RevolutionCounters.swift
+│   └── …
+├── Adaptors/
+│   └── CSCServer/
+│       └── Server+MeasurementServer.swift
 └── Resources/
     └── PrivacyInfo.xcprivacy
 ```

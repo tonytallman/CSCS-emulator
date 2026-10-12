@@ -8,7 +8,7 @@
 final class AppContainer {
     private let appStateStore: AppStateStore
     private let simulationEngine: SimulationEngine<SystemRandomNumberGenerator>
-    private let peripheralManager: CSCPeripheralManager
+    private let broadcaster: MeasurementBroadcaster
 
     init() {
         let appStateStore = AppStateStore()
@@ -28,8 +28,12 @@ final class AppContainer {
             randomCadenceGenerator: RandomCadenceGenerator(rng: SystemRandomNumberGenerator()),
         )
         simulationEngine = engine
-        peripheralManager = CSCPeripheralManager { engine.state.vitals }
-        peripheralManager.prepare()
+        broadcaster = MeasurementBroadcaster(
+            bluetooth: CoreBluetoothStateMonitor(),
+            makeServer: { ServerToMeasurementServer(configuration: $0) },
+            vitalsProvider: { engine.state.vitals },
+        )
+        broadcaster.prepare()
 
         #if DEBUG
         if ScreenshotLaunchMode.appState == .running {
@@ -46,7 +50,7 @@ final class AppContainer {
     private func makeConfigurationViewModel() -> AppConfigurationViewModel {
         AppConfigurationViewModel(
             simulation: simulationEngine,
-            broadcaster: peripheralManager,
+            broadcaster: broadcaster,
             appStateStore: appStateStore,
             settingsOpener: SystemSettingsOpener(),
         )
@@ -55,7 +59,7 @@ final class AppContainer {
     private func makeRunningViewModel() -> AppRunningViewModel {
         AppRunningViewModel(
             simulation: simulationEngine,
-            broadcaster: peripheralManager,
+            broadcaster: broadcaster,
             simulationEngine: simulationEngine,
             appStateStore: appStateStore,
         )

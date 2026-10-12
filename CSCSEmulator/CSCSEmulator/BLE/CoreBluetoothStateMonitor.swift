@@ -5,6 +5,7 @@
 
 import CoreBluetooth
 
+@MainActor
 final class CoreBluetoothStateMonitor: NSObject, BluetoothStateMonitoring {
     var authorization: CBManagerAuthorization { CBManager.authorization }
     var state: CBManagerState? { manager?.state }

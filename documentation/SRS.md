@@ -121,12 +121,12 @@ Examples:
 | Cadence only    | Cadence           |
 | Speed + Cadence | Speed and Cadence |
 
+While at least one central is subscribed, the emulator shall send at most one measurement per second. Each measurement carries only the metrics whose revolution count advanced since the previous one, and none is sent when neither advanced (PDR 0004). When speed is enabled, the SC Control Point is present and Set Cumulative Value is rejected with Operation Failed (PDR 0003).
+
 ### 4.4 Central Connections
 
-The emulator shall support at most one connected BLE central device at a time.
+The emulator shall serve every central that connects and subscribes; each receives the same measurements (PDR 0002).
 
-- If no central is connected, connection requests shall be accepted.
-- If a central is already connected, additional connection requests shall be rejected.
 - Connection status display is a future enhancement; see section 8.
 - The identity of the connected central is not required to be displayed.
 
