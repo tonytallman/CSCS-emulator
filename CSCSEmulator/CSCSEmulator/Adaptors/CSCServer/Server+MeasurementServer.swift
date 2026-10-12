@@ -14,30 +14,31 @@ final class ServerToMeasurementServer: MeasurementServer {
 
     init(configuration: SimulatorConfiguration) {
         let reject = RejectSetCumulativeWheelRevolutions()
+        // Counters are cumulative, so a replaced element loses no revolutions.
         switch (configuration.supportsSpeed, configuration.supportsCadence) {
         case (true, true):
             let (stream, continuation) = AsyncStream.makeStream(
                 of: WheelAndCrankRevolution.self,
                 bufferingPolicy: .bufferingNewest(1),
             )
-            // Counters are cumulative, so a replaced element loses no revolutions.
             input = { sample in
-                let revolution = WheelAndCrankRevolution(
-                    wheel: sample.wheel.map {
-                        WheelRevolution(
-                            cumulativeRevolutions: $0.cumulativeRevolutions,
-                            lastEventTime: $0.lastEventTime,
-                        )
-                    },
-                    crank: sample.crank.map {
-                        CrankRevolution(
-                            cumulativeRevolutions: $0.cumulativeRevolutions,
-                            lastEventTime: $0.lastEventTime,
-                        )
-                    },
+                guard sample.wheel != nil || sample.crank != nil else { return }
+                continuation.yield(
+                    WheelAndCrankRevolution(
+                        wheel: sample.wheel.map {
+                            WheelRevolution(
+                                cumulativeRevolutions: $0.cumulativeRevolutions,
+                                lastEventTime: $0.lastEventTime,
+                            )
+                        },
+                        crank: sample.crank.map {
+                            CrankRevolution(
+                                cumulativeRevolutions: $0.cumulativeRevolutions,
+                                lastEventTime: $0.lastEventTime,
+                            )
+                        },
+                    ),
                 )
-                guard revolution.wheel != nil || revolution.crank != nil else { return }
-                continuation.yield(revolution)
             }
             finish = { continuation.finish() }
             server = Server.wheelAndCrankRevolutions(stream, setCumulativeWheelRevolutions: reject).build()
@@ -46,7 +47,6 @@ final class ServerToMeasurementServer: MeasurementServer {
                 of: WheelRevolution.self,
                 bufferingPolicy: .bufferingNewest(1),
             )
-            // Counters are cumulative, so a replaced element loses no revolutions.
             input = { sample in
                 guard let wheel = sample.wheel else { return }
                 continuation.yield(
@@ -63,7 +63,6 @@ final class ServerToMeasurementServer: MeasurementServer {
                 of: CrankRevolution.self,
                 bufferingPolicy: .bufferingNewest(1),
             )
-            // Counters are cumulative, so a replaced element loses no revolutions.
             input = { sample in
                 guard let crank = sample.crank else { return }
                 continuation.yield(

@@ -21,21 +21,10 @@ final class MeasurementBroadcaster: MeasurementBroadcasting {
 
     private static let logger = Logger(subsystem: "com.tallmansoftware.csc-emulator", category: "BLE")
 
-    #if DEBUG
-    private var suppressBluetoothAvailabilityCheck: Bool {
-        #if targetEnvironment(simulator)
-        ScreenshotLaunchMode.appState != nil
-        #else
-        false
-        #endif
-    }
-    #else
-    private let suppressBluetoothAvailabilityCheck = false
-    #endif
-
     private let bluetooth: any BluetoothStateMonitoring
     private let makeServer: (SimulatorConfiguration) -> any MeasurementServer
     private let vitalsProvider: () -> SimulatorVitals
+    private let sleep: (Duration) async throws -> Void
     private var server: (any MeasurementServer)?
     private var counters: RevolutionCounters?
     private var notifyTask: Task<Void, Never>?
@@ -44,10 +33,12 @@ final class MeasurementBroadcaster: MeasurementBroadcasting {
         bluetooth: any BluetoothStateMonitoring,
         makeServer: @escaping (SimulatorConfiguration) -> any MeasurementServer,
         vitalsProvider: @escaping () -> SimulatorVitals,
+        sleep: @escaping (Duration) async throws -> Void = { try await Task.sleep(for: $0) },
     ) {
         self.bluetooth = bluetooth
         self.makeServer = makeServer
         self.vitalsProvider = vitalsProvider
+        self.sleep = sleep
         bluetooth.onStateChange = { [weak self] in self?.handleStateChange($0) }
     }
 
@@ -94,6 +85,7 @@ final class MeasurementBroadcaster: MeasurementBroadcasting {
     }
 
     private func run(_ server: any MeasurementServer, after previous: Task<Void, Never>?) async {
+        // Two Servers can advertise at once; never start before the previous stop() returned.
         await previous?.value
         do {
             try Task.checkCancellation()
@@ -107,8 +99,10 @@ final class MeasurementBroadcaster: MeasurementBroadcasting {
                 updateConnection(subscriberCount: count)
             }
         } catch {
-            if !Task.isCancelled {
+            if !(error is CancellationError) {
                 Self.logger.error("CSCServer start failed: \(String(describing: error), privacy: .public)")
+            }
+            if !Task.isCancelled {
                 lastError = BluetoothAvailabilityMapper.availability(
                     authorization: bluetooth.authorization,
                     state: bluetooth.state,
@@ -122,7 +116,7 @@ final class MeasurementBroadcaster: MeasurementBroadcasting {
         notifyTask?.cancel()
         notifyTask = Task { [weak self] in
             while !Task.isCancelled {
-                try? await Task.sleep(for: measurementNotifyInterval)
+                try? await self?.sleep(measurementNotifyInterval)
                 guard !Task.isCancelled else { break }
                 self?.publishSample()
             }
@@ -130,10 +124,6 @@ final class MeasurementBroadcaster: MeasurementBroadcasting {
     }
 
     private func updateAvailability() {
-        if suppressBluetoothAvailabilityCheck {
-            availability = .ready
-            return
-        }
         availability = BluetoothAvailabilityMapper.availability(
             authorization: bluetooth.authorization,
             state: bluetooth.state,
@@ -142,9 +132,6 @@ final class MeasurementBroadcaster: MeasurementBroadcasting {
 
     private func handleStateChange(_ state: CBManagerState) {
         updateAvailability()
-        if suppressBluetoothAvailabilityCheck {
-            return
-        }
         if let error = BluetoothStateMapper.error(for: state) {
             lastError = error
             stop()

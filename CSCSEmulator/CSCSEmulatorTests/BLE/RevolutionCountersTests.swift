@@ -59,8 +59,26 @@ import Testing
         _ = counters.advance(vitals: vitals, elapsed: .seconds(1))
         let second = counters.advance(vitals: vitals, elapsed: .seconds(1))
         let third = counters.advance(vitals: vitals, elapsed: .seconds(1))
-        #expect(third?.wheel?.cumulativeRevolutions ?? 0 > second?.wheel?.cumulativeRevolutions ?? 0)
-        #expect(third?.crank?.cumulativeRevolutions ?? 0 > second?.crank?.cumulativeRevolutions ?? 0)
+        #expect(second?.wheel?.cumulativeRevolutions == 8)
+        #expect(third?.wheel?.cumulativeRevolutions == 12)
+        #expect(second?.crank?.cumulativeRevolutions == 3)
+        #expect(third?.crank?.cumulativeRevolutions == 4)
+    }
+
+    @Test func movingCadenceSkipsTicksWhenCountDoesNotAdvance() {
+        var counters = RevolutionCounters(
+            configuration: SimulatorConfiguration(supportsSpeed: false, supportsCadence: true),
+        )
+        let vitals = SimulatorVitals(
+            speed: .stopped,
+            cadence: .rpm(30),
+            supportsSpeed: false,
+            supportsCadence: true,
+        )
+        #expect(counters.advance(vitals: vitals, elapsed: .seconds(1)) == nil)
+        let second = counters.advance(vitals: vitals, elapsed: .seconds(1))
+        #expect(second?.crank?.cumulativeRevolutions == 1)
+        #expect(counters.advance(vitals: vitals, elapsed: .seconds(1)) == nil)
     }
 
     @Test func zeroSpeedAndCadenceReturnsNil() {

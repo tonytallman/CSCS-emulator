@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		EADDA9D22FD9C21E00A2D5D1 /* CSCServer in Frameworks */ = {isa = PBXBuildFile; productRef = EADDA9D12FD9C21E00A2D5D1 /* CSCServer */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		EADDA9922FD9C21E00A2D5D1 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -52,6 +56,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EADDA9D22FD9C21E00A2D5D1 /* CSCServer in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -112,7 +117,7 @@
 			);
 			name = CSCSEmulator;
 			packageProductDependencies = (
-				ECSC00212FD9C21D00A2D5D1 /* CSCServer */,
+				EADDA9D12FD9C21E00A2D5D1 /* CSCServer */,
 			);
 			productName = CSCSEmulator;
 			productReference = EADDA9842FD9C21D00A2D5D1 /* CSCSEmulator.app */;
@@ -210,7 +215,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			packageReferences = (
-				ECSC00112FD9C21D00A2D5D1 /* XCRemoteSwiftPackageReference "BluetoothBikeSensorSwift" */,
+				EADDA9D02FD9C21E00A2D5D1 /* XCRemoteSwiftPackageReference "BluetoothBikeSensorSwift" */,
 			);
 			targets = (
 				EADDA9832FD9C21D00A2D5D1 /* CSCSEmulator */,
@@ -618,7 +623,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		ECSC00112FD9C21D00A2D5D1 /* XCRemoteSwiftPackageReference "BluetoothBikeSensorSwift" */ = {
+		EADDA9D02FD9C21E00A2D5D1 /* XCRemoteSwiftPackageReference "BluetoothBikeSensorSwift" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/tonytallman/BluetoothBikeSensorSwift.git";
 			requirement = {
@@ -629,9 +634,9 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		ECSC00212FD9C21D00A2D5D1 /* CSCServer */ = {
+		EADDA9D12FD9C21E00A2D5D1 /* CSCServer */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = ECSC00112FD9C21D00A2D5D1 /* XCRemoteSwiftPackageReference "BluetoothBikeSensorSwift" */;
+			package = EADDA9D02FD9C21E00A2D5D1 /* XCRemoteSwiftPackageReference "BluetoothBikeSensorSwift" */;
 			productName = CSCServer;
 		};
 /* End XCSwiftPackageProductDependency section */

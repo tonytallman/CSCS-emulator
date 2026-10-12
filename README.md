@@ -130,8 +130,14 @@ CSCSEmulator/
 │   └── RandomCadenceGenerator.swift
 ├── BLE/
 │   ├── MeasurementBroadcaster.swift
+│   ├── MeasurementBroadcasting.swift
+│   ├── MeasurementServer.swift
 │   ├── RevolutionCounters.swift
-│   └── …
+│   ├── RevolutionAccumulator.swift
+│   ├── CoreBluetoothStateMonitor.swift
+│   ├── BluetoothStateMonitoring.swift
+│   ├── BluetoothAvailabilityMapper.swift
+│   └── BluetoothStateMapper.swift
 ├── Adaptors/
 │   └── CSCServer/
 │       └── Server+MeasurementServer.swift

@@ -9,18 +9,34 @@ import Testing
 @testable import CSCSEmulator
 
 @Suite(.timeLimit(.minutes(1))) @MainActor struct MeasurementBroadcasterTests {
+    private func makeFakeServer(
+        label: String = "server",
+        slot: FakeServerSlot = FakeServerSlot(),
+        script: FakeMeasurementServer.Script = .succeed,
+        eventLog: SharedEventLog? = nil,
+    ) -> FakeMeasurementServer {
+        FakeMeasurementServer(
+            label: label,
+            slot: slot,
+            script: script,
+            eventLog: eventLog ?? SharedEventLog(),
+        )
+    }
+
     private func makeBroadcaster(
         bluetooth: FakeBluetoothStateMonitor? = nil,
         makeServer: @escaping (SimulatorConfiguration) -> any MeasurementServer,
         vitals: @escaping () -> SimulatorVitals = {
             .initial(supportsSpeed: true, supportsCadence: true)
         },
+        sleep: @escaping (Duration) async throws -> Void = { try await Task.sleep(for: $0) },
     ) -> MeasurementBroadcaster {
         let bluetooth = bluetooth ?? FakeBluetoothStateMonitor()
         return MeasurementBroadcaster(
             bluetooth: bluetooth,
             makeServer: makeServer,
             vitalsProvider: vitals,
+            sleep: sleep,
         )
     }
 
@@ -28,7 +44,7 @@ import Testing
         var received: SimulatorConfiguration?
         let broadcaster = makeBroadcaster { configuration in
             received = configuration
-            return FakeMeasurementServer(label: "server", slot: FakeServerSlot(), script: .succeed)
+            return makeFakeServer(label: "server", slot: FakeServerSlot(), script: .succeed)
         }
         let configuration = SimulatorConfiguration(supportsSpeed: true, supportsCadence: false)
         broadcaster.start(configuration: configuration)
@@ -38,7 +54,7 @@ import Testing
     }
 
     @Test func advertisingOnlyAfterStartSucceeds() async {
-        let server = FakeMeasurementServer(label: "server", slot: FakeServerSlot(), script: .holdUntilReleased)
+        let server = makeFakeServer(label: "server", slot: FakeServerSlot(), script: .holdUntilReleased)
         let broadcaster = makeBroadcaster { _ in server }
         broadcaster.start(configuration: SimulatorConfiguration(supportsSpeed: true, supportsCadence: true))
         await server.waitUntilStartEntered()
@@ -63,7 +79,7 @@ import Testing
         expected: AppError,
     ) async {
         let bluetooth = FakeBluetoothStateMonitor(authorization: authorization, state: state)
-        let server = FakeMeasurementServer(
+        let server = makeFakeServer(
             label: "server",
             slot: FakeServerSlot(),
             script: .fail(TestStartFailure()),
@@ -80,7 +96,7 @@ import Testing
             authorization: .notDetermined,
             state: .poweredOn,
         )
-        let server = FakeMeasurementServer(
+        let server = makeFakeServer(
             label: "server",
             slot: FakeServerSlot(),
             script: .holdUntilReleased,
@@ -96,7 +112,7 @@ import Testing
     }
 
     @Test func cancelledStartSetsNoError() async {
-        let server = FakeMeasurementServer(
+        let server = makeFakeServer(
             label: "server",
             slot: FakeServerSlot(),
             script: .suspendUntilCancelled,
@@ -112,7 +128,7 @@ import Testing
     }
 
     @Test func startSucceedingAfterStopDoesNotAdvertise() async {
-        let server = FakeMeasurementServer(
+        let server = makeFakeServer(
             label: "server",
             slot: FakeServerSlot(),
             script: .holdUntilReleased,
@@ -129,11 +145,11 @@ import Testing
         #expect(server.publishes.isEmpty)
     }
 
-    @Test func doubleStopThenRestartNeverOverlapsServers() async {
+    @Test func doubleStopThenRestartNeverOverlapsServers() async throws {
         let slot = FakeServerSlot()
         let log = SharedEventLog()
-        let server1 = FakeMeasurementServer(label: "server1", slot: slot, script: .succeed, eventLog: log)
-        let server2 = FakeMeasurementServer(label: "server2", slot: slot, script: .succeed, eventLog: log)
+        let server1 = makeFakeServer(label: "server1", slot: slot, script: .succeed, eventLog: log)
+        let server2 = makeFakeServer(label: "server2", slot: slot, script: .succeed, eventLog: log)
         let bluetooth = FakeBluetoothStateMonitor(state: .poweredOn)
         var serverIndex = 0
         let broadcaster = makeBroadcaster(bluetooth: bluetooth) { _ in
@@ -154,46 +170,55 @@ import Testing
         server1.releaseStop()
         await server2.waitUntilObservingSubscribers()
         let events = log.snapshot()
-        let stop1 = events.firstIndex { $0 == "server1.stopReturned" }
-        let start2 = events.firstIndex { $0 == "server2.startEntered" }
-        #expect(stop1 != nil && start2 != nil && stop1! < start2!)
+        let stop1 = try #require(events.firstIndex { $0 == "server1.stopReturned" })
+        let start2 = try #require(events.firstIndex { $0 == "server2.startEntered" })
+        #expect(stop1 < start2)
         #expect(broadcaster.isAdvertising)
         broadcaster.stop()
         await broadcaster.runTask?.value
     }
 
-    @Test func rapidSequenceEndsWithOneRunningServer() async {
+    @Test func rapidSequenceEndsWithOneRunningServer() async throws {
         let slot = FakeServerSlot()
         let log = SharedEventLog()
-        var index = 0
+        let server1 = makeFakeServer(label: "server1", slot: slot, script: .succeed, eventLog: log)
+        let server2 = makeFakeServer(label: "server2", slot: slot, script: .succeed, eventLog: log)
+        let server3 = makeFakeServer(label: "server3", slot: slot, script: .succeed, eventLog: log)
+        var serverIndex = 0
+        let servers = [server1, server2, server3]
         let broadcaster = makeBroadcaster { _ in
-            index += 1
-            return FakeMeasurementServer(
-                label: "server\(index)",
-                slot: slot,
-                script: .succeed,
-                eventLog: log,
-            )
+            let server = servers[serverIndex]
+            serverIndex += 1
+            return server
         }
-        broadcaster.start(configuration: SimulatorConfiguration(supportsSpeed: true, supportsCadence: true))
+        let configuration = SimulatorConfiguration(supportsSpeed: true, supportsCadence: true)
+        broadcaster.start(configuration: configuration)
+        await server1.waitUntilObservingSubscribers()
         broadcaster.stop()
-        broadcaster.start(configuration: SimulatorConfiguration(supportsSpeed: true, supportsCadence: true))
+        await server1.waitUntilStopReturned()
+        broadcaster.start(configuration: configuration)
+        await server2.waitUntilObservingSubscribers()
         broadcaster.stop()
-        broadcaster.start(configuration: SimulatorConfiguration(supportsSpeed: true, supportsCadence: true))
-        let last = FakeMeasurementServer.lastCreated!
-        await last.waitUntilObservingSubscribers()
+        await server2.waitUntilStopReturned()
+        broadcaster.start(configuration: configuration)
+        await server3.waitUntilObservingSubscribers()
+        #expect(slot.isOccupied)
+        #expect(server1.stopCount == 1)
+        #expect(server2.stopCount == 1)
+        #expect(broadcaster.isAdvertising)
         let events = log.snapshot()
-        for pair in zip(events, events.dropFirst()) {
-            if pair.0.hasSuffix("startEntered") {
-                #expect(pair.1.hasSuffix("stopReturned") || pair.1.hasSuffix("startEntered"))
-            }
-        }
+        let stop1 = try #require(events.firstIndex { $0 == "server1.stopReturned" })
+        let start2 = try #require(events.firstIndex { $0 == "server2.startEntered" })
+        let stop2 = try #require(events.firstIndex { $0 == "server2.stopReturned" })
+        let start3 = try #require(events.firstIndex { $0 == "server3.startEntered" })
+        #expect(stop1 < start2)
+        #expect(stop2 < start3)
         broadcaster.stop()
         await broadcaster.runTask?.value
     }
 
     @Test func bluetoothOffWhileRunning() async {
-        let server = FakeMeasurementServer(label: "server", slot: FakeServerSlot(), script: .succeed)
+        let server = makeFakeServer(label: "server", slot: FakeServerSlot(), script: .succeed)
         let bluetooth = FakeBluetoothStateMonitor(state: .poweredOn)
         let broadcaster = makeBroadcaster(bluetooth: bluetooth) { _ in server }
         broadcaster.start(configuration: SimulatorConfiguration(supportsSpeed: true, supportsCadence: true))
@@ -206,7 +231,7 @@ import Testing
     }
 
     @Test func resettingNeitherSetsErrorNorStops() async {
-        let server = FakeMeasurementServer(label: "server", slot: FakeServerSlot(), script: .succeed)
+        let server = makeFakeServer(label: "server", slot: FakeServerSlot(), script: .succeed)
         let bluetooth = FakeBluetoothStateMonitor(state: .poweredOn)
         let broadcaster = makeBroadcaster(bluetooth: bluetooth) { _ in server }
         broadcaster.start(configuration: SimulatorConfiguration(supportsSpeed: true, supportsCadence: true))
@@ -221,7 +246,7 @@ import Testing
     @Test func prepareActivatesOnlyWhenAuthorizationKnown() {
         let bluetooth = FakeBluetoothStateMonitor(authorization: .notDetermined)
         let broadcaster = makeBroadcaster(bluetooth: bluetooth) { _ in
-            FakeMeasurementServer(label: "server", slot: FakeServerSlot(), script: .succeed)
+            makeFakeServer(label: "server", slot: FakeServerSlot(), script: .succeed)
         }
         broadcaster.prepare()
         #expect(bluetooth.activateCount == 0)
@@ -231,14 +256,19 @@ import Testing
     }
 
     @Test func subscriberCountDrivesConnectionAndImmediatePublish() async {
-        let server = FakeMeasurementServer(label: "server", slot: FakeServerSlot(), script: .succeed)
+        let server = makeFakeServer(label: "server", slot: FakeServerSlot(), script: .succeed)
         let vitals = SimulatorVitals(
             speed: .milesPerHour(20),
             cadence: .rpm(90),
             supportsSpeed: true,
             supportsCadence: true,
         )
-        let broadcaster = makeBroadcaster(makeServer: { _ in server }, vitals: { vitals })
+        let notifySleep = PausedNotifySleep()
+        let broadcaster = makeBroadcaster(
+            makeServer: { _ in server },
+            vitals: { vitals },
+            sleep: { duration in try await notifySleep.sleep(for: duration) },
+        )
         broadcaster.start(configuration: SimulatorConfiguration(supportsSpeed: true, supportsCadence: true))
         await server.waitUntilObservingSubscribers()
         server.setSubscriberCount(1)
@@ -248,11 +278,12 @@ import Testing
         server.setSubscriberCount(1)
         await server.waitForPublishCount(2)
         broadcaster.stop()
+        notifySleep.cancelAll()
         await broadcaster.runTask?.value
     }
 
     @Test func configurationNotVitalsSelectsHalves() async {
-        let server = FakeMeasurementServer(label: "server", slot: FakeServerSlot(), script: .succeed)
+        let server = makeFakeServer(label: "server", slot: FakeServerSlot(), script: .succeed)
         let vitals = SimulatorVitals(
             speed: .milesPerHour(20),
             cadence: .rpm(90),
@@ -271,7 +302,7 @@ import Testing
     }
 
     @Test func publishSampleWithSubscriberPublishesBothHalves() async {
-        let server = FakeMeasurementServer(label: "server", slot: FakeServerSlot(), script: .succeed)
+        let server = makeFakeServer(label: "server", slot: FakeServerSlot(), script: .succeed)
         let vitals = SimulatorVitals(
             speed: .milesPerHour(20),
             cadence: .rpm(90),
@@ -292,32 +323,43 @@ import Testing
     }
 
     @Test func publishSampleWithoutSubscribersDoesNotAdvanceCounters() async {
-        let server = FakeMeasurementServer(label: "server", slot: FakeServerSlot(), script: .succeed)
+        let server = makeFakeServer(label: "server", slot: FakeServerSlot(), script: .succeed)
+        let configuration = SimulatorConfiguration(supportsSpeed: true, supportsCadence: true)
         let vitals = SimulatorVitals(
             speed: .milesPerHour(20),
             cadence: .rpm(90),
             supportsSpeed: true,
             supportsCadence: true,
         )
-        let broadcaster = makeBroadcaster(makeServer: { _ in server }, vitals: { vitals })
-        broadcaster.start(configuration: SimulatorConfiguration(supportsSpeed: true, supportsCadence: true))
+        let notifySleep = PausedNotifySleep()
+        let broadcaster = makeBroadcaster(
+            makeServer: { _ in server },
+            vitals: { vitals },
+            sleep: { duration in try await notifySleep.sleep(for: duration) },
+        )
+        broadcaster.start(configuration: configuration)
         await server.waitUntilObservingSubscribers()
         broadcaster.publishSample()
         #expect(server.publishes.isEmpty)
         server.setSubscriberCount(1)
         await server.waitForPublishCount(1)
         let first = server.publishes[0]
+        var reference = RevolutionCounters(configuration: configuration)
+        let expectedFirst = reference.advance(vitals: vitals, elapsed: .seconds(1))
+        #expect(first == expectedFirst)
         server.setSubscriberCount(0)
         server.setSubscriberCount(1)
         await server.waitForPublishCount(2)
         let second = server.publishes[1]
-        #expect((second.wheel?.cumulativeRevolutions ?? 0) > (first.wheel?.cumulativeRevolutions ?? 0))
+        let expectedSecond = reference.advance(vitals: vitals, elapsed: .seconds(1))
+        #expect(second == expectedSecond)
         broadcaster.stop()
+        notifySleep.cancelAll()
         await broadcaster.runTask?.value
     }
 
     @Test func stopLeadsToExactlyOneServerStop() async {
-        let server = FakeMeasurementServer(label: "server", slot: FakeServerSlot(), script: .succeed)
+        let server = makeFakeServer(label: "server", slot: FakeServerSlot(), script: .succeed)
         let broadcaster = makeBroadcaster { _ in server }
         broadcaster.start(configuration: SimulatorConfiguration(supportsSpeed: true, supportsCadence: true))
         await server.waitUntilObservingSubscribers()
@@ -393,6 +435,27 @@ private final class FakeServerSlot: @unchecked Sendable {
     }
 }
 
+@MainActor
+private final class PausedNotifySleep {
+    private var waiters: [CheckedContinuation<Void, Never>] = []
+
+    func sleep(for duration: Duration) async throws {
+        try Task.checkCancellation()
+        await withCheckedContinuation { continuation in
+            waiters.append(continuation)
+        }
+        try Task.checkCancellation()
+    }
+
+    func cancelAll() {
+        let waiters = waiters
+        self.waiters = []
+        for waiter in waiters {
+            waiter.resume()
+        }
+    }
+}
+
 private final class FakeMeasurementSubscriberCount: @unchecked Sendable {
     private let lock = NSLock()
     private var latest = 0
@@ -438,8 +501,6 @@ private final class FakeMeasurementServer: MeasurementServer {
         case holdUntilReleased
     }
 
-    static weak var lastCreated: FakeMeasurementServer?
-
     private let label: String
     private let slot: FakeServerSlot
     private let script: Script
@@ -455,6 +516,8 @@ private final class FakeMeasurementServer: MeasurementServer {
     private var releaseContinuations: [CheckedContinuation<Void, Never>] = []
     private var observingSubscribersContinuations: [CheckedContinuation<Void, Never>] = []
     private var stopEnteredContinuations: [CheckedContinuation<Void, Never>] = []
+    private var stopReturnedContinuations: [CheckedContinuation<Void, Never>] = []
+    private var subscriberCountStreamExposed = false
     private var stopHeld = false
     private var stopHoldContinuations: [CheckedContinuation<Void, Never>] = []
     private var publishWaiters: [CheckedContinuation<Void, Never>] = []
@@ -463,17 +526,17 @@ private final class FakeMeasurementServer: MeasurementServer {
         label: String,
         slot: FakeServerSlot,
         script: Script,
-        eventLog: SharedEventLog = SharedEventLog(),
+        eventLog: SharedEventLog,
     ) {
         self.label = label
         self.slot = slot
         self.script = script
         self.eventLog = eventLog
-        Self.lastCreated = self
     }
 
     var subscriberCount: AsyncStream<Int> {
         get async {
+            subscriberCountStreamExposed = true
             resumeObservingSubscribersWaiters()
             return subscriberCounts.stream()
         }
@@ -525,6 +588,7 @@ private final class FakeMeasurementServer: MeasurementServer {
         subscriberCounts.send(0)
         slot.release()
         eventLog.append("\(label).stopReturned")
+        resumeStopReturnedWaiters()
     }
 
     func publish(_ sample: RevolutionCounters.Sample) {
@@ -568,8 +632,16 @@ private final class FakeMeasurementServer: MeasurementServer {
     }
 
     func waitUntilObservingSubscribers() async {
+        if subscriberCountStreamExposed { return }
         await withCheckedContinuation { continuation in
             observingSubscribersContinuations.append(continuation)
+        }
+    }
+
+    func waitUntilStopReturned() async {
+        if eventLog.snapshot().contains(where: { $0 == "\(label).stopReturned" }) { return }
+        await withCheckedContinuation { continuation in
+            stopReturnedContinuations.append(continuation)
         }
     }
 
@@ -602,6 +674,14 @@ private final class FakeMeasurementServer: MeasurementServer {
     private func resumeStopEnteredWaiters() {
         let waiters = stopEnteredContinuations
         stopEnteredContinuations = []
+        for waiter in waiters {
+            waiter.resume()
+        }
+    }
+
+    private func resumeStopReturnedWaiters() {
+        let waiters = stopReturnedContinuations
+        stopReturnedContinuations = []
         for waiter in waiters {
             waiter.resume()
         }

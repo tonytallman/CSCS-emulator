@@ -92,9 +92,14 @@ The script does **not** write to `build/archives/` or export a `.ipa` to `build/
 
 ### Step 4: Regenerate screenshots
 
-Simulator screenshots rely on the committed Debug Simulator bypass in `MeasurementBroadcaster` (`suppressBluetoothAvailabilityCheck`). Do not add or remove that bypass during capture.
+Simulator screenshots need a **temporary** Bluetooth-availability bypass in `MeasurementBroadcaster`. Do **not** leave that change in the committed tree.
 
-1. **Capture screenshots:**
+1. **Apply the temporary bypass** in `CSCSEmulator/CSCSEmulator/BLE/MeasurementBroadcaster.swift`:
+   - Add a private `suppressBluetoothAvailabilityCheck` that is `true` under `#if DEBUG && targetEnvironment(simulator)` (else `false`).
+   - In `updateAvailability()`, if suppressed, set `availability = .ready` and return.
+   - In `handleStateChange(_:)`, after `updateAvailability()`, if suppressed, return before `BluetoothStateMapper.error` / stop handling.
+
+2. **Capture screenshots:**
 
    ```bash
    bash scripts/capture-screenshots.sh
@@ -109,7 +114,16 @@ Simulator screenshots rely on the committed Debug Simulator bypass in `Measureme
 
    Launch modes use `CSCS_SCREENSHOT_MODE=configuration|running` (via `SIMCTL_CHILD_CSCS_SCREENSHOT_MODE` for Simulator). The script resizes iPhone captures to **1284 × 2778** for App Store Connect’s 6.5" slot.
 
-2. Visually confirm configuration shots show the in-app Configuration UI (not the SpringBoard home screen) and that no Bluetooth warning callout appears.
+3. **Undo the temporary bypass** immediately after capture succeeds (or fails — always restore):
+
+   ```bash
+   git restore --source=HEAD --staged --worktree \
+     CSCSEmulator/CSCSEmulator/BLE/MeasurementBroadcaster.swift
+   ```
+
+   If the file had other legitimate uncommitted edits, restore only the bypass hunks instead of a full restore. Confirm `git status` / `git diff` shows **no** remaining `suppressBluetoothAvailabilityCheck` changes.
+
+4. Visually confirm configuration shots show the in-app Configuration UI (not the SpringBoard home screen) and that no Bluetooth warning callout appears.
 
 ### Step 5: Update "What's New in This Version"
 
@@ -251,7 +265,7 @@ Report whether the brief was written in the final summary.
 
 This step is authorized by the skill — do not ask for extra confirmation. **Never push** the commit or the tag (`git push`, `git push --tags`, or equivalent).
 
-1. Confirm no **extra** `suppressBluetoothAvailabilityCheck` edits beyond the committed Debug Simulator bypass in `MeasurementBroadcaster.swift`.
+1. Confirm the Bluetooth bypass is gone (`git diff` / `git status` show no `suppressBluetoothAvailabilityCheck`). If it is still present, restore `MeasurementBroadcaster.swift` and do not commit until it is gone.
 
 2. Read `MARKETING_VERSION` and `CURRENT_PROJECT_VERSION` from `project.pbxproj`. The tag name is `MARKETING_VERSION(CURRENT_PROJECT_VERSION)` (e.g. `1.1(5)`). The commit message is `version MARKETING_VERSION (BUILD)` (e.g. `version 1.1 (5)`).
 
@@ -306,7 +320,7 @@ When all automated steps succeed, report:
 - **Unit tests:** passed (iOS Simulator)
 - **Xcode Organizer:** ~/Library/Developer/Xcode/Archives/YYYY-mm-dd/*.xcarchive
 - **Screenshots:** documentation/screenshots/ (Screenshot iPhone + Screenshot iPad Simulators)
-- **Bluetooth bypass:** committed Debug Simulator bypass in `MeasurementBroadcaster` (no temporary patch)
+- **Bluetooth bypass:** temporary Simulator patch in `MeasurementBroadcaster` applied for screenshots, then restored
 - **What's New:** [1–3 sentence summary or bullet list drafted into APP_STORE_SUBMISSION.md]
 - **Listing upload:** [N locales uploaded via App Store Connect API | skipped per user request]
 - **Website:** documentation/WEBSITE_UPDATES.md (brief for website agent) | no updates needed
@@ -334,7 +348,7 @@ These are required for reliable Simulator captures. Only the capture-script sett
 
 The Simulator has no usable BLE peripheral stack, so real Bluetooth availability checks show the orange warning and disable **Start Emulator**.
 
-**During Step 4**, rely on the committed Debug Simulator bypass in `MeasurementBroadcaster` (`suppressBluetoothAvailabilityCheck`). Do not add a second bypass or remove the committed one for capture.
+**During Step 4 only**, temporarily patch `MeasurementBroadcaster` so Debug Simulator builds treat availability as `.ready` and skip Bluetooth state error handling (`#if DEBUG && targetEnvironment(simulator)`). After `capture-screenshots.sh` finishes (success or failure), **undo** that patch so it is never committed or left in the working tree.
 
 Release and device builds must keep real Bluetooth gating.
 
@@ -363,7 +377,9 @@ Resize iPhone PNGs to **1284 × 2778** with `sips` so they match App Store Conne
 
 **Configuration screenshot shows home screen:** Increase settle time (`SCREENSHOT_SETTLE_SECONDS=8 bash scripts/capture-screenshots.sh`) and re-run; ensure launch uses `--terminate-running-process` and `SIMCTL_CHILD_CSCS_SCREENSHOT_MODE`.
 
-**Configuration screenshot shows Bluetooth warning:** Confirm the Debug Simulator build includes the committed bypass in `MeasurementBroadcaster.swift`.
+**Configuration screenshot shows Bluetooth warning:** Re-apply the temporary Simulator bypass in `MeasurementBroadcaster` before capturing, then undo it after. Confirm the Debug Simulator build used for capture included the bypass.
+
+**Bluetooth bypass left in working tree:** Run `git restore --source=HEAD --staged --worktree CSCSEmulator/CSCSEmulator/BLE/MeasurementBroadcaster.swift` (or manually remove `suppressBluetoothAvailabilityCheck`). Never commit that bypass.
 
 **Unit-test Simulator not found:** `scripts/run-unit-tests.sh` may pin a specific device/OS. Install that runtime in Xcode → Settings → Platforms, or update the destination in the script.
 
@@ -381,7 +397,7 @@ Resize iPhone PNGs to **1284 × 2778** with `sips` so they match App Store Conne
 
 **Do not push:** This workflow never runs `git push` or `git push --tags`. The local commit and tag stay on the machine until the user pushes.
 
-**Extra bypass staged for commit:** Unstage any ad-hoc `suppressBluetoothAvailabilityCheck` edits beyond the committed `MeasurementBroadcaster` bypass.
+**Bluetooth bypass staged for commit:** Restore `MeasurementBroadcaster.swift` and unstage it. Never commit `suppressBluetoothAvailabilityCheck`.
 
 **Missing Issuer ID:** Create `~/.appstoreconnect/issuer_id` with the UUID from App Store Connect → Users and Access → Integrations → App Store Connect API, or set `APP_STORE_CONNECT_ISSUER_ID`.
 
