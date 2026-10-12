@@ -121,7 +121,7 @@ Examples:
 | Cadence only    | Cadence           |
 | Speed + Cadence | Speed and Cadence |
 
-While at least one central is subscribed, the emulator shall send at most one measurement per second. Each measurement carries only the metrics whose revolution count advanced since the previous one, and none is sent when neither advanced (PDR 0004). When speed is enabled, the SC Control Point is present and Set Cumulative Value is rejected with Operation Failed (PDR 0003).
+While at least one central is subscribed, the emulator shall send no more than one measurement per second. Each measurement carries only the metrics whose revolution count advanced since the previous one, and none is sent when neither advanced (PDR 0004). When speed is enabled, the SC Control Point is present and Set Cumulative Value is rejected with Operation Failed (PDR 0003).
 
 ### 4.4 Central Connections
 
