@@ -24,7 +24,7 @@ final class MeasurementBroadcaster: MeasurementBroadcasting {
     #if DEBUG
     private var suppressBluetoothAvailabilityCheck: Bool {
         #if targetEnvironment(simulator)
-        true
+        ScreenshotLaunchMode.appState != nil
         #else
         false
         #endif

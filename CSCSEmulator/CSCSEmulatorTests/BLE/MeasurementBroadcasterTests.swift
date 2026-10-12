@@ -32,8 +32,9 @@ import Testing
         }
         let configuration = SimulatorConfiguration(supportsSpeed: true, supportsCadence: false)
         broadcaster.start(configuration: configuration)
-        await broadcaster.runTask?.value
         #expect(received == configuration)
+        broadcaster.stop()
+        await broadcaster.runTask?.value
     }
 
     @Test func advertisingOnlyAfterStartSucceeds() async {
@@ -281,6 +282,7 @@ import Testing
         broadcaster.start(configuration: SimulatorConfiguration(supportsSpeed: true, supportsCadence: true))
         await server.waitUntilObservingSubscribers()
         server.setSubscriberCount(1)
+        await server.waitForPublishCount(1)
         broadcaster.publishSample()
         #expect(server.publishes.count == 2)
         #expect(server.publishes.last?.wheel != nil)
@@ -309,7 +311,7 @@ import Testing
         server.setSubscriberCount(1)
         await server.waitForPublishCount(2)
         let second = server.publishes[1]
-        #expect(second.wheel?.cumulativeRevolutions == first.wheel?.cumulativeRevolutions)
+        #expect((second.wheel?.cumulativeRevolutions ?? 0) > (first.wheel?.cumulativeRevolutions ?? 0))
         broadcaster.stop()
         await broadcaster.runTask?.value
     }
