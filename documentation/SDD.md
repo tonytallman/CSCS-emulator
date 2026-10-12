@@ -452,7 +452,7 @@ No automatic updates occur.
 
 ## Device Name
 
-Advertised local name is localized to the device language. Every locale includes the untranslated Bluetooth SIG acronym **CSCS** plus a localized equivalent of “Emulator.” English is `CSCS Emulator`.
+No local name is advertised (PDR 0001).
 
 ---
 
@@ -539,7 +539,7 @@ Connection status display is a future enhancement. The running screen is not req
 
 The app declares the `bluetooth-peripheral` background mode on iPhone and iPad so advertising and measurement notifications can continue while the app is backgrounded.
 
-When backgrounded, iOS may stop including the localized advertised local name in advertisement packets and instead expose the CSCS service UUID in the overflow area. Centrals that scan by service UUID remain able to discover the emulator.
+The emulator sets no local name. In the background, iOS may move the service UUID to the overflow area; centrals that scan for the CSCS service UUID can still discover and connect to the emulator.
 
 State restoration (`CBPeripheralManagerOptionRestoreIdentifierKey`) is not implemented in the initial release.
 
@@ -547,7 +547,7 @@ State restoration (`CBPeripheralManagerOptionRestoreIdentifierKey`) is not imple
 
 # 12. Localization
 
-The app UI, home-screen name, BLE advertised local name, and Bluetooth permission prompt are localized using Xcode String Catalogs (`Localizable.xcstrings`, `InfoPlist.xcstrings`).
+The app UI, home-screen name, and Bluetooth permission prompt are localized using Xcode String Catalogs (`Localizable.xcstrings`, `InfoPlist.xcstrings`).
 
 Supported languages: English (development language), Spanish, Simplified Chinese, Traditional Chinese, Japanese, German, French, Portuguese (Brazil), Korean, and Italian.
 

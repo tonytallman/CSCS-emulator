@@ -138,18 +138,6 @@ import Testing
         "zh-Hant": "廣播模擬的騎行速度與踏頻感測器。",
     ]
 
-    private static let bleNameTranslations: [String: String] = [
-        "es": "Emulador CSCS",
-        "zh-Hans": "CSCS 模拟器",
-        "zh-Hant": "CSCS 模擬器",
-        "ja": "CSCSエミュレーター",
-        "de": "CSCS-Emulator",
-        "fr": "Émulateur CSCS",
-        "pt-BR": "Emulador CSCS",
-        "ko": "CSCS 에뮬레이터",
-        "it": "Emulatore CSCS",
-    ]
-
     private static let errorDescriptionKeys = [
         "Bluetooth is not available on this device.",
         "Bluetooth is turned off. Enable Bluetooth in Settings to use the emulator.",
@@ -318,18 +306,6 @@ import Testing
             localeIdentifier: "fr",
             expected: "tr/min",
         )
-    }
-
-    @Test(arguments: supportedLocales)
-    func bleAdvertisedNameContainsCSCSAndIsTranslated(localeIdentifier: String) throws {
-        let catalog = try loadCatalog(named: "Localizable")
-        let translation = localizedValue(
-            in: catalog,
-            key: "CSCS Emulator",
-            localeIdentifier: localeIdentifier,
-        )
-        #expect(translation?.contains("CSCS") == true)
-        #expect(translation == Self.bleNameTranslations[localeIdentifier])
     }
 
     @Test(arguments: Array(advertisingFailedTranslations.keys))

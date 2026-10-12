@@ -581,64 +581,6 @@
         }
       }
     },
-    "CSCS Emulator": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "CSCS-Emulator"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Emulador CSCS"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Émulateur CSCS"
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Emulatore CSCS"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "CSCSエミュレーター"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "CSCS 에뮬레이터"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Emulador CSCS"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "CSCS 模拟器"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "CSCS 模擬器"
-          }
-        }
-      }
-    },
     "Emulator Running": {
       "localizations": {
         "de": {
@@ -1683,7 +1625,7 @@
         }
       }
     },
-        "rpm": {
+    "rpm": {
       "localizations": {
         "de": {
           "stringUnit": {

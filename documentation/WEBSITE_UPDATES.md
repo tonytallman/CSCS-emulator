@@ -16,7 +16,7 @@ Prefer the **Proposed copy** blocks; adapt only to match surrounding voice.
 | --- | --- |
 | Product name | Bike Sensor Emulator |
 | Home-screen name | Bike Sensor |
-| BLE advertised name | Localized; English is `CSCS Emulator`. The acronym **CSCS** is never translated |
+| BLE advertised name | None; centrals find it by the CSCS service |
 | App Store listing name | Bike Sensor Emulator (not “CSC Emulator”) |
 | Platforms | iPhone, iPad, and Apple Silicon Mac (iPad app on Mac) |
 | Manual slider ranges | Speed 0–50 mph; cadence 0–200 rpm |
@@ -105,7 +105,7 @@ Out of scope: home services/about, contact, unrelated projects, visual redesign,
 
 > Virtual cycling sensor. A native app that emulates a standard Cycling Speed and Cadence (CSCS) Bluetooth sensor — no dedicated hardware required.
 
-Remove the line “App Store listing currently appears as CSC Emulator.” The App Store listing name is **Bike Sensor Emulator**. Home screen: **Bike Sensor**. BLE advertised name: **CSCS Emulator** (localized; CSCS never translated).
+Remove the line “App Store listing currently appears as CSC Emulator.” The App Store listing name is **Bike Sensor Emulator**. Home screen: **Bike Sensor**.
 
 **What is it**
 
@@ -119,9 +119,9 @@ Remove the line “App Store listing currently appears as CSC Emulator.” The A
 
 **Result**
 
-> Bike Sensor Emulator is live on the App Store as Bike Sensor Emulator — free, no account required, no data collected. It is published under Tallman Software and available at apps.apple.com. Nearby devices see the BLE peripheral as CSCS Emulator (localized; CSCS never translated). The home-screen label is Bike Sensor.
+> Bike Sensor Emulator is live on the App Store as Bike Sensor Emulator — free, no account required, no data collected. It is published under Tallman Software and available at apps.apple.com. The home-screen label is Bike Sensor.
 
-**Must include:** CSCS (not CSC) for the Bluetooth service; App Store name Bike Sensor Emulator; home-screen name Bike Sensor; BLE name CSCS Emulator; iPad-on-Mac; free / no data collected; UI localized in the ten languages listed (English plus nine translations).
+**Must include:** CSCS (not CSC) for the Bluetooth service; App Store name Bike Sensor Emulator; home-screen name Bike Sensor; iPad-on-Mac; free / no data collected; UI localized in the ten languages listed (English plus nine translations).
 
 **Must not claim:** that the App Store listing still appears as CSC Emulator; ANT+; multiple concurrent sensors; FTMS.
 

@@ -4,7 +4,7 @@ A BLE Cycling Speed and Cadence Service (CSCS) emulator for iOS and iPadOS, buil
 
 ## Overview
 
-Bike Sensor Emulator simulates a Bluetooth Low Energy cycling speed and cadence sensor, allowing developers, testers, and users to test CSCS-compatible apps without dedicated hardware. The app advertises itself as a standard BLE peripheral (localized name; always includes **CSCS**) and publishes simulated measurement data according to the Bluetooth SIG CSCS specification.
+Bike Sensor Emulator simulates a Bluetooth Low Energy cycling speed and cadence sensor, allowing developers, testers, and users to test CSCS-compatible apps without dedicated hardware. The app advertises itself as a standard BLE peripheral and publishes simulated measurement data according to the Bluetooth SIG CSCS specification.
 
 ## Supported Languages
 
@@ -74,11 +74,10 @@ User-controlled speed and cadence. All visible sliders are enabled. Values remai
 
 ## BLE Behavior
 
-- **Advertised name:** Localized; always includes `CSCS` (English: `CSCS Emulator`)
 - **Service:** Cycling Speed and Cadence Service (Bluetooth SIG standard)
 - **Published data:** Only the metrics selected during configuration (speed only, cadence only, or both)
 - **Connections:** At most one BLE central at a time; additional connection requests are rejected
-- **Background (iOS / iPadOS):** Continues advertising while backgrounded; the local name may be omitted from advertisement packets per CoreBluetooth behavior
+- **Background (iOS / iPadOS):** Continues advertising while backgrounded; iOS may move the service UUID to the overflow area, and centrals scanning for the CSCS service still find it.
 
 ## Architecture
 

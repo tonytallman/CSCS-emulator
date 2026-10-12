@@ -208,11 +208,11 @@ Treat HTTP 404 or a missing Featured project section as findings. Do not fall ba
 Extract **factual claims** only (ignore marketing tone). Verify against:
 
 - [README.md](../../README.md) — name, platforms, features, BLE advertised name, architecture
-- Code — `AppInfo.title`, `CFBundleDisplayName`, `CSCSIdentifiers.advertisedLocalName`, `SimulatorRanges`, Random-mode behavior, type names (`CSCPeripheralManager`, `SimulationEngine`, `AppContainer`, etc.)
+- Code — `AppInfo.title`, `CFBundleDisplayName`, `SimulatorRanges`, Random-mode behavior, type names (`CSCPeripheralManager`, `SimulationEngine`, `AppContainer`, etc.)
 - [documentation/PRIVACY_POLICY.md](../../documentation/PRIVACY_POLICY.md) — free / no data collected
 - Step 5 **What's New** — user-visible changes the site copy does not yet reflect
 
-Typical claim buckets: product name, platforms, App Store vs BLE name (“CSC Emulator” / “CSCS Emulator”), slider ranges (0–50 mph, 0–200 rpm), Random ~90 rpm, one central, background advertising, architecture type names, privacy.
+Typical claim buckets: product name, platforms, App Store vs BLE name (no BLE local name; centrals find the emulator by the CSCS service), slider ranges (0–50 mph, 0–200 rpm), Random ~90 rpm, one central, background advertising, architecture type names, privacy.
 
 #### Write the brief (only when updates are needed)
 
@@ -231,7 +231,7 @@ Required document structure:
    - Prefer the **Proposed copy** blocks; adapt only to match surrounding voice.
 
 2. **Canonical facts** — source-of-truth table (no repo references). Include at least:
-   - Product name (`Bike Sensor Emulator`), home-screen name (`Bike Sensor`), BLE advertised name (localized; English `CSCS Emulator`; **CSCS** never translated)
+   - Product name (`Bike Sensor Emulator`), home-screen name (`Bike Sensor`), BLE advertised name: none (centrals find it by the CSCS service)
    - App Store listing name if it still differs from the product name
    - Platforms (iPhone, iPad, Apple Silicon Mac via iPad app)
    - Slider ranges (0–50 mph, 0–200 rpm), Random mode (~90 rpm, speed derived)

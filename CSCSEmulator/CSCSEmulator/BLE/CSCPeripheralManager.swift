@@ -143,7 +143,6 @@ final class CSCPeripheralManager: NSObject {
         guard let peripheralManager else { return }
 
         peripheralManager.startAdvertising([
-            CBAdvertisementDataLocalNameKey: CSCSIdentifiers.advertisedLocalName,
             CBAdvertisementDataServiceUUIDsKey: [CSCSIdentifiers.serviceUUID],
         ])
     }
