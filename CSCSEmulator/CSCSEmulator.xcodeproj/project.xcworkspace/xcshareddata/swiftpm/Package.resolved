@@ -1,0 +1,15 @@
+{
+  "originHash" : "0b0d0f4cb2ba6da4507bca2dfabe14ecfca1888f88562047fff208140021ee6f",
+  "pins" : [
+    {
+      "identity" : "bluetoothbikesensorswift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/tonytallman/BluetoothBikeSensorSwift.git",
+      "state" : {
+        "revision" : "e437b3fb010ea96a0a4832bd5dc6e59ae99379e3",
+        "version" : "1.1.0"
+      }
+    }
+  ],
+  "version" : 3
+}
