@@ -439,7 +439,7 @@ private final class FakeServerSlot: @unchecked Sendable {
 private final class PausedNotifySleep {
     private var waiters: [CheckedContinuation<Void, Never>] = []
 
-    func sleep(for duration: Duration) async throws {
+    func sleep(for _: Duration) async throws {
         try Task.checkCancellation()
         await withCheckedContinuation { continuation in
             waiters.append(continuation)
