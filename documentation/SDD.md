@@ -100,7 +100,7 @@ Dependencies are constructed and wired at a single composition root using a code
 final class AppContainer {
     private let appStateStore: AppStateStore
     private let simulationEngine: SimulationEngine
-    private let peripheralManager: CSCPeripheralManager
+    private let broadcaster: MeasurementBroadcaster
 
     init() { /* construct shared collaborators */ }
 
@@ -118,7 +118,7 @@ Rationale:
 
 ### Lifetimes
 
-Long-lived collaborators (`AppStateStore`, `SimulationEngine`, `CSCPeripheralManager`) are stored properties on `AppContainer` so they can be shared (for example, `AppStateStore` is shared by all view models for navigation state, and the simulation engine is shared by the running view model and the BLE peripheral manager).
+Long-lived collaborators (`AppStateStore`, `SimulationEngine`, `MeasurementBroadcaster`) are stored properties on `AppContainer` so they can be shared (for example, `AppStateStore` is shared by all view models for navigation state, and the simulation engine is shared by the running view model and the measurement broadcaster).
 
 ### Injection Rules
 
@@ -140,7 +140,8 @@ Long-lived collaborators (`AppStateStore`, `SimulationEngine`, `CSCPeripheralMan
 
 ## BLE Framework
 
-* CoreBluetooth
+* CoreBluetooth (Bluetooth state monitoring in the app)
+* [BluetoothBikeSensorSwift](https://github.com/tonytallman/BluetoothBikeSensorSwift) `CSCServer` (GATT peripheral and measurement encoding)
 
 ## Concurrency
 
@@ -446,13 +447,12 @@ No automatic updates occur.
 * Accept central connections
 * Publish measurements
 * Track subscriptions
-* Enforce connection limits
 
 ---
 
 ## Device Name
 
-Advertised local name is localized to the device language. Every locale includes the untranslated Bluetooth SIG acronym **CSCS** plus a localized equivalent of “Emulator.” English is `CSCS Emulator`.
+No local name is advertised (PDR 0001).
 
 ---
 
@@ -470,34 +470,15 @@ The implementation shall follow the Bluetooth SIG CSCS specification.
 
 ## Measurement Characteristic
 
-Measurement packets shall be generated from the current simulator vitals (speed, cadence, and capability flags) exposed by the active `SimulatorState`.
-
-The packet encoder shall be isolated from BLE transport logic.
+`RevolutionCounters` turns vitals into cumulative wheel and crank counts; `CSCServer` encodes the packet.
 
 ---
 
 ## Flag Selection
 
-### Speed Only
+The CSC Feature bits follow the configuration. Each measurement's flags follow the halves that advanced on that tick: wheel only `0x01`, crank only `0x02`, both `0x03` (PDR 0004).
 
-```text
-Wheel Data Present = true
-Crank Data Present = false
-```
-
-### Cadence Only
-
-```text
-Wheel Data Present = false
-Crank Data Present = true
-```
-
-### Speed + Cadence
-
-```text
-Wheel Data Present = true
-Crank Data Present = true
-```
+When speed is enabled, the SC Control Point characteristic is present; Set Cumulative Value responds with Operation Failed until phase 2 (PDR 0003).
 
 ---
 
@@ -505,27 +486,13 @@ Crank Data Present = true
 
 ## Supported Connections
 
-Maximum simultaneous central connections:
-
-```text
-1
-```
+All subscribing centrals.
 
 ---
 
 ## Connection Policy
 
-If no central is connected:
-
-```text
-accept connection
-```
-
-If a central is already connected:
-
-```text
-reject additional connection
-```
+Accept every connection; notify every subscriber (PDR 0002).
 
 ---
 
@@ -539,7 +506,7 @@ Connection status display is a future enhancement. The running screen is not req
 
 The app declares the `bluetooth-peripheral` background mode on iPhone and iPad so advertising and measurement notifications can continue while the app is backgrounded.
 
-When backgrounded, iOS may stop including the localized advertised local name in advertisement packets and instead expose the CSCS service UUID in the overflow area. Centrals that scan by service UUID remain able to discover the emulator.
+The emulator sets no local name. In the background, iOS may move the service UUID to the overflow area; centrals that scan for the CSCS service UUID can still discover and connect to the emulator.
 
 State restoration (`CBPeripheralManagerOptionRestoreIdentifierKey`) is not implemented in the initial release.
 
@@ -547,7 +514,7 @@ State restoration (`CBPeripheralManagerOptionRestoreIdentifierKey`) is not imple
 
 # 12. Localization
 
-The app UI, home-screen name, BLE advertised local name, and Bluetooth permission prompt are localized using Xcode String Catalogs (`Localizable.xcstrings`, `InfoPlist.xcstrings`).
+The app UI, home-screen name, and Bluetooth permission prompt are localized using Xcode String Catalogs (`Localizable.xcstrings`, `InfoPlist.xcstrings`).
 
 Supported languages: English (development language), Spanish, Simplified Chinese, Traditional Chinese, Japanese, German, French, Portuguese (Brazil), Korean, and Italian.
 
@@ -555,33 +522,15 @@ The Bluetooth SIG acronym **CSCS** is never translated. App Store listing metada
 
 ---
 
-# 13. CSCS Encoder
+# 13. Revolution Counters
 
 ## Responsibilities
 
-Convert simulator state into valid CSCS measurement packets.
-
-The encoder converts `Speed` and `Cadence` measurements to the raw integer wheel and crank units required by the CSCS packet format. This conversion happens at the encoder boundary; the encoder remains free of CoreBluetooth dependencies.
-
-### Inputs
-
-```swift
-any SimulatorState
-```
-
-### Outputs
-
-```swift
-Data
-```
-
-The encoder should contain no CoreBluetooth dependencies.
-
-This allows independent unit testing.
+Convert simulator vitals into cumulative wheel and crank revolution samples for `CSCServer`. The counter logic has no CoreBluetooth dependencies and is unit tested independently.
 
 ---
 
-# 13. Error Handling
+# 14. Error Handling
 
 Errors shall be surfaced through a shared application error model.
 
@@ -601,7 +550,7 @@ Errors should be user-visible and logged.
 
 ---
 
-# 14. Suggested Project Structure
+# 15. Suggested Project Structure
 
 ```text
 CSCSEmulator/
@@ -636,20 +585,29 @@ CSCSEmulator/
 │   └── RandomCadenceGenerator.swift
 │
 ├── BLE/
-│   ├── CSCPeripheralManager.swift
-│   ├── CSCSMeasurementEncoder.swift
-│   └── BLEConnectionManager.swift
+│   ├── MeasurementBroadcaster.swift
+│   ├── MeasurementBroadcasting.swift
+│   ├── MeasurementServer.swift
+│   ├── RevolutionCounters.swift
+│   ├── RevolutionAccumulator.swift
+│   ├── CoreBluetoothStateMonitor.swift
+│   ├── BluetoothStateMonitoring.swift
+│   ├── BluetoothAvailabilityMapper.swift
+│   └── BluetoothStateMapper.swift
+│
+├── Adaptors/
+│   └── CSCServer/
+│       └── Server+MeasurementServer.swift
 │
 └── Resources/
 ```
 
 ---
 
-# 15. Future Enhancements
+# 16. Future Enhancements
 
 The architecture should support future additions including:
 
-* Multiple central connections
 * Multiple virtual sensors
 * Sensor battery simulation
 * GPX route playback

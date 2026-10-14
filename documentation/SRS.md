@@ -103,7 +103,7 @@ These ranges shall accommodate Random-mode derived speed (200 RPM corresponds to
 
 ### 4.1 Device Name
 
-While advertising, the BLE device local name shall be localized to the device language. In every locale it shall include the untranslated Bluetooth SIG acronym **CSCS** plus a localized equivalent of “Emulator.” English is `CSCS Emulator` (for example, Spanish `Emulador CSCS`, German `CSCS-Emulator`). The acronym **CSCS** shall never be translated.
+The emulator shall not set an advertised local name. Centrals discover it by the CSCS service UUID (PDR 0001).
 
 ### 4.2 Advertising
 
@@ -121,12 +121,12 @@ Examples:
 | Cadence only    | Cadence           |
 | Speed + Cadence | Speed and Cadence |
 
+While any central is subscribed, the emulator shall send no more than one measurement per second. Each measurement carries only the metrics whose revolution count advanced since the previous one, and none is sent when neither advanced (PDR 0004). When speed is enabled, the SC Control Point is present and Set Cumulative Value is rejected with Operation Failed (PDR 0003).
+
 ### 4.4 Central Connections
 
-The emulator shall support at most one connected BLE central device at a time.
+The emulator shall serve every central that connects and subscribes; each receives the same measurements (PDR 0002).
 
-- If no central is connected, connection requests shall be accepted.
-- If a central is already connected, additional connection requests shall be rejected.
 - Connection status display is a future enhancement; see section 8.
 - The identity of the connected central is not required to be displayed.
 
@@ -134,7 +134,7 @@ The emulator shall support at most one connected BLE central device at a time.
 
 On iPhone and iPad, while the emulator is running, the application shall continue advertising the CSCS service and publishing measurements when moved to the background.
 
-When backgrounded on iOS, CoreBluetooth may omit the advertised local name and expose the service UUID in the overflow area instead. This is expected platform behavior and shall not prevent centrals from discovering and connecting to the emulator.
+The emulator sets no local name. In the background, iOS may move the service UUID to the overflow area; centrals that scan for the CSCS service UUID can still discover and connect to the emulator.
 
 ---
 

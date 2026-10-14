@@ -18,5 +18,3 @@ protocol MeasurementBroadcasting: AnyObject {
     func start(configuration: SimulatorConfiguration)
     func stop()
 }
-
-extension CSCPeripheralManager: MeasurementBroadcasting {}

@@ -16,12 +16,12 @@ Prefer the **Proposed copy** blocks; adapt only to match surrounding voice.
 | --- | --- |
 | Product name | Bike Sensor Emulator |
 | Home-screen name | Bike Sensor |
-| BLE advertised name | Localized; English is `CSCS Emulator`. The acronym **CSCS** is never translated |
+| BLE advertised name | None; centrals find it by the CSCS service |
 | App Store listing name | Bike Sensor Emulator (not “CSC Emulator”) |
 | Platforms | iPhone, iPad, and Apple Silicon Mac (iPad app on Mac) |
 | Manual slider ranges | Speed 0–50 mph; cadence 0–200 rpm |
 | Random mode | Cadence varies around ~90 rpm; speed is derived from cadence |
-| BLE connections | One central at a time |
+| BLE connections | Every central that subscribes |
 | Background | Continues advertising on iPhone and iPad while the app runs in the background |
 | Price / privacy | Free; no data collected |
 | GitHub | https://github.com/tonytallman/CSCS-emulator |
@@ -105,7 +105,7 @@ Out of scope: home services/about, contact, unrelated projects, visual redesign,
 
 > Virtual cycling sensor. A native app that emulates a standard Cycling Speed and Cadence (CSCS) Bluetooth sensor — no dedicated hardware required.
 
-Remove the line “App Store listing currently appears as CSC Emulator.” The App Store listing name is **Bike Sensor Emulator**. Home screen: **Bike Sensor**. BLE advertised name: **CSCS Emulator** (localized; CSCS never translated).
+Remove the line “App Store listing currently appears as CSC Emulator.” The App Store listing name is **Bike Sensor Emulator**. Home screen: **Bike Sensor**.
 
 **What is it**
 
@@ -113,15 +113,15 @@ Remove the line “App Store listing currently appears as CSC Emulator.” The A
 >
 > The app is free, collects no data, and runs as a single native codebase on iPhone, iPad, and Apple Silicon Mac (iPad app on Mac). The interface is localized in English, Spanish, Simplified Chinese, Traditional Chinese, Japanese, German, French, Portuguese (Brazil), Korean, and Italian. The Bluetooth SIG acronym CSCS is never translated.
 
-**Engineering challenge** — keep the existing architecture paragraphs. Type names `CSCPeripheralManager`, `CSCSMeasurementEncoder`, `CentralSubscriptionTracker`, `SimulationEngine`, and `AppContainer` are still accurate. No change required unless surrounding copy still says CSC instead of CSCS.
+**Engineering challenge** — update architecture type names to `MeasurementBroadcaster`, `RevolutionCounters`, `SimulationEngine`, and `AppContainer`.
 
-**How it behaves** — current bullets are accurate (metrics lock, Random ~90 rpm, Manual 0–50 mph / 0–200 rpm, one central, background advertising, Bluetooth errors). No change required.
+**How it behaves** — update connection behavior to every central that subscribes; other bullets remain accurate (metrics lock, Random ~90 rpm, Manual 0–50 mph / 0–200 rpm, background advertising, Bluetooth errors).
 
 **Result**
 
-> Bike Sensor Emulator is live on the App Store as Bike Sensor Emulator — free, no account required, no data collected. It is published under Tallman Software and available at apps.apple.com. Nearby devices see the BLE peripheral as CSCS Emulator (localized; CSCS never translated). The home-screen label is Bike Sensor.
+> Bike Sensor Emulator is live on the App Store as Bike Sensor Emulator — free, no account required, no data collected. It is published under Tallman Software and available at apps.apple.com. The home-screen label is Bike Sensor.
 
-**Must include:** CSCS (not CSC) for the Bluetooth service; App Store name Bike Sensor Emulator; home-screen name Bike Sensor; BLE name CSCS Emulator; iPad-on-Mac; free / no data collected; UI localized in the ten languages listed (English plus nine translations).
+**Must include:** CSCS (not CSC) for the Bluetooth service; App Store name Bike Sensor Emulator; home-screen name Bike Sensor; iPad-on-Mac; free / no data collected; UI localized in the ten languages listed (English plus nine translations).
 
 **Must not claim:** that the App Store listing still appears as CSC Emulator; ANT+; multiple concurrent sensors; FTMS.
 

@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		EADDA9D22FD9C21E00A2D5D1 /* CSCServer in Frameworks */ = {isa = PBXBuildFile; productRef = EADDA9D12FD9C21E00A2D5D1 /* CSCServer */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		EADDA9922FD9C21E00A2D5D1 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -52,6 +56,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EADDA9D22FD9C21E00A2D5D1 /* CSCServer in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -112,6 +117,7 @@
 			);
 			name = CSCSEmulator;
 			packageProductDependencies = (
+				EADDA9D12FD9C21E00A2D5D1 /* CSCServer */,
 			);
 			productName = CSCSEmulator;
 			productReference = EADDA9842FD9C21D00A2D5D1 /* CSCSEmulator.app */;
@@ -208,6 +214,9 @@
 			productRefGroup = EADDA9852FD9C21D00A2D5D1 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
+			packageReferences = (
+				EADDA9D02FD9C21E00A2D5D1 /* XCRemoteSwiftPackageReference "BluetoothBikeSensorSwift" */,
+			);
 			targets = (
 				EADDA9832FD9C21D00A2D5D1 /* CSCSEmulator */,
 				EADDA9902FD9C21E00A2D5D1 /* CSCSEmulatorTests */,
@@ -612,6 +621,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		EADDA9D02FD9C21E00A2D5D1 /* XCRemoteSwiftPackageReference "BluetoothBikeSensorSwift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/tonytallman/BluetoothBikeSensorSwift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.1.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		EADDA9D12FD9C21E00A2D5D1 /* CSCServer */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = EADDA9D02FD9C21E00A2D5D1 /* XCRemoteSwiftPackageReference "BluetoothBikeSensorSwift" */;
+			productName = CSCServer;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = EADDA97C2FD9C21D00A2D5D1 /* Project object */;
 }
