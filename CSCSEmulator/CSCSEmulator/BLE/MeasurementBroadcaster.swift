@@ -42,11 +42,9 @@ final class MeasurementBroadcaster: MeasurementBroadcasting {
         bluetooth.onStateChange = { [weak self] in self?.handleStateChange($0) }
     }
 
-    nonisolated deinit {
-        MainActor.assumeIsolated {
-            runTask?.cancel()
-            notifyTask?.cancel()
-        }
+    isolated deinit {
+        runTask?.cancel()
+        notifyTask?.cancel()
     }
 
     func prepare() {

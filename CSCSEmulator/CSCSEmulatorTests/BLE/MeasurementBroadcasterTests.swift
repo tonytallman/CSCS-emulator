@@ -419,13 +419,11 @@ private final class FakeServerSlot {
     }
 
     func claim() {
-        let alreadyClaimed = occupied
-        if !alreadyClaimed {
-            occupied = true
-        }
-        if alreadyClaimed {
+        if occupied {
             Issue.record("FakeServerSlot already claimed")
+            return
         }
+        occupied = true
     }
 
     func release() {
@@ -553,21 +551,14 @@ private final class FakeMeasurementServer: MeasurementServer {
         case .succeed:
             return
         case let .fail(error):
-            slot.release()
             throw error
         case .suspendUntilCancelled:
-            do {
-                try await Task.sleep(for: .seconds(3600))
-            } catch {
-                slot.release()
-                throw error
-            }
+            try await Task.sleep(for: .seconds(3600))
         case .holdUntilReleased:
             await withCheckedContinuation { continuation in
                 releaseContinuations.append(continuation)
             }
             if let failOnRelease {
-                slot.release()
                 throw failOnRelease
             }
             return
